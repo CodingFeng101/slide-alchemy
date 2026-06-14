@@ -1,0 +1,38 @@
+[
+  {
+    "id": "green_small_person",
+    "bbox": [
+      0,
+      0,
+      836,
+      470
+    ]
+  },
+  {
+    "id": "green_small_group",
+    "bbox": [
+      836,
+      0,
+      836,
+      470
+    ]
+  },
+  {
+    "id": "green_small_books",
+    "bbox": [
+      0,
+      470,
+      836,
+      471
+    ]
+  },
+  {
+    "id": "green_small_clipboard",
+    "bbox": [
+      836,
+      470,
+      836,
+      471
+    ]
+  }
+]

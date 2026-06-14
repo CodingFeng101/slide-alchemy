@@ -1,0 +1,1176 @@
+{
+  "ref_width": 1672,
+  "ref_height": 941,
+  "slide_width_in": 13.333333,
+  "slide_height_in": 7.5,
+  "slides": [
+    {
+      "base": "../base/slide_001_base.png",
+      "geometry": [
+        {
+          "id": "s1_title_underline",
+          "kind": "line",
+          "bbox_px": [
+            112,
+            160,
+            77,
+            9
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_card_01",
+          "kind": "round_rect",
+          "bbox_px": [
+            96,
+            248,
+            574,
+            236
+          ],
+          "fill": "#FFFFFF",
+          "line": "#D5E4FA",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_badge_01",
+          "kind": "oval",
+          "bbox_px": [
+            118,
+            260,
+            48,
+            48
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_icon_bg_01",
+          "kind": "oval",
+          "bbox_px": [
+            148,
+            280,
+            176,
+            176
+          ],
+          "fill": "#E8F1FF",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_divider_01",
+          "kind": "line",
+          "bbox_px": [
+            356,
+            284,
+            2,
+            165
+          ],
+          "fill": "#C4D8F6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_01_0",
+          "kind": "oval",
+          "bbox_px": [
+            397,
+            355,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_01_1",
+          "kind": "oval",
+          "bbox_px": [
+            397,
+            397,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_01_2",
+          "kind": "oval",
+          "bbox_px": [
+            397,
+            439,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_card_02",
+          "kind": "round_rect",
+          "bbox_px": [
+            698,
+            248,
+            504,
+            236
+          ],
+          "fill": "#FFFFFF",
+          "line": "#D5E4FA",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_badge_02",
+          "kind": "oval",
+          "bbox_px": [
+            720,
+            260,
+            48,
+            48
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_icon_bg_02",
+          "kind": "oval",
+          "bbox_px": [
+            750,
+            280,
+            176,
+            176
+          ],
+          "fill": "#E8F1FF",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_divider_02",
+          "kind": "line",
+          "bbox_px": [
+            930,
+            284,
+            2,
+            165
+          ],
+          "fill": "#C4D8F6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_02_0",
+          "kind": "oval",
+          "bbox_px": [
+            968,
+            355,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_02_1",
+          "kind": "oval",
+          "bbox_px": [
+            968,
+            397,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_02_2",
+          "kind": "oval",
+          "bbox_px": [
+            968,
+            439,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_card_03",
+          "kind": "round_rect",
+          "bbox_px": [
+            96,
+            503,
+            574,
+            232
+          ],
+          "fill": "#FFFFFF",
+          "line": "#D5E4FA",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_badge_03",
+          "kind": "oval",
+          "bbox_px": [
+            118,
+            515,
+            48,
+            48
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_icon_bg_03",
+          "kind": "oval",
+          "bbox_px": [
+            148,
+            535,
+            176,
+            176
+          ],
+          "fill": "#E8F1FF",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_divider_03",
+          "kind": "line",
+          "bbox_px": [
+            356,
+            539,
+            2,
+            165
+          ],
+          "fill": "#C4D8F6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_03_0",
+          "kind": "oval",
+          "bbox_px": [
+            397,
+            610,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_03_1",
+          "kind": "oval",
+          "bbox_px": [
+            397,
+            652,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_03_2",
+          "kind": "oval",
+          "bbox_px": [
+            397,
+            694,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_card_04",
+          "kind": "round_rect",
+          "bbox_px": [
+            698,
+            503,
+            504,
+            232
+          ],
+          "fill": "#FFFFFF",
+          "line": "#D5E4FA",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_badge_04",
+          "kind": "oval",
+          "bbox_px": [
+            720,
+            515,
+            48,
+            48
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_icon_bg_04",
+          "kind": "oval",
+          "bbox_px": [
+            750,
+            535,
+            176,
+            176
+          ],
+          "fill": "#E8F1FF",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_divider_04",
+          "kind": "line",
+          "bbox_px": [
+            930,
+            539,
+            2,
+            165
+          ],
+          "fill": "#C4D8F6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_04_0",
+          "kind": "oval",
+          "bbox_px": [
+            968,
+            610,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_04_1",
+          "kind": "oval",
+          "bbox_px": [
+            968,
+            652,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bullet_04_2",
+          "kind": "oval",
+          "bbox_px": [
+            968,
+            694,
+            10,
+            10
+          ],
+          "fill": "#1267E6",
+          "line": "none",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bottom_bar",
+          "kind": "round_rect",
+          "bbox_px": [
+            97,
+            757,
+            1144,
+            108
+          ],
+          "fill": "#F7FBFF",
+          "line": "#B9D5FA",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bottom_circle_0",
+          "kind": "oval",
+          "bbox_px": [
+            150,
+            772,
+            80,
+            80
+          ],
+          "fill": "#1368E8",
+          "line": "#FFFFFF",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bottom_circle_1",
+          "kind": "oval",
+          "bbox_px": [
+            560,
+            772,
+            80,
+            80
+          ],
+          "fill": "#1368E8",
+          "line": "#FFFFFF",
+          "line_width": 1.0
+        },
+        {
+          "id": "s1_bottom_circle_2",
+          "kind": "oval",
+          "bbox_px": [
+            958,
+            772,
+            80,
+            80
+          ],
+          "fill": "#1368E8",
+          "line": "#FFFFFF",
+          "line_width": 1.0
+        }
+      ],
+      "images": [
+        {
+          "id": "s1_blue_icon_database_cloud",
+          "path": "../assets/png/blue_main_icons/blue_icon_database_cloud.png",
+          "bbox_px": [
+            156,
+            289,
+            164,
+            156
+          ]
+        },
+        {
+          "id": "s1_blue_icon_teaching_monitor",
+          "path": "../assets/png/blue_main_icons/blue_icon_teaching_monitor.png",
+          "bbox_px": [
+            754,
+            290,
+            140,
+            156
+          ]
+        },
+        {
+          "id": "s1_blue_icon_chat",
+          "path": "../assets/png/blue_main_icons/blue_icon_chat.png",
+          "bbox_px": [
+            162,
+            548,
+            148,
+            144
+          ]
+        },
+        {
+          "id": "s1_blue_icon_security_shield",
+          "path": "../assets/png/blue_main_icons/blue_icon_security_shield.png",
+          "bbox_px": [
+            752,
+            542,
+            142,
+            158
+          ]
+        },
+        {
+          "id": "s1_blue_bottom_building",
+          "path": "../assets/png/blue_bottom_icons/blue_bottom_building.png",
+          "bbox_px": [
+            167,
+            789,
+            48,
+            48
+          ]
+        },
+        {
+          "id": "s1_blue_bottom_grid",
+          "path": "../assets/png/blue_bottom_icons/blue_bottom_grid.png",
+          "bbox_px": [
+            577,
+            789,
+            48,
+            48
+          ]
+        },
+        {
+          "id": "s1_blue_bottom_chart",
+          "path": "../assets/png/blue_bottom_icons/blue_bottom_chart.png",
+          "bbox_px": [
+            975,
+            789,
+            48,
+            48
+          ]
+        }
+      ],
+      "texts": [
+        {
+          "id": "s1_title",
+          "text": "智慧校园核心模块",
+          "bbox_px": [
+            110,
+            62,
+            650,
+            86
+          ],
+          "bbox_frac": [
+            0.065789,
+            0.065887,
+            0.388756,
+            0.091392
+          ],
+          "font_size_pt": 37,
+          "color": "#0B348F",
+          "bold": true,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": "large heavy title"
+        },
+        {
+          "id": "s1_subtitle",
+          "text": "围绕教学、管理与服务构建数字化校园体系",
+          "bbox_px": [
+            112,
+            185,
+            760,
+            44
+          ],
+          "bbox_frac": [
+            0.066986,
+            0.196599,
+            0.454545,
+            0.046759
+          ],
+          "font_size_pt": 19,
+          "color": "#17285A",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_num_01",
+          "text": "01",
+          "bbox_px": [
+            118,
+            267,
+            50,
+            28
+          ],
+          "bbox_frac": [
+            0.070574,
+            0.283741,
+            0.029904,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#FFFFFF",
+          "bold": true,
+          "align": "center",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_card_title_01",
+          "text": "数据平台",
+          "bbox_px": [
+            392,
+            286,
+            185,
+            42
+          ],
+          "bbox_frac": [
+            0.23445,
+            0.303932,
+            0.110646,
+            0.044633
+          ],
+          "font_size_pt": 23,
+          "color": "#073AA3",
+          "bold": true,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_01_0",
+          "text": "统一数据汇聚",
+          "bbox_px": [
+            424,
+            348,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.253589,
+            0.369819,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_01_1",
+          "text": "实时分析看板",
+          "bbox_px": [
+            424,
+            390,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.253589,
+            0.414453,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_01_2",
+          "text": "多端协同共享",
+          "bbox_px": [
+            424,
+            432,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.253589,
+            0.459086,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_num_02",
+          "text": "02",
+          "bbox_px": [
+            720,
+            267,
+            50,
+            28
+          ],
+          "bbox_frac": [
+            0.430622,
+            0.283741,
+            0.029904,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#FFFFFF",
+          "bold": true,
+          "align": "center",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_card_title_02",
+          "text": "智慧教学",
+          "bbox_px": [
+            963,
+            286,
+            185,
+            42
+          ],
+          "bbox_frac": [
+            0.575957,
+            0.303932,
+            0.110646,
+            0.044633
+          ],
+          "font_size_pt": 23,
+          "color": "#073AA3",
+          "bold": true,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_02_0",
+          "text": "课堂互动提升",
+          "bbox_px": [
+            995,
+            348,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.595096,
+            0.369819,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_02_1",
+          "text": "学习路径推荐",
+          "bbox_px": [
+            995,
+            390,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.595096,
+            0.414453,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_02_2",
+          "text": "教学质量反馈",
+          "bbox_px": [
+            995,
+            432,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.595096,
+            0.459086,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_num_03",
+          "text": "03",
+          "bbox_px": [
+            118,
+            522,
+            50,
+            28
+          ],
+          "bbox_frac": [
+            0.070574,
+            0.554729,
+            0.029904,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#FFFFFF",
+          "bold": true,
+          "align": "center",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_card_title_03",
+          "text": "校园服务",
+          "bbox_px": [
+            392,
+            541,
+            185,
+            42
+          ],
+          "bbox_frac": [
+            0.23445,
+            0.57492,
+            0.110646,
+            0.044633
+          ],
+          "font_size_pt": 23,
+          "color": "#073AA3",
+          "bold": true,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_03_0",
+          "text": "智能问答助手",
+          "bbox_px": [
+            424,
+            603,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.253589,
+            0.640808,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_03_1",
+          "text": "业务流程优化",
+          "bbox_px": [
+            424,
+            645,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.253589,
+            0.685441,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_03_2",
+          "text": "线上办事支持",
+          "bbox_px": [
+            424,
+            687,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.253589,
+            0.730074,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_num_04",
+          "text": "04",
+          "bbox_px": [
+            720,
+            522,
+            50,
+            28
+          ],
+          "bbox_frac": [
+            0.430622,
+            0.554729,
+            0.029904,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#FFFFFF",
+          "bold": true,
+          "align": "center",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_card_title_04",
+          "text": "安全管理",
+          "bbox_px": [
+            963,
+            541,
+            185,
+            42
+          ],
+          "bbox_frac": [
+            0.575957,
+            0.57492,
+            0.110646,
+            0.044633
+          ],
+          "font_size_pt": 23,
+          "color": "#073AA3",
+          "bold": true,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_04_0",
+          "text": "风险预警",
+          "bbox_px": [
+            995,
+            603,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.595096,
+            0.640808,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_04_1",
+          "text": "设备联动监测",
+          "bbox_px": [
+            995,
+            645,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.595096,
+            0.685441,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bullet_text_04_2",
+          "text": "应急响应跟踪",
+          "bbox_px": [
+            995,
+            687,
+            185,
+            28
+          ],
+          "bbox_frac": [
+            0.595096,
+            0.730074,
+            0.110646,
+            0.029756
+          ],
+          "font_size_pt": 15,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bottom_title_0",
+          "text": "基础建设",
+          "bbox_px": [
+            260,
+            785,
+            140,
+            28
+          ],
+          "bbox_frac": [
+            0.155502,
+            0.834219,
+            0.083732,
+            0.029756
+          ],
+          "font_size_pt": 18,
+          "color": "#073AA3",
+          "bold": true,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bottom_sub_0",
+          "text": "夯实数字底座",
+          "bbox_px": [
+            260,
+            820,
+            160,
+            26
+          ],
+          "bbox_frac": [
+            0.155502,
+            0.871413,
+            0.095694,
+            0.02763
+          ],
+          "font_size_pt": 12,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bottom_title_1",
+          "text": "场景应用",
+          "bbox_px": [
+            670,
+            785,
+            140,
+            28
+          ],
+          "bbox_frac": [
+            0.400718,
+            0.834219,
+            0.083732,
+            0.029756
+          ],
+          "font_size_pt": 18,
+          "color": "#073AA3",
+          "bold": true,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bottom_sub_1",
+          "text": "赋能教学与管理",
+          "bbox_px": [
+            670,
+            820,
+            160,
+            26
+          ],
+          "bbox_frac": [
+            0.400718,
+            0.871413,
+            0.095694,
+            0.02763
+          ],
+          "font_size_pt": 12,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bottom_title_2",
+          "text": "持续优化",
+          "bbox_px": [
+            1068,
+            785,
+            140,
+            28
+          ],
+          "bbox_frac": [
+            0.638756,
+            0.834219,
+            0.083732,
+            0.029756
+          ],
+          "font_size_pt": 18,
+          "color": "#073AA3",
+          "bold": true,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bottom_sub_2",
+          "text": "数据驱动改进",
+          "bbox_px": [
+            1068,
+            820,
+            160,
+            26
+          ],
+          "bbox_frac": [
+            0.638756,
+            0.871413,
+            0.095694,
+            0.02763
+          ],
+          "font_size_pt": 12,
+          "color": "#15285D",
+          "bold": false,
+          "align": "left",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bottom_arrow_0",
+          "text": "→",
+          "bbox_px": [
+            450,
+            793,
+            48,
+            34
+          ],
+          "bbox_frac": [
+            0.269139,
+            0.842721,
+            0.028708,
+            0.036132
+          ],
+          "font_size_pt": 25,
+          "color": "#1267E6",
+          "bold": true,
+          "align": "center",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        },
+        {
+          "id": "s1_bottom_arrow_1",
+          "text": "→",
+          "bbox_px": [
+            860,
+            793,
+            48,
+            34
+          ],
+          "bbox_frac": [
+            0.514354,
+            0.842721,
+            0.028708,
+            0.036132
+          ],
+          "font_size_pt": 25,
+          "color": "#1267E6",
+          "bold": true,
+          "align": "center",
+          "font_family": "Microsoft YaHei",
+          "style_notes": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Slide Alchemy element_analysis",
+  "type": "object",
+  "required": ["ref_width", "ref_height", "components", "slides"],
+  "properties": {
+    "ref_width": { "type": "integer", "minimum": 1 },
+    "ref_height": { "type": "integer", "minimum": 1 },
+    "method_rules": { "type": "object" },
+    "components": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["category", "asset_plan", "reuse"],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["simple_geometry_svg_ooxml", "icon_png", "complex_png_whole"]
+          },
+          "asset_plan": {
+            "type": "string",
+            "enum": ["svg_to_ooxml", "generate_png_asset", "generate_png_whole"]
+          },
+          "reuse": { "type": "string" },
+          "svg_hint": { "type": "string" },
+          "png_hint": { "type": "string" },
+          "notes": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "slides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slide", "instances"],
+        "properties": {
+          "slide": { "type": "integer", "minimum": 1 },
+          "instances": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["component", "id", "bbox_px", "bbox_frac"],
+              "properties": {
+                "component": { "type": "string" },
+                "id": { "type": "string" },
+                "bbox_px": {
+                  "type": "array",
+                  "prefixItems": [
+                    { "type": "number" },
+                    { "type": "number" },
+                    { "type": "number", "exclusiveMinimum": 0 },
+                    { "type": "number", "exclusiveMinimum": 0 }
+                  ],
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "bbox_frac": {
+                  "type": "array",
+                  "prefixItems": [
+                    { "type": "number", "minimum": 0 },
+                    { "type": "number", "minimum": 0 },
+                    { "type": "number", "exclusiveMinimum": 0 },
+                    { "type": "number", "exclusiveMinimum": 0 }
+                  ],
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "transform": { "type": "string" },
+                "notes": { "type": "string" }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "png_asset_sheet_plan": { "type": "object" }
+  },
+  "additionalProperties": true
+}

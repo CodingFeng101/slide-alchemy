@@ -1,0 +1,38 @@
+[
+  {
+    "id": "green_small_folder",
+    "bbox": [
+      0,
+      0,
+      836,
+      470
+    ]
+  },
+  {
+    "id": "green_small_chat",
+    "bbox": [
+      836,
+      0,
+      836,
+      470
+    ]
+  },
+  {
+    "id": "green_small_peers",
+    "bbox": [
+      0,
+      470,
+      836,
+      471
+    ]
+  },
+  {
+    "id": "green_small_leaf",
+    "bbox": [
+      836,
+      470,
+      836,
+      471
+    ]
+  }
+]

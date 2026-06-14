@@ -1,0 +1,38 @@
+[
+  {
+    "id": "blue_icon_database_cloud",
+    "bbox": [
+      0,
+      0,
+      836,
+      470
+    ]
+  },
+  {
+    "id": "blue_icon_teaching_monitor",
+    "bbox": [
+      836,
+      0,
+      836,
+      470
+    ]
+  },
+  {
+    "id": "blue_icon_chat",
+    "bbox": [
+      0,
+      470,
+      836,
+      471
+    ]
+  },
+  {
+    "id": "blue_icon_security_shield",
+    "bbox": [
+      836,
+      470,
+      836,
+      471
+    ]
+  }
+]

@@ -1,0 +1,1368 @@
+{
+  "ref_width": 1672,
+  "ref_height": 941,
+  "method_rules": {
+    "base_grouping": {
+      "base_a": [
+        1
+      ],
+      "base_b": [
+        2
+      ]
+    },
+    "simple_geometry_not_in_png_sheet": true,
+    "png_sheets_only_for": [
+      "icon_png",
+      "complex_png_whole"
+    ]
+  },
+  "components": {
+    "blue_card_base": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "one rounded white card reused for four module cards",
+      "svg_hint": "rounded rectangle, white fill, light blue border/shadow"
+    },
+    "blue_num_badge": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "one blue circular number badge reused for 01-04",
+      "svg_hint": "blue circle with editable number text overlay"
+    },
+    "blue_icon_circle": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "one pale-blue circle behind each module icon",
+      "svg_hint": "large pale blue circle"
+    },
+    "blue_divider": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "thin vertical divider reused in all cards",
+      "svg_hint": "vertical light-blue line"
+    },
+    "blue_bottom_bar": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "one rounded bottom process container",
+      "svg_hint": "wide rounded translucent white rectangle with blue border"
+    },
+    "blue_bottom_circle": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "three repeated circular badges in process bar",
+      "svg_hint": "blue gradient-like circle approximated as solid blue with white border"
+    },
+    "blue_arrow": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "two process arrows",
+      "svg_hint": "right arrow line/chevron"
+    },
+    "blue_bottom_icon_building": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "bottom process icon for basic construction",
+      "png_hint": "white classical building pictogram, no text"
+    },
+    "blue_bottom_icon_grid": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "bottom process icon for scenario application",
+      "png_hint": "white four-square grid pictogram, no text"
+    },
+    "blue_bottom_icon_chart": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "bottom process icon for continuous optimization",
+      "png_hint": "white rising bar chart pictogram, no text"
+    },
+    "blue_icon_database_cloud": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "one main data platform icon",
+      "png_hint": "blue database cylinder with small white cloud, no text"
+    },
+    "blue_icon_teaching_monitor": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "one main teaching monitor and graduation cap icon",
+      "png_hint": "blue monitor outline with graduation cap, no text"
+    },
+    "blue_icon_chat": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "one main chat bubble icon",
+      "png_hint": "blue chat bubble with three white dots, no text"
+    },
+    "blue_icon_security_shield": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "one main shield lock icon",
+      "png_hint": "blue shield with white lock, no text"
+    },
+    "green_card_base": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "one tall rounded card reused four times",
+      "svg_hint": "white tall rounded rectangle with green border and subtle shadow"
+    },
+    "green_num_corner": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "one green rounded corner tab reused for 01-04",
+      "svg_hint": "green rounded corner label with editable number text overlay"
+    },
+    "green_icon_ring": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "one circular ring behind each main green icon",
+      "svg_hint": "two concentric circles, light green outer ring, green center"
+    },
+    "green_connector": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "dotted connector line and arrow circles between cards",
+      "svg_hint": "green dotted line with circular arrow badge"
+    },
+    "green_card_bottom_wave": {
+      "category": "simple_geometry_svg_ooxml",
+      "asset_plan": "svg_to_ooxml",
+      "reuse": "card bottom green wave decoration reused",
+      "svg_hint": "soft green curved wave at card bottom"
+    },
+    "green_decor_plant": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "low-opacity decorative plant at bottom of card 1",
+      "png_hint": "pale green plant decoration, no text"
+    },
+    "green_decor_gear": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "low-opacity decorative gear at bottom of card 2",
+      "png_hint": "pale green gear decoration, no text"
+    },
+    "green_decor_document": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "low-opacity decorative document at bottom of card 3",
+      "png_hint": "pale green document decoration, no text"
+    },
+    "green_decor_chart": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "low-opacity decorative growth chart at bottom of card 4",
+      "png_hint": "pale green growth chart decoration, no text"
+    },
+    "green_icon_course_book": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "one main book icon",
+      "png_hint": "white open book pictogram on green circular background, no text"
+    },
+    "green_icon_practice_tools": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "one main crossed wrench/screwdriver icon",
+      "png_hint": "white crossed tool pictogram on green circular background, no text"
+    },
+    "green_icon_presentation": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "one main presentation chart icon",
+      "png_hint": "white chart board pictogram on green circular background, no text"
+    },
+    "green_icon_growth_person": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "one main person star icon",
+      "png_hint": "white person and star pictogram on green circular background, no text"
+    },
+    "green_small_person": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "small person icon",
+      "png_hint": "white person pictogram on green circle"
+    },
+    "green_small_books": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "small stacked books icon",
+      "png_hint": "white stacked books pictogram on green circle"
+    },
+    "green_small_group": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "small group collaboration icon",
+      "png_hint": "white group pictogram on green circle"
+    },
+    "green_small_clipboard": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "small clipboard record icon",
+      "png_hint": "white clipboard pictogram on green circle"
+    },
+    "green_small_folder": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "small folder icon",
+      "png_hint": "white folder pictogram on green circle"
+    },
+    "green_small_chat": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "small chat message icon",
+      "png_hint": "white chat bubble pictogram on green circle"
+    },
+    "green_small_peers": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "small peer group icon",
+      "png_hint": "white two-person pictogram on green circle"
+    },
+    "green_small_leaf": {
+      "category": "icon_png",
+      "asset_plan": "generate_png_asset",
+      "reuse": "small reflection leaf icon",
+      "png_hint": "white leaf sprout pictogram on green circle"
+    }
+  },
+  "slides": [
+    {
+      "slide": 1,
+      "instances": [
+        {
+          "component": "blue_card_base",
+          "id": "s1_blue_card_base_01",
+          "bbox_px": [
+            96,
+            248,
+            574,
+            236
+          ],
+          "bbox_frac": [
+            0.057416,
+            0.263549,
+            0.343301,
+            0.250797
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_card_base",
+          "id": "s1_blue_card_base_02",
+          "bbox_px": [
+            698,
+            248,
+            504,
+            236
+          ],
+          "bbox_frac": [
+            0.417464,
+            0.263549,
+            0.301435,
+            0.250797
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_card_base",
+          "id": "s1_blue_card_base_03",
+          "bbox_px": [
+            96,
+            503,
+            574,
+            232
+          ],
+          "bbox_frac": [
+            0.057416,
+            0.534538,
+            0.343301,
+            0.246546
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_card_base",
+          "id": "s1_blue_card_base_04",
+          "bbox_px": [
+            698,
+            503,
+            504,
+            232
+          ],
+          "bbox_frac": [
+            0.417464,
+            0.534538,
+            0.301435,
+            0.246546
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_num_badge",
+          "id": "s1_blue_num_badge_01",
+          "bbox_px": [
+            119,
+            260,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.071172,
+            0.276302,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_num_badge",
+          "id": "s1_blue_num_badge_02",
+          "bbox_px": [
+            721,
+            260,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.43122,
+            0.276302,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_num_badge",
+          "id": "s1_blue_num_badge_03",
+          "bbox_px": [
+            119,
+            518,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.071172,
+            0.550478,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_num_badge",
+          "id": "s1_blue_num_badge_04",
+          "bbox_px": [
+            721,
+            518,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.43122,
+            0.550478,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_icon_circle",
+          "id": "s1_blue_icon_circle_01",
+          "bbox_px": [
+            148,
+            280,
+            176,
+            176
+          ],
+          "bbox_frac": [
+            0.088517,
+            0.297556,
+            0.105263,
+            0.187035
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_icon_circle",
+          "id": "s1_blue_icon_circle_02",
+          "bbox_px": [
+            740,
+            280,
+            176,
+            176
+          ],
+          "bbox_frac": [
+            0.442584,
+            0.297556,
+            0.105263,
+            0.187035
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_icon_circle",
+          "id": "s1_blue_icon_circle_03",
+          "bbox_px": [
+            148,
+            536,
+            176,
+            176
+          ],
+          "bbox_frac": [
+            0.088517,
+            0.569607,
+            0.105263,
+            0.187035
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_icon_circle",
+          "id": "s1_blue_icon_circle_04",
+          "bbox_px": [
+            740,
+            536,
+            176,
+            176
+          ],
+          "bbox_frac": [
+            0.442584,
+            0.569607,
+            0.105263,
+            0.187035
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_divider",
+          "id": "s1_blue_divider_01",
+          "bbox_px": [
+            356,
+            284,
+            2,
+            165
+          ],
+          "bbox_frac": [
+            0.212919,
+            0.301807,
+            0.001196,
+            0.175345
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_divider",
+          "id": "s1_blue_divider_02",
+          "bbox_px": [
+            930,
+            284,
+            2,
+            165
+          ],
+          "bbox_frac": [
+            0.55622,
+            0.301807,
+            0.001196,
+            0.175345
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_divider",
+          "id": "s1_blue_divider_03",
+          "bbox_px": [
+            356,
+            540,
+            2,
+            160
+          ],
+          "bbox_frac": [
+            0.212919,
+            0.573858,
+            0.001196,
+            0.170032
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_divider",
+          "id": "s1_blue_divider_04",
+          "bbox_px": [
+            930,
+            540,
+            2,
+            160
+          ],
+          "bbox_frac": [
+            0.55622,
+            0.573858,
+            0.001196,
+            0.170032
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_icon_database_cloud",
+          "id": "s1_blue_icon_database_cloud_01",
+          "bbox_px": [
+            180,
+            313,
+            116,
+            108
+          ],
+          "bbox_frac": [
+            0.107656,
+            0.332625,
+            0.069378,
+            0.114772
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_icon_teaching_monitor",
+          "id": "s1_blue_icon_teaching_monitor_01",
+          "bbox_px": [
+            778,
+            314,
+            92,
+            108
+          ],
+          "bbox_frac": [
+            0.465311,
+            0.333688,
+            0.055024,
+            0.114772
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_icon_chat",
+          "id": "s1_blue_icon_chat_01",
+          "bbox_px": [
+            186,
+            572,
+            100,
+            96
+          ],
+          "bbox_frac": [
+            0.111244,
+            0.607864,
+            0.059809,
+            0.102019
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_icon_security_shield",
+          "id": "s1_blue_icon_security_shield_01",
+          "bbox_px": [
+            776,
+            566,
+            94,
+            110
+          ],
+          "bbox_frac": [
+            0.464115,
+            0.601488,
+            0.05622,
+            0.116897
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_bottom_bar",
+          "id": "s1_blue_bottom_bar_01",
+          "bbox_px": [
+            97,
+            757,
+            1144,
+            108
+          ],
+          "bbox_frac": [
+            0.058014,
+            0.804463,
+            0.684211,
+            0.114772
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_bottom_circle",
+          "id": "s1_blue_bottom_circle_01",
+          "bbox_px": [
+            148,
+            773,
+            80,
+            80
+          ],
+          "bbox_frac": [
+            0.088517,
+            0.821467,
+            0.047847,
+            0.085016
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_bottom_circle",
+          "id": "s1_blue_bottom_circle_02",
+          "bbox_px": [
+            560,
+            773,
+            80,
+            80
+          ],
+          "bbox_frac": [
+            0.334928,
+            0.821467,
+            0.047847,
+            0.085016
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_bottom_circle",
+          "id": "s1_blue_bottom_circle_03",
+          "bbox_px": [
+            958,
+            773,
+            80,
+            80
+          ],
+          "bbox_frac": [
+            0.572967,
+            0.821467,
+            0.047847,
+            0.085016
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_bottom_icon_building",
+          "id": "s1_blue_bottom_icon_building_01",
+          "bbox_px": [
+            166,
+            791,
+            44,
+            44
+          ],
+          "bbox_frac": [
+            0.099282,
+            0.840595,
+            0.026316,
+            0.046759
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_bottom_icon_grid",
+          "id": "s1_blue_bottom_icon_grid_01",
+          "bbox_px": [
+            578,
+            791,
+            44,
+            44
+          ],
+          "bbox_frac": [
+            0.345694,
+            0.840595,
+            0.026316,
+            0.046759
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_bottom_icon_chart",
+          "id": "s1_blue_bottom_icon_chart_01",
+          "bbox_px": [
+            976,
+            791,
+            44,
+            44
+          ],
+          "bbox_frac": [
+            0.583732,
+            0.840595,
+            0.026316,
+            0.046759
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_arrow",
+          "id": "s1_blue_arrow_01",
+          "bbox_px": [
+            450,
+            797,
+            47,
+            27
+          ],
+          "bbox_frac": [
+            0.269139,
+            0.846971,
+            0.02811,
+            0.028693
+          ],
+          "notes": ""
+        },
+        {
+          "component": "blue_arrow",
+          "id": "s1_blue_arrow_02",
+          "bbox_px": [
+            860,
+            797,
+            47,
+            27
+          ],
+          "bbox_frac": [
+            0.514354,
+            0.846971,
+            0.02811,
+            0.028693
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "slide": 2,
+      "instances": [
+        {
+          "component": "green_card_base",
+          "id": "s2_green_card_base_1",
+          "bbox_px": [
+            540,
+            239,
+            240,
+            576
+          ],
+          "bbox_frac": [
+            0.322967,
+            0.253985,
+            0.143541,
+            0.612115
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_card_base",
+          "id": "s2_green_card_base_2",
+          "bbox_px": [
+            818,
+            239,
+            240,
+            576
+          ],
+          "bbox_frac": [
+            0.489234,
+            0.253985,
+            0.143541,
+            0.612115
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_card_base",
+          "id": "s2_green_card_base_3",
+          "bbox_px": [
+            1096,
+            239,
+            240,
+            576
+          ],
+          "bbox_frac": [
+            0.655502,
+            0.253985,
+            0.143541,
+            0.612115
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_card_base",
+          "id": "s2_green_card_base_4",
+          "bbox_px": [
+            1374,
+            239,
+            240,
+            576
+          ],
+          "bbox_frac": [
+            0.82177,
+            0.253985,
+            0.143541,
+            0.612115
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_num_corner",
+          "id": "s2_green_num_corner_1",
+          "bbox_px": [
+            558,
+            239,
+            58,
+            54
+          ],
+          "bbox_frac": [
+            0.333732,
+            0.253985,
+            0.034689,
+            0.057386
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_num_corner",
+          "id": "s2_green_num_corner_2",
+          "bbox_px": [
+            836,
+            239,
+            58,
+            54
+          ],
+          "bbox_frac": [
+            0.5,
+            0.253985,
+            0.034689,
+            0.057386
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_num_corner",
+          "id": "s2_green_num_corner_3",
+          "bbox_px": [
+            1114,
+            239,
+            58,
+            54
+          ],
+          "bbox_frac": [
+            0.666268,
+            0.253985,
+            0.034689,
+            0.057386
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_num_corner",
+          "id": "s2_green_num_corner_4",
+          "bbox_px": [
+            1392,
+            239,
+            58,
+            54
+          ],
+          "bbox_frac": [
+            0.832536,
+            0.253985,
+            0.034689,
+            0.057386
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_icon_ring",
+          "id": "s2_green_icon_ring_1",
+          "bbox_px": [
+            594,
+            296,
+            132,
+            132
+          ],
+          "bbox_frac": [
+            0.355263,
+            0.314559,
+            0.078947,
+            0.140276
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_icon_ring",
+          "id": "s2_green_icon_ring_2",
+          "bbox_px": [
+            872,
+            296,
+            132,
+            132
+          ],
+          "bbox_frac": [
+            0.521531,
+            0.314559,
+            0.078947,
+            0.140276
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_icon_ring",
+          "id": "s2_green_icon_ring_3",
+          "bbox_px": [
+            1150,
+            296,
+            132,
+            132
+          ],
+          "bbox_frac": [
+            0.687799,
+            0.314559,
+            0.078947,
+            0.140276
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_icon_ring",
+          "id": "s2_green_icon_ring_4",
+          "bbox_px": [
+            1428,
+            296,
+            132,
+            132
+          ],
+          "bbox_frac": [
+            0.854067,
+            0.314559,
+            0.078947,
+            0.140276
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_connector",
+          "id": "s2_green_connector_01",
+          "bbox_px": [
+            714,
+            400,
+            175,
+            45
+          ],
+          "bbox_frac": [
+            0.427033,
+            0.42508,
+            0.104665,
+            0.047821
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_connector",
+          "id": "s2_green_connector_02",
+          "bbox_px": [
+            993,
+            400,
+            175,
+            45
+          ],
+          "bbox_frac": [
+            0.5939,
+            0.42508,
+            0.104665,
+            0.047821
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_connector",
+          "id": "s2_green_connector_03",
+          "bbox_px": [
+            1272,
+            400,
+            175,
+            45
+          ],
+          "bbox_frac": [
+            0.760766,
+            0.42508,
+            0.104665,
+            0.047821
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_card_bottom_wave",
+          "id": "s2_green_card_bottom_wave_1",
+          "bbox_px": [
+            541,
+            736,
+            238,
+            80
+          ],
+          "bbox_frac": [
+            0.323565,
+            0.782147,
+            0.142344,
+            0.085016
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_card_bottom_wave",
+          "id": "s2_green_card_bottom_wave_2",
+          "bbox_px": [
+            819,
+            736,
+            238,
+            80
+          ],
+          "bbox_frac": [
+            0.489833,
+            0.782147,
+            0.142344,
+            0.085016
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_card_bottom_wave",
+          "id": "s2_green_card_bottom_wave_3",
+          "bbox_px": [
+            1097,
+            736,
+            238,
+            80
+          ],
+          "bbox_frac": [
+            0.6561,
+            0.782147,
+            0.142344,
+            0.085016
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_card_bottom_wave",
+          "id": "s2_green_card_bottom_wave_4",
+          "bbox_px": [
+            1375,
+            736,
+            238,
+            80
+          ],
+          "bbox_frac": [
+            0.822368,
+            0.782147,
+            0.142344,
+            0.085016
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_decor_plant",
+          "id": "s2_green_decor_plant_01",
+          "bbox_px": [
+            674,
+            720,
+            90,
+            72
+          ],
+          "bbox_frac": [
+            0.40311,
+            0.765143,
+            0.053828,
+            0.076514
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_decor_gear",
+          "id": "s2_green_decor_gear_01",
+          "bbox_px": [
+            954,
+            720,
+            90,
+            72
+          ],
+          "bbox_frac": [
+            0.570574,
+            0.765143,
+            0.053828,
+            0.076514
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_decor_document",
+          "id": "s2_green_decor_document_01",
+          "bbox_px": [
+            1234,
+            720,
+            74,
+            82
+          ],
+          "bbox_frac": [
+            0.738038,
+            0.765143,
+            0.044258,
+            0.087141
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_decor_chart",
+          "id": "s2_green_decor_chart_01",
+          "bbox_px": [
+            1480,
+            710,
+            92,
+            86
+          ],
+          "bbox_frac": [
+            0.885167,
+            0.754516,
+            0.055024,
+            0.091392
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_icon_course_book",
+          "id": "s2_green_icon_course_book_01",
+          "bbox_px": [
+            616,
+            326,
+            84,
+            72
+          ],
+          "bbox_frac": [
+            0.368421,
+            0.34644,
+            0.050239,
+            0.076514
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_icon_practice_tools",
+          "id": "s2_green_icon_practice_tools_01",
+          "bbox_px": [
+            895,
+            326,
+            84,
+            72
+          ],
+          "bbox_frac": [
+            0.535287,
+            0.34644,
+            0.050239,
+            0.076514
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_icon_presentation",
+          "id": "s2_green_icon_presentation_01",
+          "bbox_px": [
+            1172,
+            326,
+            86,
+            72
+          ],
+          "bbox_frac": [
+            0.700957,
+            0.34644,
+            0.051435,
+            0.076514
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_icon_growth_person",
+          "id": "s2_green_icon_growth_person_01",
+          "bbox_px": [
+            1450,
+            328,
+            82,
+            72
+          ],
+          "bbox_frac": [
+            0.867225,
+            0.348565,
+            0.049043,
+            0.076514
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_small_person",
+          "id": "s2_green_small_person_01",
+          "bbox_px": [
+            579,
+            592,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.346292,
+            0.629118,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_small_books",
+          "id": "s2_green_small_books_01",
+          "bbox_px": [
+            579,
+            660,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.346292,
+            0.701382,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_small_group",
+          "id": "s2_green_small_group_01",
+          "bbox_px": [
+            858,
+            592,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.513158,
+            0.629118,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_small_clipboard",
+          "id": "s2_green_small_clipboard_01",
+          "bbox_px": [
+            858,
+            660,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.513158,
+            0.701382,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_small_folder",
+          "id": "s2_green_small_folder_01",
+          "bbox_px": [
+            1134,
+            592,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.67823,
+            0.629118,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_small_chat",
+          "id": "s2_green_small_chat_01",
+          "bbox_px": [
+            1134,
+            660,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.67823,
+            0.701382,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_small_peers",
+          "id": "s2_green_small_peers_01",
+          "bbox_px": [
+            1412,
+            592,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.844498,
+            0.629118,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        },
+        {
+          "component": "green_small_leaf",
+          "id": "s2_green_small_leaf_01",
+          "bbox_px": [
+            1412,
+            660,
+            48,
+            48
+          ],
+          "bbox_frac": [
+            0.844498,
+            0.701382,
+            0.028708,
+            0.05101
+          ],
+          "notes": ""
+        }
+      ]
+    }
+  ],
+  "png_asset_sheet_plan": {
+    "blue_main_icons": [
+      "blue_icon_database_cloud",
+      "blue_icon_teaching_monitor",
+      "blue_icon_chat",
+      "blue_icon_security_shield"
+    ],
+    "green_main_icons": [
+      "green_icon_course_book",
+      "green_icon_practice_tools",
+      "green_icon_presentation",
+      "green_icon_growth_person"
+    ],
+    "green_small_icons_a": [
+      "green_small_person",
+      "green_small_books",
+      "green_small_group",
+      "green_small_clipboard"
+    ],
+    "green_small_icons_b": [
+      "green_small_folder",
+      "green_small_chat",
+      "green_small_peers",
+      "green_small_leaf"
+    ],
+    "blue_bottom_icons": [
+      "blue_bottom_icon_building",
+      "blue_bottom_icon_grid",
+      "blue_bottom_icon_chart"
+    ],
+    "green_decor_icons": [
+      "green_decor_plant",
+      "green_decor_gear",
+      "green_decor_document",
+      "green_decor_chart"
+    ]
+  }
+}

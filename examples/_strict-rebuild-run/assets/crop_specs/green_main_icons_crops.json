@@ -1,0 +1,38 @@
+[
+  {
+    "id": "green_icon_course_book",
+    "bbox": [
+      0,
+      0,
+      836,
+      470
+    ]
+  },
+  {
+    "id": "green_icon_practice_tools",
+    "bbox": [
+      836,
+      0,
+      836,
+      470
+    ]
+  },
+  {
+    "id": "green_icon_presentation",
+    "bbox": [
+      0,
+      470,
+      836,
+      471
+    ]
+  },
+  {
+    "id": "green_icon_growth_person",
+    "bbox": [
+      836,
+      470,
+      836,
+      471
+    ]
+  }
+]

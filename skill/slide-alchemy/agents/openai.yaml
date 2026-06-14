@@ -1,0 +1,4 @@
+interface:
+  display_name: "Slide Alchemy"
+  short_description: "Turn image slide decks into editable component-based PPTX."
+  default_prompt: "Use $slide-alchemy to rebuild this image-based slide deck into an editable PPTX."
