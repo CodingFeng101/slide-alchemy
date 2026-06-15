@@ -1,8 +1,16 @@
 # Workflow
 
+Every editable-PPTX conversion must run the full workflow. Do not skip steps for small decks, partial decks, quick demos, outputs-only requests, or final-output requests.
+
+Image generation/editing model use is mandatory for clean bases, `icon_png` asset sheets, `complex_png_whole` asset sheets, and regenerated visual assets. Do not replace those steps with local masking, local inpainting, direct source-image crops, copied screenshot fragments, PPT native shape approximations, or generic presentation templates.
+
 Run this workflow in order. Each section produces an artifact that is required by the next section. Do not jump to final PPTX composition until source pages, base grouping, approved or unattended-run bases, element analysis, generated assets, sliced assets, text layout, and compose spec are ready.
 
 If a required artifact is missing, create it before continuing. Do not replace missing artifacts with assumptions.
+
+Do not infer unattended execution from urgency, page count, output-directory requests, or a request for a finished PPTX. The user must explicitly ask to run unattended, run fully automatically, or skip intermediate confirmation.
+
+Generic presentation tooling may be used only for final PPTX composition after this workflow's artifacts exist. Do not let presentation-generation instructions replace slide-alchemy source rendering, base grouping, clean-base generation, element analysis, generated asset sheets, text extraction, or QA.
 
 ## Parallel Page Reconstruction
 
@@ -50,7 +58,7 @@ I recommend:
 Use this grouping, or tell me which pages should be grouped differently.
 ```
 
-Read `base-grouping.md` for the inference rules. This is the first allowed stop: the user decides whether to accept the recommendation, unless they asked for an unattended full run.
+Read `base-grouping.md` for the inference rules. This is the first hard gate: the user decides whether to accept the recommendation, unless they explicitly asked for an unattended full run. After presenting the grouping, stop and wait for the user's next message.
 
 Required output before step 3:
 
@@ -80,7 +88,7 @@ Default keep targets:
 
 If the generated base keeps card frames or central layout blocks without user approval, regenerate it.
 
-Review stop: after base images are generated, show the base previews and wait for user approval. Do not continue to element extraction until the user approves, unless the user asked for an unattended full run.
+Review stop: after base images are generated, show the base previews and wait for user approval. Do not continue to element extraction until the user approves, unless the user explicitly asked for an unattended full run. After presenting base previews, stop and wait for the user's next message.
 
 Required output before step 4:
 

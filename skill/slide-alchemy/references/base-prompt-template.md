@@ -1,6 +1,6 @@
 # Base Prompt Template
 
-Use this template when asking an image generation/editing model to create a base background.
+Use this template when asking an image generation/editing model to create a base background. This model step is mandatory for clean bases; do not replace it with local white masks, local blur, local inpainting, or copied screenshot fragments.
 
 ```text
 Use the displayed slide image as the only edit target. Generate a 16:9 clean base background.

@@ -1,6 +1,6 @@
 # Icon Sheet Prompt Template
 
-Use this template only for components classified as `icon_png` or `complex_png_whole`.
+Use this template only for components classified as `icon_png` or `complex_png_whole`. This image generation/editing model step is mandatory for PNG icon and complex visual assets; do not replace it with direct crops from the source slide or PPT native shape approximations.
 
 ```text
 Use the displayed slide image only as the visual reference/edit target. Regenerate these PNG icon assets into a new asset sheet; do not crop or paste pixels directly from the source slide:

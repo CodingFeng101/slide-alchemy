@@ -16,6 +16,32 @@ Rebuild visual slide pages into editable PPTX by separating each page into:
 
 Keep this workflow lightweight. Do not use page workers or an editppt-style state machine.
 
+## Non-Negotiable Rules
+
+Any request to convert slides into an editable PPTX must run the complete workflow. Do not use a shortcut path for small decks, first pages only, quick demos, outputs-only requests, or final-PPTX requests. The workflow is mandatory even when the user asks for only one page.
+
+The following steps must always happen in order:
+
+1. source page rendering,
+2. base grouping,
+3. clean base generation with an image generation/editing model,
+4. element analysis,
+5. SVG/OOXML generation for true layout geometry,
+6. PNG asset sheet generation with an image generation/editing model for icons and complex visuals,
+7. PNG slicing and contact-sheet QA,
+8. visual text extraction,
+9. PPTX composition,
+10. preview export and visual QA.
+
+Image generation/editing model use is mandatory for:
+
+- clean base backgrounds;
+- `icon_png` asset sheets;
+- `complex_png_whole` asset sheets;
+- any regenerated visual asset that must match the image PPT.
+
+Do not replace those model steps with local white masks, local inpainting, direct source-image crops, copied screenshot fragments, PPT native shape approximations, or generic presentation templates.
+
 ## Execution Discipline
 
 Follow the workflow in order. Do not skip ahead, merge phases, or compose the final PPTX before required upstream artifacts exist.
@@ -32,6 +58,10 @@ Before starting each step, check that the prior step's required artifact exists:
 8. preview images exist before claiming the rebuild is complete.
 
 If an artifact is missing, stop and produce that artifact instead of continuing. If a user asks for a later output directly, still run the required earlier steps first unless they explicitly override the workflow.
+
+Do not infer unattended mode from urgency, page count, an output directory, or a request for a finished PPTX. Unattended mode requires an explicit phrase such as "run unattended", "full automatic run", "no intermediate confirmation", or "不要中途确认". Otherwise, the two base-stage review stops are hard gates.
+
+Generic presentation-generation workflows, PowerPoint libraries, or presentation plugin instructions may help with final PPTX composition only after this skill's required artifacts exist. They must not replace source rendering, base grouping, clean-base generation, element analysis, generated asset sheets, text extraction, or visual QA.
 
 ## Parallel Page Reconstruction
 
@@ -58,12 +88,12 @@ The lead agent must merge all page-level outputs, deduplicate shared components,
    Treat even a PPTX input as visual source pages unless the user explicitly asks to reuse existing PPTX objects. Do not shortcut by deleting existing PPTX objects to create the base.
 
 2. Propose base grouping before extraction.
-   Inspect the source page images first, identify likely cover/content/ending/custom base groups, then present a recommended grouping to the user. This is the first allowed stop: ask the user to accept or modify the recommendation before generating bases, unless the user explicitly asked for an unattended full run.
+   Inspect the source page images first, identify likely cover/content/ending/custom base groups, then present a recommended grouping to the user. This is the first hard gate: ask the user to accept or modify the recommendation before generating bases, unless the user explicitly asked for an unattended full run. Do not continue in the same turn after presenting the grouping.
 
 3. Generate clean bases with an image generation/editing model.
    The default base is a general background: keep outer background, edge decoration, ambient texture, and theme visuals; remove all text, icons, cards, boxes, title bars, and central content. Only preserve central layout containers if the user explicitly asks for template containers.
 
-   This is the second allowed stop: after generating base preview images, show the bases to the user and wait for approval before extracting elements, unless the user explicitly requested an unattended full run.
+   This is the second hard gate: after generating base preview images, show the bases to the user and wait for approval before extracting elements, unless the user explicitly requested an unattended full run. Do not continue in the same turn after presenting base previews.
 
 4. Analyze every non-text visual element before slicing.
    Create `element_analysis.json` with reusable components and per-slide instances. Do not put all elements into an icon sheet first.
@@ -103,6 +133,8 @@ Use at most two review stops by default:
 
 1. Base grouping review: deliver the proposed base groups and wait for user approval or edits.
 2. Base preview review: deliver clean base previews and wait for user approval or regeneration requests.
+
+These are hard gates. After presenting either gate, stop work and wait for the user's next message unless unattended mode was explicitly requested before the gate.
 
 Do not stop after PNG asset generation. Contact sheets and classification summaries are QA artifacts, not approval gates. When the user asks to run all steps automatically, skip only the waiting/approval pauses; still execute every workflow step in order.
 
