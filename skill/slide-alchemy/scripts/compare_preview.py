@@ -20,7 +20,10 @@ def main():
     src = Image.open(args.source_png).convert("RGB")
     prv = Image.open(args.preview_png).convert("RGB")
     if prv.size != src.size:
-        prv = prv.resize(src.size)
+        raise SystemExit(
+            f"ERROR: preview size {prv.size} differs from source size {src.size}; "
+            "check slide export size/aspect ratio before pixel comparison"
+        )
 
     diff = ImageChops.difference(src, prv)
     heat = ImageOps.grayscale(diff)

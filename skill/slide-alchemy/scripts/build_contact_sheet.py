@@ -24,6 +24,10 @@ def main():
     args = ap.parse_args()
 
     files = sorted(Path(args.input_dir).glob("*.png"))
+    if not files:
+        raise SystemExit(f"ERROR: no PNG files found in {args.input_dir}")
+    if args.cols <= 0:
+        raise SystemExit("ERROR: --cols must be positive")
     cell_w = args.thumb_w + 80
     cell_h = args.thumb_h + 60
     rows = max(1, (len(files) + args.cols - 1) // args.cols)
@@ -42,7 +46,9 @@ def main():
         sheet.paste(im, (x + (args.thumb_w - im.width) // 2, y + (args.thumb_h - im.height) // 2), im)
         draw.text((x - 10, y + args.thumb_h + 8), file.name, fill=(20, 20, 20))
 
-    sheet.save(args.output_png)
+    output = Path(args.output_png)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(output)
     print(args.output_png)
 
 

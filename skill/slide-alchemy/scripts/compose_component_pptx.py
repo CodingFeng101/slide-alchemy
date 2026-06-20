@@ -23,6 +23,8 @@ ALIGN = {
     "right": PP_ALIGN.RIGHT,
 }
 
+BBOX_EPSILON = 0.002
+
 
 def rgb(value, default="000000"):
     if value is None:
@@ -51,11 +53,20 @@ def resolve(base_dir, path):
 
 
 def bbox(item, ref_w, ref_h, slide_w, slide_h):
+    if "bbox_px" in item and "bbox_frac" in item:
+        px = item["bbox_px"]
+        frac = item["bbox_frac"]
+        expected = [px[0] / ref_w, px[1] / ref_h, px[2] / ref_w, px[3] / ref_h]
+        if any(abs(expected[i] - frac[i]) > BBOX_EPSILON for i in range(4)):
+            raise ValueError(f"inconsistent bbox_px and bbox_frac for {item.get('id', '?')!r}")
+
     if "bbox_frac" in item:
         x, y, w, h = item["bbox_frac"]
     else:
         x, y, w, h = item["bbox_px"]
         x, y, w, h = x / ref_w, y / ref_h, w / ref_w, h / ref_h
+    if w <= 0 or h <= 0:
+        raise ValueError(f"bbox width/height must be positive for {item.get('id', '?')!r}")
     return Inches(x * slide_w), Inches(y * slide_h), Inches(w * slide_w), Inches(h * slide_h)
 
 
@@ -140,6 +151,8 @@ def compose(spec_path, out_path):
         for item in slide_spec.get("texts", []):
             add_text(slide, item, ref_w, ref_h, slide_w, slide_h)
 
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     prs.save(out_path)
     return out_path
 

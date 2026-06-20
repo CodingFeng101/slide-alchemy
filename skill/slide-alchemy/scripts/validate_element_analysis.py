@@ -33,6 +33,9 @@ def main():
         components = {}
 
     for cid, comp in components.items():
+        if not isinstance(comp, dict):
+            err(errors, f"component {cid}: must be an object")
+            continue
         cat = comp.get("category")
         plan = comp.get("asset_plan")
         if cat not in VALID:
@@ -40,9 +43,24 @@ def main():
         elif plan != VALID[cat]:
             err(errors, f"component {cid}: category {cat} expects asset_plan {VALID[cat]}, got {plan}")
 
-    for slide in data.get("slides", []):
+    slides = data.get("slides", [])
+    if not isinstance(slides, list):
+        err(errors, "slides must be an array")
+        slides = []
+
+    for slide in slides:
+        if not isinstance(slide, dict):
+            err(errors, f"slide entry must be an object, got {slide!r}")
+            continue
         sid = slide.get("slide", "?")
-        for inst in slide.get("instances", []):
+        instances = slide.get("instances", [])
+        if not isinstance(instances, list):
+            err(errors, f"slide {sid}: instances must be an array")
+            continue
+        for inst in instances:
+            if not isinstance(inst, dict):
+                err(errors, f"slide {sid}: instance must be an object, got {inst!r}")
+                continue
             iid = inst.get("id", "?")
             comp = inst.get("component")
             if comp not in components:

@@ -39,12 +39,16 @@ def main():
             files.extend(sorted(path.glob("*.png")))
         else:
             files.append(path)
+    if not files:
+        print("ERROR\tno PNG files found")
+        raise SystemExit(1)
     failed = False
     for f in files:
         result = inspect(f, args.threshold)
         touches = result.get("touches", [])
-        status = "EDGE_TOUCH" if touches else "ok"
-        if touches:
+        empty = result.get("empty", False)
+        status = "EMPTY" if empty else ("EDGE_TOUCH" if touches else "ok")
+        if empty or touches:
             failed = True
         print(f"{status}\t{f}\t{','.join(touches)}")
     raise SystemExit(1 if failed else 0)

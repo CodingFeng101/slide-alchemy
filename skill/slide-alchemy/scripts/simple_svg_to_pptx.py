@@ -53,6 +53,17 @@ def is_star(points):
     return len(points) in (10, 11)
 
 
+def is_diamond(points):
+    return len(points) == 4
+
+
+def opacity_to_transparency(value):
+    if value is None:
+        return None
+    opacity = max(0.0, min(1.0, float(value)))
+    return int(round((1.0 - opacity) * 100))
+
+
 def set_line_style(line, elem):
     stroke = color(elem.attrib.get("stroke"), "000000")
     if stroke:
@@ -95,6 +106,9 @@ def main():
         else:
             shape.fill.solid()
             shape.fill.fore_color.rgb = fill
+            fill_transparency = opacity_to_transparency(elem.attrib.get("fill-opacity"))
+            if fill_transparency is not None:
+                shape.fill.transparency = fill_transparency
         if stroke is None:
             shape.line.fill.background()
         else:
@@ -153,9 +167,14 @@ def main():
                 x, y, w, h = bbox_from_points(pts)
                 shp = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.STAR_5_POINT, emu_x(x), emu_y(y), emu_x(w), emu_y(h))
                 set_style(shp, elem)
+            elif tag == "polygon" and is_diamond(pts):
+                x, y, w, h = bbox_from_points(pts)
+                shp = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.DIAMOND, emu_x(x), emu_y(y), emu_x(w), emu_y(h))
+                set_style(shp, elem)
             else:
                 raise ValueError("unsupported polygon; simplify SVG, use ppt-master full converter, or reclassify as PNG")
 
+    Path(args.pptx).parent.mkdir(parents=True, exist_ok=True)
     prs.save(args.pptx)
     print(args.pptx)
 
