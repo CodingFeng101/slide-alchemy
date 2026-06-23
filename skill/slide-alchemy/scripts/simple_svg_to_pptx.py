@@ -2,7 +2,6 @@
 import argparse
 import re
 import xml.etree.ElementTree as ET
-from pathlib import Path
 
 from pptx import Presentation
 from pptx.dml.color import RGBColor
@@ -23,6 +22,27 @@ def num(value, default=0.0):
         return default
     m = re.match(r"[-+]?\d*\.?\d+", str(value))
     return float(m.group(0)) if m else default
+
+
+def require_positive(value, name):
+    if value <= 0:
+        raise ValueError(f"{name} must be positive, got {value}")
+    return value
+
+
+def svg_dimensions(root):
+    view_box = root.attrib.get("viewBox")
+    if view_box:
+        values = [float(x) for x in view_box.replace(",", " ").split()]
+        if len(values) != 4:
+            raise ValueError("viewBox must contain four numbers: min-x min-y width height")
+        vb_x, vb_y, vb_w, vb_h = values
+    else:
+        vb_x = 0
+        vb_y = 0
+        vb_w = num(root.attrib.get("width"), 1920)
+        vb_h = num(root.attrib.get("height"), 1080)
+    return vb_x, vb_y, require_positive(vb_w, "SVG width"), require_positive(vb_h, "SVG height")
 
 
 def color(value, default="000000"):
@@ -68,24 +88,28 @@ def main():
     ap.add_argument("--slide-height", type=float, default=7.5)
     args = ap.parse_args()
 
+    require_positive(args.slide_width, "slide width")
+    require_positive(args.slide_height, "slide height")
+
     root = ET.parse(args.svg).getroot()
-    view_box = root.attrib.get("viewBox")
-    if view_box:
-        _, _, vb_w, vb_h = [float(x) for x in view_box.replace(",", " ").split()]
-    else:
-        vb_w = num(root.attrib.get("width"), 1920)
-        vb_h = num(root.attrib.get("height"), 1080)
+    vb_x, vb_y, vb_w, vb_h = svg_dimensions(root)
 
     prs = Presentation()
     prs.slide_width = Inches(args.slide_width)
     prs.slide_height = Inches(args.slide_height)
     slide = prs.slides.add_slide(prs.slide_layouts[6])
 
-    def emu_x(x):
-        return Inches(x / vb_w * args.slide_width)
+    def pos_x(x):
+        return Inches((x - vb_x) / vb_w * args.slide_width)
 
-    def emu_y(y):
-        return Inches(y / vb_h * args.slide_height)
+    def pos_y(y):
+        return Inches((y - vb_y) / vb_h * args.slide_height)
+
+    def len_x(value):
+        return Inches(value / vb_w * args.slide_width)
+
+    def len_y(value):
+        return Inches(value / vb_h * args.slide_height)
 
     def set_style(shape, elem):
         fill = color(elem.attrib.get("fill"), None)
@@ -113,27 +137,27 @@ def main():
             h = num(elem.attrib.get("height"))
             rx = num(elem.attrib.get("rx"))
             shape_type = MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE if rx else MSO_AUTO_SHAPE_TYPE.RECTANGLE
-            shp = slide.shapes.add_shape(shape_type, emu_x(x), emu_y(y), emu_x(w), emu_y(h))
+            shp = slide.shapes.add_shape(shape_type, pos_x(x), pos_y(y), len_x(w), len_y(h))
             set_style(shp, elem)
         elif tag == "circle":
             cx = num(elem.attrib.get("cx"))
             cy = num(elem.attrib.get("cy"))
             r = num(elem.attrib.get("r"))
-            shp = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.OVAL, emu_x(cx - r), emu_y(cy - r), emu_x(2 * r), emu_y(2 * r))
+            shp = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.OVAL, pos_x(cx - r), pos_y(cy - r), len_x(2 * r), len_y(2 * r))
             set_style(shp, elem)
         elif tag == "ellipse":
             cx = num(elem.attrib.get("cx"))
             cy = num(elem.attrib.get("cy"))
             rx = num(elem.attrib.get("rx"))
             ry = num(elem.attrib.get("ry"))
-            shp = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.OVAL, emu_x(cx - rx), emu_y(cy - ry), emu_x(2 * rx), emu_y(2 * ry))
+            shp = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.OVAL, pos_x(cx - rx), pos_y(cy - ry), len_x(2 * rx), len_y(2 * ry))
             set_style(shp, elem)
         elif tag == "line":
             x1 = num(elem.attrib.get("x1"))
             y1 = num(elem.attrib.get("y1"))
             x2 = num(elem.attrib.get("x2"))
             y2 = num(elem.attrib.get("y2"))
-            line = slide.shapes.add_connector(MSO_CONNECTOR_TYPE.STRAIGHT, emu_x(x1), emu_y(y1), emu_x(x2), emu_y(y2))
+            line = slide.shapes.add_connector(MSO_CONNECTOR_TYPE.STRAIGHT, pos_x(x1), pos_y(y1), pos_x(x2), pos_y(y2))
             set_line_style(line, elem)
         elif tag in ("polygon", "polyline"):
             pts = parse_points(elem.attrib.get("points"))
@@ -143,15 +167,15 @@ def main():
                 for p1, p2 in zip(pts, pts[1:]):
                     line = slide.shapes.add_connector(
                         MSO_CONNECTOR_TYPE.STRAIGHT,
-                        emu_x(p1[0]),
-                        emu_y(p1[1]),
-                        emu_x(p2[0]),
-                        emu_y(p2[1]),
+                        pos_x(p1[0]),
+                        pos_y(p1[1]),
+                        pos_x(p2[0]),
+                        pos_y(p2[1]),
                     )
                     set_line_style(line, elem)
             elif tag == "polygon" and is_star(pts):
                 x, y, w, h = bbox_from_points(pts)
-                shp = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.STAR_5_POINT, emu_x(x), emu_y(y), emu_x(w), emu_y(h))
+                shp = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.STAR_5_POINT, pos_x(x), pos_y(y), len_x(w), len_y(h))
                 set_style(shp, elem)
             else:
                 raise ValueError("unsupported polygon; simplify SVG, use ppt-master full converter, or reclassify as PNG")

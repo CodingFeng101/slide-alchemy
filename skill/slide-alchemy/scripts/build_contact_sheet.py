@@ -4,6 +4,13 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 
+def positive_int(value):
+    value = int(value)
+    if value < 1:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return value
+
+
 def checker(size):
     img = Image.new("RGB", size, (245, 245, 245))
     draw = ImageDraw.Draw(img)
@@ -18,9 +25,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("input_dir")
     ap.add_argument("output_png")
-    ap.add_argument("--thumb-w", type=int, default=220)
-    ap.add_argument("--thumb-h", type=int, default=160)
-    ap.add_argument("--cols", type=int, default=3)
+    ap.add_argument("--thumb-w", type=positive_int, default=220)
+    ap.add_argument("--thumb-h", type=positive_int, default=160)
+    ap.add_argument("--cols", type=positive_int, default=3)
     args = ap.parse_args()
 
     files = sorted(Path(args.input_dir).glob("*.png"))
