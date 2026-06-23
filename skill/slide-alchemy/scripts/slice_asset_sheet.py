@@ -1,8 +1,24 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import re
 from pathlib import Path
 from PIL import Image
+
+
+SAFE_ID = re.compile(r"^[A-Za-z0-9_.-]+$")
+
+
+def safe_output_path(output_dir, item_id):
+    item_id = str(item_id)
+    if not SAFE_ID.fullmatch(item_id):
+        raise ValueError(f"unsafe crop id: {item_id!r}")
+
+    output_dir = output_dir.resolve()
+    path = (output_dir / f"{item_id}.png").resolve()
+    if output_dir != path.parent and output_dir not in path.parents:
+        raise ValueError(f"output path escapes output_dir: {item_id!r}")
+    return path
 
 
 def key_to_alpha(img, key=(0, 255, 0), tolerance=70):
@@ -53,7 +69,7 @@ def main():
                 tr = min(crop.width, bbox[2] + args.pad)
                 tb = min(crop.height, bbox[3] + args.pad)
                 crop = crop.crop((tl, tt, tr, tb))
-        crop.save(out / f"{item['id']}.png")
+        crop.save(safe_output_path(out, item["id"]))
 
 
 if __name__ == "__main__":
