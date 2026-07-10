@@ -61,9 +61,9 @@ def parse_hex_color(value):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("sheet_png")
-    ap.add_argument("crops_json", help="JSON list of {id, bbox:[x,y,w,h]}")
+    ap.add_argument("crops_json", help="JSON list of crops or {key_color, crops}")
     ap.add_argument("output_dir")
-    ap.add_argument("--key-color", default="#00ff00")
+    ap.add_argument("--key-color", help="Override the crop spec key color (default: #00ff00)")
     ap.add_argument("--tolerance", type=int, default=70)
     ap.add_argument("--pad", type=int, default=16)
     ap.add_argument("--trim", action="store_true", help="Trim alpha bbox but keep --pad. Off by default.")
@@ -71,10 +71,16 @@ def main():
 
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
-    sheet = key_to_alpha(Image.open(args.sheet_png), parse_hex_color(args.key_color), args.tolerance)
-    crops = json.loads(Path(args.crops_json).read_text(encoding="utf-8-sig"))
+    crop_spec = json.loads(Path(args.crops_json).read_text(encoding="utf-8-sig"))
+    if isinstance(crop_spec, dict):
+        crops = crop_spec.get("crops")
+        key_color = args.key_color or crop_spec.get("key_color", "#00ff00")
+    else:
+        crops = crop_spec
+        key_color = args.key_color or "#00ff00"
     if not isinstance(crops, list):
-        raise ValueError("crops JSON must be an array")
+        raise ValueError("crops JSON must be an array or an object containing a crops array")
+    sheet = key_to_alpha(Image.open(args.sheet_png), parse_hex_color(key_color), args.tolerance)
 
     for index, item in enumerate(crops):
         item_id, item_bbox = validate_crop_item(index, item)

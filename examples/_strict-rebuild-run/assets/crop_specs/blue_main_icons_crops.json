@@ -1,4 +1,6 @@
-[
+{
+  "key_color": "#ff00ff",
+  "crops": [
   {
     "id": "blue_icon_database_cloud",
     "bbox": [
@@ -35,4 +37,5 @@
       471
     ]
   }
-]
+  ]
+}

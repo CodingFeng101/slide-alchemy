@@ -128,7 +128,7 @@ def main():
 
     for elem in root.iter():
         tag = strip_ns(elem.tag)
-        if tag == "svg":
+        if tag in ("svg", "g", "defs", "title", "desc", "metadata"):
             continue
         if tag == "rect":
             x = num(elem.attrib.get("x"))
@@ -179,6 +179,8 @@ def main():
                 set_style(shp, elem)
             else:
                 raise ValueError("unsupported polygon; simplify SVG, use ppt-master full converter, or reclassify as PNG")
+        else:
+            raise ValueError(f"unsupported SVG element: {tag}; simplify SVG, use ppt-master full converter, or reclassify as PNG")
 
     prs.save(args.pptx)
     print(args.pptx)

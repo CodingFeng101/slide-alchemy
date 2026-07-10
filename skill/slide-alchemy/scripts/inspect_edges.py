@@ -36,9 +36,11 @@ def main():
     for p in args.paths:
         path = Path(p)
         if path.is_dir():
-            files.extend(sorted(path.glob("*.png")))
+            files.extend(sorted(path.rglob("*.png")))
         else:
             files.append(path)
+    if not files:
+        raise SystemExit("no PNG files found")
     failed = False
     for f in files:
         result = inspect(f, args.threshold)

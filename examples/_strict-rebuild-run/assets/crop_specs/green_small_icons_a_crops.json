@@ -1,4 +1,6 @@
-[
+{
+  "key_color": "#ff00ff",
+  "crops": [
   {
     "id": "green_small_person",
     "bbox": [
@@ -35,4 +37,5 @@
       471
     ]
   }
-]
+  ]
+}

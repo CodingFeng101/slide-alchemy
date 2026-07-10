@@ -1,4 +1,6 @@
-[
+{
+  "key_color": "#ff00ff",
+  "crops": [
   {
     "id": "green_icon_course_book",
     "bbox": [
@@ -35,4 +37,5 @@
       471
     ]
   }
-]
+  ]
+}

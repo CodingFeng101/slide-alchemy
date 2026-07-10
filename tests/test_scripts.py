@@ -6,6 +6,8 @@ import unittest
 import zipfile
 from pathlib import Path
 
+from PIL import Image
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "skill" / "slide-alchemy" / "scripts"
@@ -45,6 +47,136 @@ class SimpleSvgToPptxTests(unittest.TestCase):
                 slide_xml = archive.read("ppt/slides/slide1.xml").decode("utf-8")
 
             self.assertIn('<a:off x="0" y="0"/>', slide_xml)
+
+    def test_rejects_unsupported_visible_elements(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            svg = tmp_path / "shape.svg"
+            pptx = tmp_path / "shape.pptx"
+            svg.write_text(
+                """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <path d="M 0 0 L 100 100" stroke="#ff0000" fill="none"/>
+</svg>
+""",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPTS / "simple_svg_to_pptx.py"),
+                    str(svg),
+                    str(pptx),
+                ],
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("unsupported SVG element: path", result.stderr)
+            self.assertFalse(pptx.exists())
+
+
+class AssetQaTests(unittest.TestCase):
+    def test_asset_qa_scans_nested_directories(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            nested = tmp_path / "nested"
+            nested.mkdir()
+            image_path = nested / "icon.png"
+            image = Image.new("RGBA", (20, 20), (0, 0, 0, 0))
+            for y in range(5, 15):
+                for x in range(5, 15):
+                    image.putpixel((x, y), (255, 0, 0, 255))
+            image.save(image_path)
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPTS / "inspect_edges.py"), str(tmp_path)],
+                capture_output=True,
+                text=True,
+            )
+            contact_path = tmp_path / "contact.png"
+            contact_result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPTS / "build_contact_sheet.py"),
+                    str(tmp_path),
+                    str(contact_path),
+                ],
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertIn(str(image_path), result.stdout)
+            self.assertEqual(0, contact_result.returncode, contact_result.stderr)
+            self.assertTrue(contact_path.exists())
+
+    def test_asset_qa_rejects_empty_directories(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+
+            inspect_result = subprocess.run(
+                [sys.executable, str(SCRIPTS / "inspect_edges.py"), str(tmp_path)],
+                capture_output=True,
+                text=True,
+            )
+            contact_result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPTS / "build_contact_sheet.py"),
+                    str(tmp_path),
+                    str(tmp_path / "contact.png"),
+                ],
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertNotEqual(0, inspect_result.returncode)
+            self.assertIn("no PNG files found", inspect_result.stderr)
+            self.assertNotEqual(0, contact_result.returncode)
+            self.assertIn("no PNG files found", contact_result.stderr)
+
+
+class SliceAssetSheetTests(unittest.TestCase):
+    def test_uses_key_color_from_crop_spec(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            sheet_path = tmp_path / "sheet.png"
+            spec_path = tmp_path / "crops.json"
+            output_dir = tmp_path / "output"
+
+            sheet = Image.new("RGB", (40, 40), (255, 0, 255))
+            for y in range(10, 30):
+                for x in range(10, 30):
+                    sheet.putpixel((x, y), (255, 0, 0))
+            sheet.save(sheet_path)
+            spec_path.write_text(
+                json.dumps(
+                    {
+                        "key_color": "#ff00ff",
+                        "crops": [{"id": "icon", "bbox": [0, 0, 40, 40]}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPTS / "slice_asset_sheet.py"),
+                    str(sheet_path),
+                    str(spec_path),
+                    str(output_dir),
+                ],
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            icon = Image.open(output_dir / "icon.png").convert("RGBA")
+            self.assertEqual(0, icon.getpixel((0, 0))[3])
+            self.assertEqual(255, icon.getpixel((20, 20))[3])
 
 
 class ValidateElementAnalysisTests(unittest.TestCase):
