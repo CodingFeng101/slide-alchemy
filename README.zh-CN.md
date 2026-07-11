@@ -2,9 +2,17 @@
 
 <p align="center">
   <strong>🧪 把图片式幻灯片重新炼成</strong><br>
-  <span style="font-size: 42px; color: #ff2d2d; font-weight: 900;">完全完全</span><br>
-  <strong>可编辑的 PowerPoint。</strong>
+  <span style="font-size: 42px; color: #ff2d2d; font-weight: 900;">真正可编辑</span><br>
+  <strong>组件化的 PowerPoint。</strong>
 </p>
+
+> 把幻灯片截图、扫描版 PPT 或图片型 PPTX 变成真正能修改的 PowerPoint：文字是文本框，几何元素是原生对象，复杂视觉素材保持稳定。
+
+[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
+[![Latest release](https://img.shields.io/github/v/release/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/releases/latest)
+[![License](https://img.shields.io/github/license/CodingFeng101/slide-alchemy?style=flat-square)](LICENSE)
+
+如果它帮你省下了手工重做幻灯片的时间，欢迎给仓库点个 **Star**，让更多需要处理 AI 幻灯片的人找到它。
 
 Slide Alchemy 是一个 Codex Skill，用来把图片型 PPT/PPTX、幻灯片截图、扫描版视觉页面还原成可编辑的 `.pptx`。它不是把整页截图塞回 PowerPoint 后称为“可编辑”，而是把页面拆成干净底图、可编辑几何形状、生成式 PNG 素材和真实文本框。
 

@@ -2,9 +2,17 @@
 
 <p align="center">
   <strong>🧪 Reforge image-based slides into</strong><br>
-  <span style="font-size: 42px; color: #ff2d2d; font-weight: 900;">FULLY FULLY</span><br>
-  <strong>editable, component-based PowerPoint decks.</strong>
+  <span style="font-size: 42px; color: #ff2d2d; font-weight: 900;">TRULY EDITABLE</span><br>
+  <strong>component-based PowerPoint decks.</strong>
 </p>
+
+> Turn a slide screenshot, scanned deck, or image-based PPTX into a PowerPoint you can actually edit: real text boxes, native geometry, and stable visual assets.
+
+[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
+[![Latest release](https://img.shields.io/github/v/release/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/releases/latest)
+[![License](https://img.shields.io/github/license/CodingFeng101/slide-alchemy?style=flat-square)](LICENSE)
+
+If this saves you from rebuilding a deck by hand, please **star the repo** so more people working with AI-generated slides can find it.
 
 Slide Alchemy is a Codex skill for rebuilding picture-style PPT/PPTX files, slide screenshots, and scanned visual decks into editable `.pptx` files. It does not place a full-slide screenshot back into PowerPoint and call it editable. It separates each page into a clean base background, editable geometry, generated PNG assets, and real text boxes.
 
