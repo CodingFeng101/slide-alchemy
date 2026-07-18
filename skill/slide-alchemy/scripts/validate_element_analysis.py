@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import re
 from numbers import Real
 from pathlib import Path
 
@@ -9,6 +10,11 @@ VALID = {
     "simple_geometry_svg_ooxml": "svg_to_ooxml",
     "icon_png": "generate_png_asset",
     "complex_png_whole": "generate_png_whole",
+}
+
+SHEET_CAPACITY = {
+    "icon_png": 9,
+    "complex_png_whole": 4,
 }
 
 
@@ -51,6 +57,76 @@ def validate_box(errors, context, field, box, frac=False):
         err(errors, f"{context}: {field} x/y must be non-negative")
     if box[2] <= 0 or box[3] <= 0:
         err(errors, f"{context}: {field} width/height must be positive")
+
+
+def component_category(components, component_id):
+    base_id = component_id.split(":", 1)[0]
+    component = components.get(base_id)
+    return component.get("category") if isinstance(component, dict) else None
+
+
+def validate_asset_sheet_plan(errors, plan, components):
+    if plan is None:
+        return
+    if not isinstance(plan, dict):
+        err(errors, "png_asset_sheet_plan must be an object")
+        return
+
+    sheets = plan.get("sheets")
+    if sheets is None:
+        return
+    if not isinstance(sheets, list):
+        err(errors, "png_asset_sheet_plan: sheets must be an array")
+        return
+    key_color = plan.get("key_color")
+    if not isinstance(key_color, str) or re.fullmatch(r"#[0-9A-Fa-f]{6}", key_color) is None:
+        err(errors, "png_asset_sheet_plan: key_color must be a #RRGGBB string")
+
+    category_sheets = {category: [] for category in SHEET_CAPACITY}
+    for index, sheet in enumerate(sheets, start=1):
+        context = f"png_asset_sheet_plan sheet {index}"
+        if not isinstance(sheet, dict):
+            err(errors, f"{context}: must be an object")
+            continue
+        asset_ids = sheet.get("components")
+        if not isinstance(asset_ids, list) or not asset_ids:
+            err(errors, f"{context}: components must be a non-empty array")
+            continue
+        if not all(isinstance(asset_id, str) and asset_id for asset_id in asset_ids):
+            err(errors, f"{context}: component ids must be non-empty strings")
+            continue
+
+        categories = {component_category(components, asset_id) for asset_id in asset_ids}
+        if None in categories:
+            unknown = [asset_id for asset_id in asset_ids if component_category(components, asset_id) is None]
+            err(errors, f"{context}: unknown component(s): {', '.join(unknown)}")
+            continue
+        if len(categories) != 1:
+            err(errors, f"{context}: do not mix normal and complex assets")
+            continue
+
+        category = categories.pop()
+        if category not in SHEET_CAPACITY:
+            err(errors, f"{context}: only PNG component categories belong on asset sheets")
+            continue
+        capacity = SHEET_CAPACITY[category]
+        if "max" in sheet and sheet.get("max") != capacity:
+            err(errors, f"{context}: {category} max must be {capacity}, got {sheet.get('max')}")
+        if "key_color" in sheet and (
+            not isinstance(sheet.get("key_color"), str)
+            or not isinstance(key_color, str)
+            or sheet.get("key_color").lower() != key_color.lower()
+        ):
+            err(errors, f"{context}: key_color must match the run-level key_color")
+        if len(asset_ids) > capacity:
+            err(errors, f"{context}: {category} allows at most {capacity} assets, got {len(asset_ids)}")
+        category_sheets[category].append((context, len(asset_ids)))
+
+    for category, entries in category_sheets.items():
+        capacity = SHEET_CAPACITY[category]
+        for context, count in entries[:-1]:
+            if count != capacity:
+                err(errors, f"{context}: {category} sheets must contain {capacity} assets except for the final remainder sheet, got {count}")
 
 
 def report(errors):
@@ -129,6 +205,8 @@ def main():
                 err(errors, f"slide {sid} instance {iid}: unknown component {comp}")
             validate_box(errors, f"slide {sid} instance {iid}", "bbox_px", inst.get("bbox_px"))
             validate_box(errors, f"slide {sid} instance {iid}", "bbox_frac", inst.get("bbox_frac"), frac=True)
+
+    validate_asset_sheet_plan(errors, data.get("png_asset_sheet_plan"), components)
 
     if errors:
         report(errors)

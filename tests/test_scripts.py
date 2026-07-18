@@ -180,6 +180,89 @@ class SliceAssetSheetTests(unittest.TestCase):
 
 
 class ValidateElementAnalysisTests(unittest.TestCase):
+    def run_validator(self, payload):
+        with tempfile.TemporaryDirectory() as tmp:
+            analysis_json = Path(tmp) / "element_analysis.json"
+            analysis_json.write_text(json.dumps(payload), encoding="utf-8")
+            return subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPTS / "validate_element_analysis.py"),
+                    str(analysis_json),
+                ],
+                capture_output=True,
+                text=True,
+            )
+
+    def test_accepts_nine_normal_and_four_complex_assets_per_sheet(self):
+        components = {}
+        normal_ids = []
+        complex_ids = []
+        for index in range(10):
+            component_id = f"normal_{index}"
+            normal_ids.append(component_id)
+            components[component_id] = {
+                "category": "icon_png",
+                "asset_plan": "generate_png_asset",
+                "reuse": "shared",
+            }
+        for index in range(5):
+            component_id = f"complex_{index}"
+            complex_ids.append(component_id)
+            components[component_id] = {
+                "category": "complex_png_whole",
+                "asset_plan": "generate_png_whole",
+                "reuse": "shared",
+            }
+
+        result = self.run_validator(
+            {
+                "ref_width": 1920,
+                "ref_height": 1080,
+                "components": components,
+                "slides": [],
+                "png_asset_sheet_plan": {
+                    "key_color": "#00ff00",
+                    "sheets": [
+                        {"id": "normal_1", "max": 9, "components": normal_ids[:9]},
+                        {"id": "normal_2", "max": 9, "components": normal_ids[9:]},
+                        {"id": "complex_1", "max": 4, "components": complex_ids[:4]},
+                        {"id": "complex_2", "max": 4, "components": complex_ids[4:]},
+                    ]
+                },
+            }
+        )
+
+        self.assertEqual(0, result.returncode, result.stdout)
+
+    def test_rejects_underfilled_nonfinal_asset_sheets(self):
+        components = {
+            f"complex_{index}": {
+                "category": "complex_png_whole",
+                "asset_plan": "generate_png_whole",
+                "reuse": "shared",
+            }
+            for index in range(5)
+        }
+        result = self.run_validator(
+            {
+                "ref_width": 1920,
+                "ref_height": 1080,
+                "components": components,
+                "slides": [],
+                "png_asset_sheet_plan": {
+                    "key_color": "#ff00ff",
+                    "sheets": [
+                        {"id": "complex_1", "components": ["complex_0"]},
+                        {"id": "complex_2", "components": ["complex_1", "complex_2", "complex_3", "complex_4"]},
+                    ]
+                },
+            }
+        )
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("must contain 4 assets except for the final remainder sheet", result.stdout)
+
     def test_rejects_schema_required_fields_and_ranges(self):
         with tempfile.TemporaryDirectory() as tmp:
             bad_json = Path(tmp) / "bad_element_analysis.json"

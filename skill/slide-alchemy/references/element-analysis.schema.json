@@ -76,7 +76,31 @@
         "additionalProperties": true
       }
     },
-    "png_asset_sheet_plan": { "type": "object" }
+    "png_asset_sheet_plan": {
+      "type": "object",
+      "properties": {
+        "key_color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "sheets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "components"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "max": { "type": "integer", "enum": [4, 9] },
+              "components": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 },
+                "minItems": 1,
+                "maxItems": 9
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
   },
   "additionalProperties": true
 }
