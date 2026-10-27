@@ -99,6 +99,14 @@ def apply_corner_radius(shape, item, ref_w, ref_h):
 
 
 def add_geometry(slide, item, ref_w, ref_h, slide_w, slide_h):
+    shape = draw_geometry(slide, item, ref_w, ref_h, slide_w, slide_h)
+    # add_shape references the theme's effect style, which gives every shape a
+    # drop shadow the source never had.
+    shape.shadow.inherit = False
+    return shape
+
+
+def draw_geometry(slide, item, ref_w, ref_h, slide_w, slide_h):
     kind = item["kind"]
     if kind == "line":
         x, y, w, h = bbox(item, ref_w, ref_h, slide_w, slide_h)

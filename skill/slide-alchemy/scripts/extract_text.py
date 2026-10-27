@@ -56,14 +56,47 @@ MERGE_COLOUR_TOLERANCE = 100
 
 ITALIC_SLANT = 0.13
 
-# Every measured stroke carries an anti-aliased fringe of about a pixel that
-# does not grow with the font. Left in, it makes small regular text look as
-# heavy as large bold text; taken out, regular CJK faces measure 0.02-0.066 of
-# the em and bold faces from 20px up measure 0.068-0.12. Latin faces spread
-# wider, so they get a higher bar. Below about 18px the two overlap and no
-# threshold separates them.
-FRINGE_PX = 1.0
-BOLD_NET_RATIO = {"cjk": 0.067, "latin": 0.09}
+# Weight is the stroke width over the em, with the width taken as twice the
+# ink area over the outline length (a stroke of width w and length L has area
+# wL and perimeter about 2L). Counting anti-aliased pixels by their coverage
+# makes the width continuous and sub-pixel; the distance transform used before
+# moves in steps of about a pixel, which put 15-18pt regular text on the same
+# step as bold headings.
+#
+# Rendered fonts (YaHei, DengXian, HarmonyOS Sans, Noto Sans SC, SimHei at
+# 16-80px em, both polarities, 1x and 1.15x resampling): regular and light
+# faces measure at most 0.099 of the em at 16px, falling to 0.076 at 80px;
+# bold and black faces 0.108-0.156; medium in between. Body text drawn by image
+# models sits heavier than a true regular -- 0.094-0.119 at a 27-36px em on
+# generated slides, where headings from a 44px em up measure 0.112-0.148. The
+# composer only has regular and bold, so that medium-looking body text has to
+# land on regular. Hence a threshold that is high for small text and eases with
+# size: it keeps every rendered bold from a 30px em up and every generated
+# heading, and gives up bold below about a 26px em (13pt), where a missed bold
+# is the lesser error. Sizes are taken on a 1920px-wide page so the decision
+# does not move with the render resolution.
+BOLD_RATIO_BASE = 0.0915
+BOLD_RATIO_SIZE_PX = 0.75
+REFERENCE_PAGE_WIDTH = 1920.0
+# Below this em the glyphs are too few pixels to show weight at all.
+MIN_BOLD_EM_PX = 12
+# Weight is relative within a deck: one generated deck's regular body text
+# measured heavier than another deck's bold labels at the same size. So `auto`
+# takes each block's margin over the threshold above and looks across the whole
+# deck for the valley between the regular cluster and the bold one -- a local
+# minimum of the smoothed margin density, inside this window, well below the
+# peaks on both sides, with enough blocks on each side. Without such a valley
+# (a single-weight deck, a handful of blocks) the threshold is used as is.
+# Measured: a year-end deck splits at +0.003, a course deck at -0.022.
+WEIGHT_VALLEY_WINDOW = (-0.035, 0.02)
+WEIGHT_VALLEY_BANDWIDTH = 0.003
+WEIGHT_VALLEY_DEPTH = 0.6
+WEIGHT_VALLEY_MIN_SHARE = 0.1
+WEIGHT_VALLEY_MIN_BLOCKS = 8
+# Blocks on one page within this share of each other's em and this colour
+# distance are taken as one style and given one weight.
+SIBLING_EM_TOLERANCE = 0.06
+SIBLING_COLOUR_TOLERANCE = 60
 
 # --- text box frame ----------------------------------------------------------
 
@@ -82,6 +115,23 @@ SINGLE_SPACING_EM = 1.2
 EXACT_SPACING_LIFT = 0.6
 
 BULLET_CHARS = "•·‣▪◦●○∙–—-"
+
+# --- spaces ------------------------------------------------------------------
+
+# OCR drops the spaces in mixed CJK text ("上线 3 个月" reads as "上线3个月"),
+# and the rebuilt line comes out narrower than the source. Measured on
+# generated slides, an ink gap that holds a space is 0.36-0.49 em, and a gap
+# without one -- including digit-to-CJK -- at most 0.31 em.
+SPACE_GAP_EM = 0.33
+# A space with an interpunct in it spans about 0.7 em. Anything much wider is
+# part of a glyph the ink mask lost (a lighter-coloured name, say), not a space.
+SPACE_GAP_MAX_EM = 0.9
+# Full-width punctuation carries its own whitespace inside the glyph, so a wide
+# gap next to it is not a missing space.
+NO_SPACE_AFTER = set("，。、；：！？（《“‘【〔「『")
+NO_SPACE_BEFORE = set("，。、；：！？）》”’】〕」』")
+# OCR reads the interpunct between CJK words as a bullet or katakana dot.
+INTERPUNCT_LOOKALIKES = "•・･∙"
 CJK_PATTERN = re.compile(r"[㐀-鿿豈-﫿　-〿]")
 
 DEFAULT_SLIDE_WIDTH_IN = 13.333333
@@ -120,14 +170,35 @@ def _ocr_engine():
 
 
 def run_ocr(image):
-    """(quad, text, confidence) triples from whichever engine is installed."""
-    result = _ocr_engine()(image)
-    if hasattr(result, "boxes"):
+    """(quad, text, confidence, chars) from whichever engine is installed.
+
+    `chars` holds each recognised character's (left, right) columns; only
+    RapidOCR 3.x reports them, and the older build gives None.
+    """
+    engine = _ocr_engine()
+    if _engine_name == "rapidocr":
+        result = engine(image, return_word_box=True, return_single_char_box=True)
         if result.boxes is None:
             return []
-        return list(zip(result.boxes, result.txts, result.scores))
-    lines, _ = result
-    return lines or []
+        words = result.word_results or [None] * len(result.txts)
+        return [
+            (quad, text, score, char_columns(word))
+            for quad, text, score, word in zip(result.boxes, result.txts, result.scores, words)
+        ]
+    lines, _ = engine(image)
+    return [(quad, text, conf, None) for quad, text, conf in (lines or [])]
+
+
+def char_columns(word_result):
+    if not word_result:
+        return None
+    columns = []
+    for char, _, quad in word_result:
+        if len(char) != 1:
+            return None
+        xs = [float(point[0]) for point in quad]
+        columns.append((min(xs), max(xs)))
+    return columns
 
 
 def read_image(path):
@@ -147,13 +218,18 @@ class OcrBox:
     y: int
     w: int
     h: int
+    # (left, right) page columns of each non-space character, when the OCR
+    # engine reports them.
+    chars: list = None
 
 
 @dataclass
 class TextMetrics:
     stroke_px: float = 0.0
     stroke_ratio: float = 0.0
-    stroke_ratio_net: float = 0.0
+    stroke_ratio_area: float = 0.0
+    # The em in pixels on a page scaled to REFERENCE_PAGE_WIDTH.
+    em_ref_px: float = 0.0
     stroke_cv: float = 0.0
     slant: float = 0.0
 
@@ -191,7 +267,7 @@ def read_boxes(image):
     """Run OCR and drop the three classes of result that cause damage."""
     boxes = []
 
-    for quad, text, conf in run_ocr(image):
+    for quad, text, conf, chars in run_ocr(image):
         text = str(text or "").strip()
         conf = float(conf)
         if not text or conf < MIN_CONF:
@@ -217,7 +293,7 @@ def read_boxes(image):
         if abs(ys[0] - ys[1]) > h * MAX_SKEW:
             continue
 
-        boxes.append(OcrBox(text, conf, int(x), int(y), int(round(w)), int(round(h))))
+        boxes.append(OcrBox(text, conf, int(x), int(y), int(round(w)), int(round(h)), chars))
 
     return boxes
 
@@ -343,6 +419,33 @@ def stroke_metrics(mask):
     return width, variation
 
 
+def area_stroke_px(crop, mask, background, text_colour):
+    """Stroke width as twice the ink area over the outline length.
+
+    Each pixel near the glyphs counts by how far it sits from the background
+    towards the text colour, so the anti-aliased rim adds its true share
+    instead of a whole pixel or none.
+    """
+    crop_f = crop.astype(np.float32)
+    background = np.asarray(background, np.float32)
+    span = np.asarray(text_colour, np.float32) - background
+    span_sq = float((span * span).sum())
+    if span_sq < 1.0:
+        return 0.0
+    coverage = np.clip(((crop_f - background) * span).sum(axis=2) / span_sq, 0.0, 1.0)
+    near = cv2.dilate(mask, np.ones((3, 3), np.uint8), iterations=1).astype(bool)
+    coverage = np.where(near, coverage, 0.0)
+
+    solid = (coverage >= 0.5).astype(np.uint8)
+    contours, _ = cv2.findContours(solid, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+    perimeter = sum(cv2.arcLength(contour, True) for contour in contours)
+    return 2.0 * float(coverage.sum()) / perimeter if perimeter > 0 else 0.0
+
+
+def bold_threshold(em_px):
+    return BOLD_RATIO_BASE + BOLD_RATIO_SIZE_PX / em_px
+
+
 def slant(mask):
     """Shear the mask until the vertical projection is most peaked.
 
@@ -389,6 +492,59 @@ def leading_bullet(mask, glyph_height):
     return 0
 
 
+def ink_gaps(mask, origin_x, min_width, max_width):
+    """Page-column centres of interior blank runs between the two widths."""
+    columns = np.where(mask.any(axis=0))[0]
+    gaps = []
+    for left, right in zip(columns, columns[1:]):
+        if min_width <= right - left - 1 <= max_width:
+            gaps.append(origin_x + (left + right) / 2.0)
+    return gaps
+
+
+def restore_spaces(text, chars, mask, origin_x, em_px):
+    """Put back the spaces OCR drops, where the ink has a space-wide gap.
+
+    Each wide gap is assigned to the nearest boundary between two recognised
+    characters, using the per-character columns the OCR engine reports.
+    Without them the text is returned as read.
+    """
+    glyphs = [(i, c) for i, c in enumerate(text) if not c.isspace()]
+    if not chars or len(chars) != len(glyphs) or len(glyphs) < 2 or em_px <= 0:
+        return text
+
+    boundaries = [
+        (chars[k][1] + chars[k + 1][0]) / 2.0 for k in range(len(glyphs) - 1)
+    ]
+    spaced = set()
+    for gap in ink_gaps(mask, origin_x, SPACE_GAP_EM * em_px, SPACE_GAP_MAX_EM * em_px):
+        k = min(range(len(boundaries)), key=lambda n: abs(boundaries[n] - gap))
+        if abs(boundaries[k] - gap) <= em_px * 0.6:
+            spaced.add(k)
+
+    out = []
+    for k, (i, char) in enumerate(glyphs):
+        out.append(char)
+        if k + 1 == len(glyphs):
+            break
+        following_index, following = glyphs[k + 1]
+        already = following_index > i + 1
+        if already:
+            out.append(" ")
+        elif k in spaced and char not in NO_SPACE_AFTER and following not in NO_SPACE_BEFORE:
+            out.append(" ")
+    return "".join(out)
+
+
+def normalise_interpunct(text):
+    """A dot read between two words is the interpunct, not a bullet."""
+    chars = list(text)
+    for i, char in enumerate(chars):
+        if char in INTERPUNCT_LOOKALIKES and 0 < i < len(chars) - 1 and text[:i].strip():
+            chars[i] = "·"
+    return "".join(chars)
+
+
 def strip_bullet(text):
     stripped = text.lstrip()
     if stripped and stripped[0] in BULLET_CHARS:
@@ -400,15 +556,44 @@ def is_cjk(text):
     return bool(CJK_PATTERN.search(text))
 
 
-def resolve_bold(blocks, mode):
+def deck_weight_offset(blocks):
+    """Where this deck's own regular/bold valley sits, relative to the threshold."""
+    margins = np.array([
+        weight_margin(block) for block in blocks if block.metrics.em_ref_px >= MIN_BOLD_EM_PX
+    ])
+    if margins.size < WEIGHT_VALLEY_MIN_BLOCKS:
+        return 0.0
+    grid = np.arange(-0.1, 0.1, 0.0005)
+    density = np.exp(
+        -((grid[:, None] - margins[None, :]) ** 2) / (2 * WEIGHT_VALLEY_BANDWIDTH ** 2)
+    ).sum(axis=1)
+
+    low, high = WEIGHT_VALLEY_WINDOW
+    best, best_score = 0.0, WEIGHT_VALLEY_DEPTH
+    for i in range(1, grid.size - 1):
+        x = grid[i]
+        if not low <= x <= high:
+            continue
+        if density[i] > density[i - 1] or density[i] > density[i + 1]:
+            continue
+        below = float((margins < x).mean())
+        if below < WEIGHT_VALLEY_MIN_SHARE or below > 1 - WEIGHT_VALLEY_MIN_SHARE:
+            continue
+        score = density[i] / min(density[:i].max(), density[i + 1:].max())
+        if score < best_score:
+            best, best_score = float(x), score
+    return best
+
+
+def resolve_bold(blocks, mode, offset=None):
     """Decide weight.
 
-    `auto` compares the stroke width with the fringe taken out against a fixed
-    share of the em, so the answer does not depend on which other text happens
-    to be on the page. It cannot see bold in small text. When the guess is
-    wrong, pin a threshold on the raw ratio with `ratio:<value>` instead -- the
-    raw measurements stay in the JSON so one calibration serves a whole batch
-    of same-template slides.
+    `auto` compares the area-based stroke width with a share of the em that
+    eases with size, shifted by `offset` to where this deck's own regular and
+    bold clusters part (found from `blocks` when not given). When the guess is
+    wrong for a template, pin a threshold on `stroke_ratio_area` with
+    `ratio:<value>` instead -- the measurements stay in the JSON so one
+    calibration serves a whole batch of same-template slides.
     """
     mode = (mode or "auto").strip().lower()
     if mode == "off" or not blocks:
@@ -423,14 +608,65 @@ def resolve_bold(blocks, mode):
         try:
             threshold = float(mode.split(":", 1)[1])
         except ValueError:
-            threshold = 0.145
+            threshold = 0.1
         for block in blocks:
-            block.bold = block.metrics.stroke_ratio >= threshold
+            block.bold = block.metrics.stroke_ratio_area >= threshold
         return
 
+    if offset is None:
+        offset = deck_weight_offset(blocks)
     for block in blocks:
-        threshold = BOLD_NET_RATIO.get(block.script, BOLD_NET_RATIO["latin"])
-        block.bold = block.metrics.stroke_ratio_net >= threshold
+        block.bold = block.metrics.em_ref_px >= MIN_BOLD_EM_PX and weight_margin(block) >= offset
+    harmonise_siblings(blocks, offset)
+
+
+def weight_margin(block):
+    return block.metrics.stroke_ratio_area - bold_threshold(max(block.metrics.em_ref_px, 1.0))
+
+
+def siblings(left, right):
+    """Same size and colour on one page: almost always one style, like a row of card titles."""
+    a, b = left.metrics.em_ref_px, right.metrics.em_ref_px
+    return (
+        a > 0 and b > 0
+        and abs(a - b) <= max(a, b) * SIBLING_EM_TOLERANCE
+        and colour_distance(left.color, right.color) <= SIBLING_COLOUR_TOLERANCE
+    )
+
+
+def harmonise_siblings(blocks, offset=0.0):
+    """Give each group of sibling blocks one weight, by majority.
+
+    The same style measures a little differently from string to string, and a
+    style that sits near the threshold otherwise comes out with some titles of
+    a row bold and the rest regular. A tie goes by the group's mean margin.
+    """
+    parent = list(range(len(blocks)))
+
+    def root(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for i in range(len(blocks)):
+        for j in range(i + 1, len(blocks)):
+            if siblings(blocks[i], blocks[j]):
+                parent[root(i)] = root(j)
+
+    groups = {}
+    for i, block in enumerate(blocks):
+        groups.setdefault(root(i), []).append(block)
+    for group in groups.values():
+        if len(group) < 2:
+            continue
+        bold = sum(block.bold for block in group)
+        if bold * 2 == len(group):
+            verdict = sum(weight_margin(block) - offset for block in group) >= 0
+        else:
+            verdict = bold * 2 > len(group)
+        for block in group:
+            block.bold = verdict
 
 
 def extract_text(image_path, slide_id, bold_mode="auto", expected=None,
@@ -464,6 +700,10 @@ def extract_text(image_path, slide_id, bold_mode="auto", expected=None,
         text, had_bullet_char = strip_bullet(box.text)
         script = "cjk" if is_cjk(text) else "latin"
         glyph_px = font_height_px(mask[top:bottom, left:right], script)
+        line_em = glyph_px / (CJK_FACE_RATIO if script == "cjk" else LATIN_FACE_RATIO)
+        text, _ = strip_bullet(
+            normalise_interpunct(restore_spaces(box.text, box.chars, mask, box.x, line_em))
+        )
 
         bullet_start = leading_bullet(mask[top:bottom, left:right], glyph_px)
         if bullet_start:
@@ -483,6 +723,7 @@ def extract_text(image_path, slide_id, bold_mode="auto", expected=None,
         em_px = glyph_px / face_ratio
 
         stroke_px, stroke_cv = stroke_metrics(region)
+        area_px = area_stroke_px(crop_region, region, background, text_colour)
         slant_value = slant(region)
 
         blocks.append(
@@ -505,9 +746,8 @@ def extract_text(image_path, slide_id, bold_mode="auto", expected=None,
                 metrics=TextMetrics(
                     stroke_px=round(stroke_px, 2),
                     stroke_ratio=round(stroke_px / em_px, 3) if em_px > 0 else 0.0,
-                    stroke_ratio_net=(
-                        round(max(0.0, stroke_px - FRINGE_PX) / em_px, 3) if em_px > 0 else 0.0
-                    ),
+                    stroke_ratio_area=round(area_px / em_px, 4) if em_px > 0 else 0.0,
+                    em_ref_px=round(em_px * REFERENCE_PAGE_WIDTH / page_w, 2),
                     stroke_cv=round(stroke_cv, 3),
                     slant=round(slant_value, 3),
                 ),
@@ -713,7 +953,8 @@ def block_record(block, page_w, page_h, slide_width_pt):
         "metrics": {
             "stroke_px": block.metrics.stroke_px,
             "stroke_ratio": block.metrics.stroke_ratio,
-            "stroke_ratio_net": block.metrics.stroke_ratio_net,
+            "stroke_ratio_area": block.metrics.stroke_ratio_area,
+            "em_ref_px": block.metrics.em_ref_px,
             "stroke_cv": block.metrics.stroke_cv,
             "slant": block.metrics.slant,
         },
@@ -732,6 +973,7 @@ def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
     ref_w = ref_h = None
 
     seen = {}
+    pages = []
     for index, path in enumerate(image_paths):
         page_h, page_w = read_image(path).shape[:2]
         if ref_w is None:
@@ -745,6 +987,17 @@ def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
             )
         seen[number] = path
         blocks = extract_text(path, f"s{number}", bold_mode, expected, slide_width_pt)
+        pages.append((path, number, page_w, page_h, blocks))
+
+    # Weight is decided across the deck, before lines merge, since merging
+    # keeps bold and regular lines apart.
+    offset = 0.0
+    if (bold_mode or "auto").strip().lower() == "auto":
+        offset = deck_weight_offset([block for *_, blocks in pages for block in blocks])
+        for *_, blocks in pages:
+            resolve_bold(blocks, "auto", offset)
+
+    for path, number, page_w, page_h, blocks in pages:
         line_count = len(blocks)
         if merge:
             blocks = merge_lines(blocks)
@@ -762,6 +1015,7 @@ def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
         "method": "ocr",
         "ocr_engine": _engine_name,
         "bold_mode": bold_mode,
+        "bold_offset": round(offset, 4),
         "slide_width_in": slide_width_in,
         "ref_width": ref_w,
         "ref_height": ref_h,
@@ -776,7 +1030,7 @@ def main():
     ap.add_argument(
         "--bold-mode",
         default="auto",
-        help="auto | off | on | ratio:<stroke_ratio threshold>, e.g. ratio:0.145",
+        help="auto | off | on | ratio:<stroke_ratio_area threshold>, e.g. ratio:0.1",
     )
     ap.add_argument("--no-merge-lines", action="store_true",
                     help="Keep one text box per OCR line instead of merging paragraphs")

@@ -11,6 +11,11 @@ This file records the notable changes in each Slide Alchemy release.
 
 ### Text extraction
 
+- Restore the spaces OCR drops in mixed CJK text ("上线 3 个月" read as "上线3个月"), from the ink gaps at the character boundaries RapidOCR 3.x reports; full-width punctuation and gaps wider than a space are left alone. Read the interpunct back as `·` instead of `•` or `・`.
+- Decide weight from an area-based stroke width (twice the coverage-weighted ink area over the outline length) against a threshold that eases with size, instead of a distance transform that moved in whole-pixel steps and called nearly all 15-18pt body text bold. Sizes are normalised to a 1920px-wide page.
+- Find each deck's own split between regular and bold: across all pages, the valley between the two clusters shifts the threshold (`bold_offset` in the output). Blocks on a page with the same size and colour take the majority weight, so a row of titles is never half bold.
+- `ratio:<value>` now thresholds `stroke_ratio_area`, as the calibration guide describes; `stroke_ratio_net` is replaced by `stroke_ratio_area` and `em_ref_px`.
+
 - Replace visual-model text extraction with `scripts/extract_text.py`: RapidOCR reads the characters; position, font size, colour, weight, bullets, and paragraph merging are measured from the pixels. Ported from slide-alchemy-pipeline.
 - Write compose-ready text boxes (`bbox_*`, with font-substitution slack and baseline lift) next to the measured glyph bounds (`ink_bbox_*`), and keep raw stroke metrics for bold calibration.
 - Decide bold from the stroke width with the anti-aliased fringe removed, so that it no longer depends on which other text is on the page. Drop the stroke-variation serif guess, which flagged heavy sans titles as serif.
@@ -21,6 +26,7 @@ This file records the notable changes in each Slide Alchemy release.
 
 ### Composition
 
+- Drop the theme drop shadow that `add_shape` gave every card, line, and disc.
 - Split text on `\n` into separate paragraphs; a run cannot hold a line break.
 - Apply `line_spacing_pt` as exact line spacing, so merged paragraphs keep the source's line pitch.
 - Place PNG images by their drawn pixels (`fit: visible`, the new default): the image bbox is the drawing's bounds from element analysis, and the transparent padding falls outside it. `fit: frame` (or spec-level `image_fit`) keeps the old whole-PNG stretch; the bundled example specs now set it explicitly.
@@ -37,6 +43,11 @@ This file records the notable changes in each Slide Alchemy release.
 - Use the `rx`/`ry` radius for rounded rectangles, and rotate rects and ellipses natively.
 - Remove the drop shadow that the theme's default effect added to every shape.
 - Default `fill` to black as SVG does, and reject curves, skewed boxes, gradients, and nested `<svg>` with a clear error.
+
+### Asset slicing
+
+- Unmix the anti-aliased rim from the key colour: each rim pixel's coverage and colour are recovered against the nearest solid pixel, which removes the 1px key-colour fringe (`--edge-px`, default 2; 0 turns it off). Keying is vectorised.
+- The asset sheet prompt asks for fully opaque assets, since pale or translucent parts blended with the key colour cannot be recovered.
 
 ### Validation
 

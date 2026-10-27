@@ -4,6 +4,9 @@ import json
 import re
 from numbers import Real
 from pathlib import Path
+
+import cv2
+import numpy as np
 from PIL import Image
 
 
@@ -41,16 +44,55 @@ def validate_crop_item(index, item):
     return item_id, bbox
 
 
-def key_to_alpha(img, key=(0, 255, 0), tolerance=70):
-    img = img.convert("RGBA")
-    pix = img.load()
-    kr, kg, kb = key
-    for y in range(img.height):
-        for x in range(img.width):
-            r, g, b, a = pix[x, y]
-            if abs(r - kr) <= tolerance and abs(g - kg) <= tolerance and abs(b - kb) <= tolerance:
-                pix[x, y] = (r, g, b, 0)
-    return img
+def key_to_alpha(img, key=(0, 255, 0), tolerance=70, edge_px=2):
+    rgba = np.array(img.convert("RGBA"))
+    rgb = rgba[..., :3].astype(np.float32)
+    keyed = (np.abs(rgb - np.array(key, np.float32)) <= tolerance).all(axis=2)
+    rgba[keyed, 3] = 0
+    if edge_px > 0 and keyed.any() and not keyed.all():
+        unmix_edges(rgba, keyed, np.array(key, np.float32), edge_px)
+    return Image.fromarray(rgba, "RGBA")
+
+
+def unmix_edges(rgba, keyed, key, edge_px):
+    """Take the key colour back out of the anti-aliased rim.
+
+    A rim pixel is a blend of the drawing and the key, and the tolerance test
+    keeps it fully opaque, so every asset comes out with a coloured fringe.
+    Each rim pixel is matched to the nearest solid pixel inside the drawing;
+    projecting it onto the line from the key to that colour gives its coverage,
+    and dividing the key back out gives its own colour.
+    """
+    near_key = cv2.dilate(keyed.astype(np.uint8), np.ones((3, 3), np.uint8), iterations=edge_px).astype(bool)
+    rim = near_key & ~keyed
+    solid = ~near_key & ~keyed
+    if not rim.any() or not solid.any():
+        return
+
+    # Distance to the nearest solid pixel, labelled with that pixel's index.
+    _, labels = cv2.distanceTransformWithLabels(
+        (~solid).astype(np.uint8), cv2.DIST_L2, 3, labelType=cv2.DIST_LABEL_PIXEL
+    )
+    solid_ys, solid_xs = np.nonzero(solid)
+    by_label = np.zeros(labels.max() + 1, dtype=np.int64)
+    by_label[labels[solid_ys, solid_xs]] = np.arange(solid_ys.size)
+
+    ys, xs = np.nonzero(rim)
+    nearest = by_label[labels[ys, xs]]
+    rgb = rgba[..., :3].astype(np.float32)
+    colour = rgb[ys, xs]
+    fore = rgb[solid_ys[nearest], solid_xs[nearest]]
+
+    span = fore - key
+    span_sq = (span * span).sum(axis=1)
+    usable = span_sq > 900  # a drawing within ~30 of the key cannot be unmixed
+    coverage = np.ones(len(ys), np.float32)
+    coverage[usable] = np.clip(((colour - key) * span).sum(axis=1)[usable] / span_sq[usable], 0, 1)
+
+    unmixed = key + (colour - key) / np.maximum(coverage, 1e-3)[:, None]
+    restored = np.where(coverage[:, None] > 0.2, np.clip(unmixed, 0, 255), fore)
+    rgba[ys, xs, :3] = np.where(usable[:, None], restored, colour).astype(np.uint8)
+    rgba[ys, xs, 3] = np.round(rgba[ys, xs, 3] * np.where(usable, coverage, 1)).astype(np.uint8)
 
 
 def parse_hex_color(value):
@@ -65,6 +107,7 @@ def main():
     ap.add_argument("output_dir")
     ap.add_argument("--key-color", help="Override the crop spec key color (default: #00ff00)")
     ap.add_argument("--tolerance", type=int, default=70)
+    ap.add_argument("--edge-px", type=int, default=2, help="Rim width to unmix from the key colour; 0 turns it off")
     ap.add_argument("--pad", type=int, default=16)
     ap.add_argument("--trim", action="store_true", help="Trim alpha bbox but keep --pad. Off by default.")
     args = ap.parse_args()
@@ -80,7 +123,7 @@ def main():
         key_color = args.key_color or "#00ff00"
     if not isinstance(crops, list):
         raise ValueError("crops JSON must be an array or an object containing a crops array")
-    sheet = key_to_alpha(Image.open(args.sheet_png), parse_hex_color(key_color), args.tolerance)
+    sheet = key_to_alpha(Image.open(args.sheet_png), parse_hex_color(key_color), args.tolerance, args.edge_px)
 
     for index, item in enumerate(crops):
         item_id, item_bbox = validate_crop_item(index, item)

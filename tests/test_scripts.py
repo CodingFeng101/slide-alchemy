@@ -279,6 +279,45 @@ class SliceAssetSheetTests(unittest.TestCase):
             self.assertEqual(255, icon.getpixel((20, 20))[3])
 
 
+    def test_rim_blended_with_the_key_is_unmixed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            sheet_path = tmp_path / "sheet.png"
+            spec_path = tmp_path / "crops.json"
+            output_dir = tmp_path / "output"
+
+            # Blue square on green, ringed by a one-pixel 50/50 blend of the two.
+            sheet = Image.new("RGB", (60, 60), (0, 255, 0))
+            sheet.paste((22, 80, 220), (19, 19, 41, 41))
+            sheet.paste((30, 120, 230), (20, 20, 40, 40))
+            for x in range(19, 41):
+                for y in (19, 40):
+                    sheet.putpixel((x, y), (15, 168, 110))
+                    sheet.putpixel((y, x), (15, 168, 110))
+            sheet.paste((30, 120, 230), (20, 20, 40, 40))
+            sheet.save(sheet_path)
+            spec_path.write_text(
+                json.dumps({"key_color": "#00ff00", "crops": [{"id": "icon", "bbox": [0, 0, 60, 60]}]}),
+                encoding="utf-8",
+            )
+
+            run = lambda *extra: subprocess.run(
+                [sys.executable, str(SCRIPTS / "slice_asset_sheet.py"), str(sheet_path), str(spec_path),
+                 str(output_dir), *extra],
+                capture_output=True, text=True,
+            )
+            result = run()
+            self.assertEqual(0, result.returncode, result.stderr)
+            r, g, b, a = Image.open(output_dir / "icon.png").convert("RGBA").getpixel((30, 19))
+            self.assertLess(abs(a - 128), 20)
+            self.assertLess(g, b)  # blue again, not green
+            self.assertEqual((30, 120, 230, 255), Image.open(output_dir / "icon.png").getpixel((30, 30)))
+
+            result = run("--edge-px", "0")
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual((15, 168, 110, 255), Image.open(output_dir / "icon.png").convert("RGBA").getpixel((30, 19)))
+
+
 class ValidateElementAnalysisTests(unittest.TestCase):
     def run_validator(self, payload):
         with tempfile.TemporaryDirectory() as tmp:
@@ -469,6 +508,47 @@ class ExtractTextLogicTests(unittest.TestCase):
     def block(self, text, bbox, size=14.0, **extra):
         return self.et.TextBlock(id=text, text=text, bbox=bbox, font_size_pt=size, **extra)
 
+    def glyph_mask(self, spans, height=20):
+        """A one-line mask with ink in each (left, right) column span."""
+        import numpy as np
+
+        mask = np.zeros((height, max(right for _, right in spans) + 5), np.uint8)
+        for left, right in spans:
+            mask[2:height - 2, left:right] = 1
+        return mask
+
+    def test_space_width_gaps_become_spaces(self):
+        # 30px em: glyphs 26px wide with 3px tracking, and a 12px (0.4 em)
+        # gap after the second glyph and after the digit.
+        spans = [(0, 26), (29, 55), (67, 79), (91, 117), (120, 146)]
+        chars = [(0, 27), (28, 56), (64, 82), (88, 118), (119, 147)]
+        mask = self.glyph_mask(spans)
+
+        self.assertEqual("上线 3 个月", self.et.restore_spaces("上线3个月", chars, mask, 0, 30))
+        # Page offset: the OCR box starts at x=500 and so do the char columns.
+        shifted = [(a + 500, b + 500) for a, b in chars]
+        self.assertEqual("上线 3 个月", self.et.restore_spaces("上线3个月", shifted, mask, 500, 30))
+
+    def test_no_space_without_char_columns_or_after_full_width_punctuation(self):
+        spans = [(0, 26), (29, 55), (67, 93)]
+        chars = [(0, 27), (28, 56), (64, 94)]
+        mask = self.glyph_mask(spans)
+
+        self.assertEqual("上线月", self.et.restore_spaces("上线月", None, mask, 0, 30))
+        self.assertEqual("人：张", self.et.restore_spaces("人：张", chars, mask, 0, 30))
+        # A spaced string keeps its one space instead of gaining another.
+        self.assertEqual("AI 2.0", self.et.restore_spaces("AI 2.0", [(0, 10), (11, 22), (36, 46), (47, 52), (53, 63)],
+                                                          self.glyph_mask([(0, 10), (11, 22), (36, 46), (47, 52), (53, 63)]), 0, 30))
+
+    def test_gap_wider_than_a_space_is_not_a_space(self):
+        spans = [(0, 26), (60, 86)]  # 34px = 1.13 em: a lost glyph, not a space
+        self.assertEqual("张明", self.et.restore_spaces("张明", [(0, 27), (59, 87)], self.glyph_mask(spans), 0, 30))
+
+    def test_interpunct_lookalikes_between_words(self):
+        self.assertEqual("中心 · 述职", self.et.normalise_interpunct("中心 • 述职"))
+        self.assertEqual("携手同行·再创佳绩", self.et.normalise_interpunct("携手同行・再创佳绩"))
+        self.assertEqual("• 第一条", self.et.normalise_interpunct("• 第一条"))
+
     def test_merge_follows_columns_not_reading_order(self):
         et = self.et
         blocks = [
@@ -505,24 +585,56 @@ class ExtractTextLogicTests(unittest.TestCase):
         self.assertEqual(20, self.et.leading_bullet(middle, 16))
         self.assertEqual(0, self.et.leading_bullet(baseline, 16))
 
-    def test_auto_bold_uses_fringe_corrected_ratio(self):
+    def weighted(self, text, em, ratio, color="#333333"):
+        block = self.block(text, (0, 0, 0.1, 0.03), color=color)
+        block.metrics.em_ref_px = em
+        block.metrics.stroke_ratio_area = ratio
+        return block
+
+    def test_auto_threshold_eases_with_size(self):
         et = self.et
-        heading = self.block("heading", (0, 0, 0.1, 0.05), size=22)
-        heading.metrics.stroke_ratio_net = 0.076
-        body = self.block("body", (0, 0.1, 0.1, 0.03), size=11)
-        body.metrics.stroke_ratio_net = 0.046
-        latin = self.block("Data", (0, 0.2, 0.1, 0.03), size=20, script="latin")
-        latin.metrics.stroke_ratio_net = 0.08
+        # 0.0915 + 0.75/em: 0.1165 at a 30px em, 0.1015 at 75px.
+        body = self.weighted("body", 30, 0.112)
+        heading = self.weighted("heading", 75, 0.112)
+        tiny = self.weighted("tiny", 10, 0.2)
 
-        et.resolve_bold([heading, body, latin], "auto")
+        et.resolve_bold([body, heading, tiny], "auto", offset=0.0)
 
-        self.assertEqual([True, False, False], [heading.bold, body.bold, latin.bold])
+        self.assertEqual([False, True, False], [body.bold, heading.bold, tiny.bold])
 
-    def test_ratio_mode_thresholds_raw_ratio(self):
-        block = self.block("x", (0, 0, 0.1, 0.03))
-        block.metrics.stroke_ratio = 0.15
+    def test_deck_valley_moves_the_threshold(self):
+        et = self.et
+        # Regular body sits 0.03 under the threshold, labels 0.01 under it:
+        # two clusters, both below the threshold, with a valley between.
+        body = [self.weighted(f"b{i}", 30, et.bold_threshold(30) - 0.032 + i * 0.001) for i in range(8)]
+        labels = [self.weighted(f"l{i}", 40, et.bold_threshold(40) - 0.012 + i * 0.001, color=f"#0000{i:02X}") for i in range(6)]
+        offset = et.deck_weight_offset(body + labels)
 
-        self.et.resolve_bold([block], "ratio:0.145")
+        self.assertTrue(-0.024 < offset < -0.016, offset)
+        et.resolve_bold(body + labels, "auto", offset)
+        self.assertFalse(any(b.bold for b in body))
+        self.assertTrue(all(b.bold for b in labels))
+
+    def test_single_weight_deck_keeps_the_threshold(self):
+        et = self.et
+        blocks = [self.weighted(f"b{i}", 30, et.bold_threshold(30) - 0.03 + i * 0.0005) for i in range(20)]
+
+        self.assertEqual(0.0, et.deck_weight_offset(blocks))
+
+    def test_siblings_share_the_majority_weight(self):
+        et = self.et
+        titles = [self.weighted(t, 40, et.bold_threshold(40) + d, color="#0450DA")
+                  for t, d in (("演绎推理", -0.001), ("归纳推理", 0.0005), ("规则推理", 0.005))]
+        other = self.weighted("说明", 29, et.bold_threshold(29) - 0.03, color="#555555")
+
+        et.resolve_bold(titles + [other], "auto", offset=0.0)
+
+        self.assertEqual([True, True, True, False], [b.bold for b in titles + [other]])
+
+    def test_ratio_mode_thresholds_area_ratio(self):
+        block = self.weighted("x", 30, 0.105)
+
+        self.et.resolve_bold([block], "ratio:0.1")
 
         self.assertTrue(block.bold)
 
@@ -701,6 +813,18 @@ class ComposeShapeAndImageTests(unittest.TestCase):
 
         self.assertIn('<a:alpha val="80000"/>', slide_xml)
         self.assertAlmostEqual(24000, adjustment(slide_xml), delta=2)
+
+    def test_shapes_drop_the_theme_shadow(self):
+        slide_xml, _ = self.compose({
+            "ref_width": 1920,
+            "ref_height": 1080,
+            "slides": [{"geometry": [
+                {"id": "card", "kind": "round_rect", "bbox_px": [0, 0, 200, 100], "fill": "#FFFFFF"},
+                {"id": "rule", "kind": "line", "bbox_px": [0, 200, 400, 2], "fill": "#FF7A1A"},
+            ]}],
+        })
+
+        self.assertEqual(2, slide_xml.count("<a:effectLst/>"))
 
 
 class FakeImageApi:

@@ -13,6 +13,7 @@ Each icon must have large empty space on all sides. Icons must not touch each ot
 Remove image noise and high-frequency visual artifacts from the regenerated icons.
 Preserve all icon linework exactly. Keep colors and brightness unchanged.
 Preserve the original icon style, colors, highlights, shadows, and proportions.
+Render every asset fully opaque with crisp edges. Do not let any part of an asset fade, glow, or blend into the key color: pale or translucent parts (faded buildings, mist, soft glows, light reflections) must be painted as solid light colors, because anything mixed with the key color is cut out or tinted when the key is removed.
 For complex composite icons, place each whole composite as one isolated asset; do not split it.
 Output only the asset sheet, not the slide background.
 ```

@@ -58,7 +58,8 @@ Slide numbers come from the trailing digits of each file name (`slide_003.png` -
           "metrics": {
             "stroke_px": 1.91,
             "stroke_ratio": 0.085,
-            "stroke_ratio_net": 0.041,
+            "stroke_ratio_area": 0.0951,
+            "em_ref_px": 36.0,
             "stroke_cv": 0.075,
             "slant": -0.02
           }
@@ -76,7 +77,8 @@ Field meanings:
 - `font_size_pt`: points on a slide `slide_width_in` wide.
 - `line_spacing_pt`: present only on merged paragraphs. It is the page's own line pitch, and the composer applies it as exact line spacing.
 - `bullet`: a leading bullet was detected. The text already carries a `• ` prefix on each line.
-- `metrics`: raw measurements, kept so a bold threshold can be calibrated once and reused across a batch.
+- `metrics`: raw measurements, kept so a bold threshold can be calibrated once and reused across a batch. `stroke_ratio_area` is what weight is decided on; `em_ref_px` is the em on a page scaled to 1920px wide.
+- `bold_offset` (top level): where this deck's regular and bold clusters part, relative to the size-based threshold. `0` means no clear split was found and the threshold was used as is.
 - `align` is always `left`, because the box is anchored at the measured left edge of the ink.
 
 ## How the Measurement Works
@@ -89,15 +91,15 @@ These points are load-bearing. Do not "simplify" them away.
 - **Bounds.** Re-derived from the ink mask. OCR boxes routinely swallow a neighbouring icon.
 - **Font size.** The 80th percentile of connected-component heights, after dropping fragments shorter than half the tallest component. Thin CJK strokes break into pieces, and keeping those pieces would make the size a third too small. Divide by the face ratio to get the em. The ratio belongs to the face the composer renders (Microsoft YaHei in PowerPoint), not to the source face, because the rebuilt ink is what has to match: CJK 0.94, Latin 0.75. An all-lowercase Latin line without ascenders measures small, because its components are mostly x-height.
 - **Colour.** The median of the *eroded* mask. Anti-aliased edges are a blend of text and background, and sampling them washes the colour out.
-- **Weight.** Use a distance transform, never ink coverage. Coverage cannot tell a dense regular glyph from a simple bold one. About 1px of anti-aliased fringe is subtracted before dividing by the em (`stroke_ratio_net`). `auto` calls CJK text bold at 0.067 or above and Latin text at 0.09 or above. Below about 18px, bold and regular overlap, and no threshold separates them.
+- **Weight.** Stroke width is twice the ink area over the outline length, with anti-aliased pixels counted by their coverage, divided by the em (`stroke_ratio_area`). Do not use ink coverage of the box, which cannot tell a dense regular glyph from a simple bold one, and do not use a distance transform, which moves in whole-pixel steps and put 15-18pt regular text on the same step as bold headings. The threshold is `0.0915 + 0.75 / em_ref_px`: high for small text, easing with size. Generated decks draw body text heavier than a true regular, and how much heavier varies by deck, so `auto` then looks across all pages for the valley between the deck's own regular and bold clusters and shifts the threshold there (`bold_offset`). Finally, blocks on one page with the same size and colour, such as a row of card titles, take the majority weight. Bold below about 13pt (a 26px em) is usually read as regular.
 - **Bullets.** A small leading component in the middle band of the line, followed by a gap, is a bullet. So is a leading bullet character in the OCR text. A speck at the top or baseline of the line is the edge of a badge, not a bullet.
 - **Line merging.** Each block is chained to its own successor below it, with similar left edge, size, colour, weight, and bullet state. Do not merge in reading order: reading order interleaves side-by-side columns and severs every paragraph on a two-column page.
 
 ## Bold Calibration
 
-Bold is relative to the regular weight of the same family, and a page may contain no regular sample to compare against. If `auto` gets a template wrong:
+Bold is relative to the regular weight of the same family. `auto` finds that split per deck, so run the whole deck in one call rather than page by page. If it still gets a template wrong:
 
-1. Read `metrics.stroke_ratio` for blocks you know are bold and blocks you know are regular.
+1. Read `metrics.stroke_ratio_area` for blocks you know are bold and blocks you know are regular.
 2. Re-run with `--bold-mode ratio:<value between them>`.
 3. Reuse that value for every page of the same template.
 

@@ -149,7 +149,7 @@ Do not claim arbitrary SVG path conversion works unless verified in a generated 
 
 ### Bold is wrong
 
-1. Compare `metrics.stroke_ratio` of blocks that should and should not be bold.
+1. Check that all pages were extracted in one run; `auto` decides weight across the deck. Then compare `metrics.stroke_ratio_area` of blocks that should and should not be bold.
 2. Re-run with `--bold-mode ratio:<value between them>`, or `off`/`on` for a single-weight deck.
 3. Reuse the value for every page of the same template. Do not edit weights block by block.
 
