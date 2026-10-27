@@ -31,6 +31,7 @@ Slide Alchemy 是一个 Codex Skill，用来把图片型 PPT/PPTX、幻灯片截
 | 🪙 **更省 token** | 先把页面分析成可复用组件，避免每一页都从零描述和重建。 |
 | ⚡ **还原更快** | 重复的卡片、星星、线条、标题条和图标素材只生成一次，再跨页面复用。 |
 | ✍️ **文字可编辑** | 普通文字会还原为 PowerPoint 文本框，而不是截图文字。 |
+| 📏 **文字位置实测** | OCR 只负责认字，位置、字号、颜色、粗细、项目符号和行距都从像素量出来，不靠视觉模型估算。 |
 | 📐 **几何元素可编辑** | 线条、星星、卡片、标题条、圆形、边框等会尽量还原为 PPT 可编辑对象。 |
 | 🧩 **复杂图标更稳定** | 奖杯、徽章、插画、光效等复杂图标保留为透明 PNG，避免硬拆后变丑。 |
 | 🖼️ **底图由 AI 清理** | 底图由图像编辑模型补全，不用白块遮罩或本地粗糙 inpaint。 |
@@ -79,6 +80,12 @@ Install the Codex skill from https://github.com/CodingFeng101/slide-alchemy.git
 ```
 
 安装后重启 Codex。
+
+Skill 自带的脚本需要安装 Python 依赖，其中包括文字提取用的 OCR 引擎。OCR 模型随包附带，运行时不需要联网下载：
+
+```bash
+pip install -r skill/slide-alchemy/requirements.txt
+```
 
 ## 🚀 使用
 

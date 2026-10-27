@@ -100,15 +100,19 @@ def add_text(slide, item, ref_w, ref_h, slide_w, slide_h):
     tf.margin_right = 0
     tf.margin_top = 0
     tf.margin_bottom = 0
-    p = tf.paragraphs[0]
-    p.alignment = ALIGN.get(item.get("align", "center"), PP_ALIGN.CENTER)
-    run = p.add_run()
-    run.text = item.get("text", "")
-    run.font.name = item.get("font_family", "Microsoft YaHei")
-    run.font.size = Pt(float(item.get("font_size_pt", 18)))
-    run.font.bold = as_bool(item.get("bold"), False)
-    run.font.italic = as_bool(item.get("italic"), False)
-    run.font.color.rgb = rgb(item.get("color"), "000000")
+    # A run cannot hold a line break; each line becomes its own paragraph.
+    for index, line in enumerate(str(item.get("text", "")).split("\n")):
+        p = tf.paragraphs[0] if index == 0 else tf.add_paragraph()
+        p.alignment = ALIGN.get(item.get("align", "center"), PP_ALIGN.CENTER)
+        if item.get("line_spacing_pt"):
+            p.line_spacing = Pt(float(item["line_spacing_pt"]))
+        run = p.add_run()
+        run.text = line
+        run.font.name = item.get("font_family", "Microsoft YaHei")
+        run.font.size = Pt(float(item.get("font_size_pt", 18)))
+        run.font.bold = as_bool(item.get("bold"), False)
+        run.font.italic = as_bool(item.get("italic"), False)
+        run.font.color.rgb = rgb(item.get("color"), "000000")
     return box
 
 

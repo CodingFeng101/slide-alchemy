@@ -31,6 +31,7 @@ source slide image
 | 🪙 **Lower token use** | Pages are analyzed into reusable components, so repeated slide objects do not need to be described and rebuilt from scratch. |
 | ⚡ **Faster reconstruction** | Repeated cards, stars, lines, title bars, and icon assets are generated once, then reused across slides. |
 | ✍️ **Editable text** | Normal slide text becomes real PowerPoint text boxes, not rasterized text. |
+| 📏 **Measured text layout** | OCR reads the characters; position, font size, colour, weight, bullets, and line spacing are measured from the pixels instead of estimated by a vision model. |
 | 📐 **Editable geometry** | Lines, stars, cards, title bars, circles, borders, and other simple shapes become editable PPT objects when practical. |
 | 🧩 **Stable complex icons** | Badges, illustrations, glow effects, and detailed icons stay as transparent PNG assets instead of brittle over-splitting. |
 | 🖼️ **AI-cleaned bases** | Backgrounds are regenerated with an image editing model, not covered with white masks or rough local inpainting. |
@@ -79,6 +80,12 @@ Install the Codex skill from https://github.com/CodingFeng101/slide-alchemy.git
 ```
 
 Restart Codex after installation.
+
+The bundled scripts need their Python dependencies, including the OCR engine used for text extraction. The OCR models ship inside the package, so nothing is downloaded at run time:
+
+```bash
+pip install -r skill/slide-alchemy/requirements.txt
+```
 
 ## 🚀 Usage
 
