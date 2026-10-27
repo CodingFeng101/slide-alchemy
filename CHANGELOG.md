@@ -4,6 +4,11 @@ This file records the notable changes in each Slide Alchemy release.
 
 ## [Unreleased]
 
+### Claude Code support
+
+- Add `scripts/generate_image.py`, which generates or edits images through an OpenAI-compatible Images API (configured by `SLIDE_ALCHEMY_IMAGE_*` environment variables) for runtimes without an image tool, such as Claude Code. A reference image makes the request an edit; gateways without an images endpoint fall back to `/chat/completions`.
+- Document installing the skill in Claude Code and configuring the image API, in both READMEs.
+
 ### Text extraction
 
 - Replace visual-model text extraction with `scripts/extract_text.py`: RapidOCR reads the characters; position, font size, colour, weight, bullets, and paragraph merging are measured from the pixels. Ported from slide-alchemy-pipeline.

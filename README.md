@@ -14,7 +14,7 @@
 
 If this saves you from rebuilding a deck by hand, please **star the repo** so more people working with AI-generated slides can find it.
 
-Slide Alchemy is a Codex skill for rebuilding picture-style PPT/PPTX files, slide screenshots, and scanned visual decks into editable `.pptx` files. It does not place a full-slide screenshot back into PowerPoint and call it editable. It separates each page into a clean base background, editable geometry, generated PNG assets, and real text boxes.
+Slide Alchemy is a skill for Codex and Claude Code that rebuilds picture-style PPT/PPTX files, slide screenshots, and scanned visual decks into editable `.pptx` files. It does not place a full-slide screenshot back into PowerPoint and call it editable. It separates each page into a clean base background, editable geometry, generated PNG assets, and real text boxes.
 
 ```text
 source slide image
@@ -73,13 +73,42 @@ Slide Alchemy uses a component-based reconstruction strategy:
 
 ## 📦 Installation
 
-Ask Codex to install this skill from the repository:
+### Codex
+
+Ask Codex to install this skill from the repository, then restart Codex:
 
 ```text
 Install the Codex skill from https://github.com/CodingFeng101/slide-alchemy.git
 ```
 
-Restart Codex after installation.
+### Claude Code
+
+Ask Claude Code to install it:
+
+```text
+Install the skill from https://github.com/CodingFeng101/slide-alchemy.git: copy its skill/slide-alchemy folder into ~/.claude/skills/
+```
+
+Or copy it yourself:
+
+```bash
+git clone https://github.com/CodingFeng101/slide-alchemy.git
+cp -r slide-alchemy/skill/slide-alchemy ~/.claude/skills/
+```
+
+Restart Claude Code so it picks up the skill.
+
+Claude Code has no image tool of its own, so the skill calls `scripts/generate_image.py`, which uses an OpenAI-compatible Images API. Set these before starting Claude Code:
+
+```bash
+export SLIDE_ALCHEMY_IMAGE_API_KEY=sk-...
+export SLIDE_ALCHEMY_IMAGE_BASE_URL=https://api.openai.com/v1   # or your compatible gateway
+export SLIDE_ALCHEMY_IMAGE_MODEL=gpt-image-2                     # optional, this is the default
+```
+
+On Windows PowerShell, use `$env:SLIDE_ALCHEMY_IMAGE_API_KEY = "sk-..."`, or `setx` to keep the values across sessions.
+
+### Python dependencies
 
 The bundled scripts need their Python dependencies, including the OCR engine used for text extraction. The OCR models ship inside the package, so nothing is downloaded at run time:
 
@@ -89,10 +118,16 @@ pip install -r skill/slide-alchemy/requirements.txt
 
 ## 🚀 Usage
 
-Invoke the skill in Codex:
+In Codex:
 
 ```text
 Use $slide-alchemy to convert these image-style PPT slides into an editable PPTX.
+```
+
+In Claude Code:
+
+```text
+/slide-alchemy convert deck.pptx into an editable PPTX
 ```
 
 ## 🧱 Element Strategy

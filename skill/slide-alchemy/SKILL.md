@@ -40,6 +40,8 @@ Image generation/editing model use is mandatory for:
 - `complex_png_whole` asset sheets;
 - any regenerated visual asset that must match the image PPT.
 
+Use the runtime's own image generation/editing tool when it has one, as Codex does. When it has none, as in Claude Code, run `scripts/generate_image.py`: it sends the prompt, plus the source page as `--reference` for edits, to an OpenAI-compatible Images API configured by `SLIDE_ALCHEMY_IMAGE_API_KEY`, `SLIDE_ALCHEMY_IMAGE_BASE_URL`, and `SLIDE_ALCHEMY_IMAGE_MODEL`. If neither is available, stop and tell the user how to configure the script; do not fall back to any of the replacements forbidden below.
+
 Every regenerated image asset must remove image noise and high-frequency visual artifacts while preserving all kept linework. Colors and brightness must remain unchanged.
 
 Do not replace those model steps with local white masks, local inpainting, direct source-image crops, copied screenshot fragments, PPT native shape approximations, or generic presentation templates.
@@ -149,6 +151,7 @@ Use a run directory with this shape:
 run/
   source/
     slide_001.png
+  prompts/
   base/
     slide_001_base.png
   analysis/
@@ -190,6 +193,7 @@ Script dependencies are listed in `requirements.txt` inside this skill directory
 
 Use bundled scripts for deterministic checks:
 
+- `scripts/generate_image.py`: generate an image, or edit one given `--reference`, through an OpenAI-compatible Images API when the runtime has no image tool. Pass long prompts as `@prompt.txt`.
 - `scripts/inspect_edges.py`: report transparent PNGs that touch crop edges.
 - `scripts/build_contact_sheet.py`: make contact sheets for sliced PNG assets.
 - `scripts/slice_asset_sheet.py`: slice a solid-key asset sheet from a JSON crop spec while preserving padding.

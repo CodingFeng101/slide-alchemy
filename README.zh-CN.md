@@ -14,7 +14,7 @@
 
 如果它帮你省下了手工重做幻灯片的时间，欢迎给仓库点个 **Star**，让更多需要处理 AI 幻灯片的人找到它。
 
-Slide Alchemy 是一个 Codex Skill，用来把图片型 PPT/PPTX、幻灯片截图、扫描版视觉页面还原成可编辑的 `.pptx`。它不是把整页截图塞回 PowerPoint 后称为“可编辑”，而是把页面拆成干净底图、可编辑几何形状、生成式 PNG 素材和真实文本框。
+Slide Alchemy 是一个可用于 Codex 和 Claude Code 的 Skill，用来把图片型 PPT/PPTX、幻灯片截图、扫描版视觉页面还原成可编辑的 `.pptx`。它不是把整页截图塞回 PowerPoint 后称为“可编辑”，而是把页面拆成干净底图、可编辑几何形状、生成式 PNG 素材和真实文本框。
 
 ```text
 原始幻灯片图片
@@ -73,13 +73,42 @@ Slide Alchemy 使用组件化还原策略：
 
 ## 📦 安装
 
-让 Codex 从这个仓库安装 skill：
+### Codex
+
+让 Codex 从这个仓库安装 skill，装好后重启 Codex：
 
 ```text
 Install the Codex skill from https://github.com/CodingFeng101/slide-alchemy.git
 ```
 
-安装后重启 Codex。
+### Claude Code
+
+让 Claude Code 帮你安装：
+
+```text
+从 https://github.com/CodingFeng101/slide-alchemy.git 安装 skill：把其中的 skill/slide-alchemy 文件夹复制到 ~/.claude/skills/
+```
+
+也可以手动复制：
+
+```bash
+git clone https://github.com/CodingFeng101/slide-alchemy.git
+cp -r slide-alchemy/skill/slide-alchemy ~/.claude/skills/
+```
+
+装好后重启 Claude Code，让它加载这个 skill。
+
+Claude Code 没有自带的生图工具，skill 会改用 `scripts/generate_image.py` 调用兼容 OpenAI 的 Images API。启动 Claude Code 前先设置：
+
+```bash
+export SLIDE_ALCHEMY_IMAGE_API_KEY=sk-...
+export SLIDE_ALCHEMY_IMAGE_BASE_URL=https://api.openai.com/v1   # 也可以换成兼容的中转地址
+export SLIDE_ALCHEMY_IMAGE_MODEL=gpt-image-2                     # 可选，默认就是这个
+```
+
+Windows PowerShell 用 `$env:SLIDE_ALCHEMY_IMAGE_API_KEY = "sk-..."`；想长期生效可以用 `setx`。
+
+### Python 依赖
 
 Skill 自带的脚本需要安装 Python 依赖，其中包括文字提取用的 OCR 引擎。OCR 模型随包附带，运行时不需要联网下载：
 
@@ -93,6 +122,12 @@ pip install -r skill/slide-alchemy/requirements.txt
 
 ```text
 Use $slide-alchemy to convert these image-style PPT slides into an editable PPTX.
+```
+
+在 Claude Code 中调用：
+
+```text
+/slide-alchemy 把 deck.pptx 转成可编辑的 PPTX
 ```
 
 ## 🧱 元素分类策略

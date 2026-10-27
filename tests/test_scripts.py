@@ -703,5 +703,145 @@ class ComposeShapeAndImageTests(unittest.TestCase):
         self.assertAlmostEqual(24000, adjustment(slide_xml), delta=2)
 
 
+class FakeImageApi:
+    """A local OpenAI-compatible endpoint that records requests and returns a PNG."""
+
+    def __init__(self, missing=()):
+        import base64
+        import io
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+        import threading
+
+        png = io.BytesIO()
+        Image.new("RGB", (32, 18), (30, 79, 216)).save(png, format="PNG")
+        b64 = base64.b64encode(png.getvalue()).decode()
+        self.requests = []
+        api = self
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                body = self.rfile.read(int(self.headers["Content-Length"]))
+                api.requests.append((self.path, self.headers["Content-Type"], body, self.headers["Authorization"]))
+                if self.path in missing:
+                    self.send_response(404)
+                    self.end_headers()
+                    return
+                if self.path == "/v1/chat/completions":
+                    reply = {"choices": [{"message": {"content": f"![image](data:image/png;base64,{b64})"}}]}
+                else:
+                    reply = {"data": [{"b64_json": b64}]}
+                data = json.dumps(reply).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+
+            def log_message(self, *args):
+                pass
+
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        threading.Thread(target=self.server.serve_forever, daemon=True).start()
+        self.base_url = f"http://127.0.0.1:{self.server.server_port}/v1"
+
+    def close(self):
+        self.server.shutdown()
+        self.server.server_close()
+
+
+class GenerateImageTests(unittest.TestCase):
+    KEY = "sk-test-secret"
+
+    def run_script(self, api, *args, key=KEY):
+        import os
+
+        env = {k: v for k, v in os.environ.items() if not k.startswith(("SLIDE_ALCHEMY_IMAGE_", "OPENAI_"))}
+        env["SLIDE_ALCHEMY_IMAGE_BASE_URL"] = api.base_url
+        if key:
+            env["SLIDE_ALCHEMY_IMAGE_API_KEY"] = key
+        return subprocess.run(
+            [sys.executable, str(SCRIPTS / "generate_image.py"), *args],
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.tmp_path = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_prompt_without_reference_generates(self):
+        api = FakeImageApi()
+        self.addCleanup(api.close)
+        out = self.tmp_path / "nested" / "base.png"
+
+        result = self.run_script(api, "a clean blue background", str(out))
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        path, content_type, body, auth = api.requests[0]
+        self.assertEqual("/v1/images/generations", path)
+        self.assertEqual(f"Bearer {self.KEY}", auth)
+        self.assertEqual(
+            {"model": "gpt-image-2", "prompt": "a clean blue background"},
+            json.loads(body),
+        )
+        with Image.open(out) as image:
+            self.assertEqual((32, 18), image.size)
+        self.assertEqual("images", json.loads(result.stdout)["route"])
+
+    def test_reference_image_becomes_an_edit_with_a_prompt_file(self):
+        api = FakeImageApi()
+        self.addCleanup(api.close)
+        source = self.tmp_path / "slide_001.png"
+        Image.new("RGB", (16, 9), "white").save(source)
+        prompt = self.tmp_path / "prompt.txt"
+        prompt.write_text("去掉所有文字和卡片", encoding="utf-8")
+
+        result = self.run_script(api, f"@{prompt}", str(self.tmp_path / "out.png"), "--reference", str(source))
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        path, content_type, body, _ = api.requests[0]
+        self.assertEqual("/v1/images/edits", path)
+        self.assertTrue(content_type.startswith("multipart/form-data"))
+        self.assertIn("去掉所有文字和卡片".encode("utf-8"), body)
+        self.assertIn(b'name="image"; filename="slide_001.png"', body)
+
+    def test_missing_images_endpoint_falls_back_to_chat(self):
+        api = FakeImageApi(missing={"/v1/images/generations"})
+        self.addCleanup(api.close)
+
+        result = self.run_script(api, "icon sheet", str(self.tmp_path / "sheet.png"))
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(
+            ["/v1/images/generations", "/v1/chat/completions"],
+            [request[0] for request in api.requests],
+        )
+        self.assertEqual("chat", json.loads(result.stdout)["route"])
+
+    def test_images_route_does_not_fall_back(self):
+        api = FakeImageApi(missing={"/v1/images/generations"})
+        self.addCleanup(api.close)
+
+        result = self.run_script(api, "icon sheet", str(self.tmp_path / "sheet.png"), "--route", "images")
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("HTTP 404", result.stderr)
+        self.assertEqual(1, len(api.requests))
+
+    def test_missing_key_fails_without_a_request(self):
+        api = FakeImageApi()
+        self.addCleanup(api.close)
+
+        result = self.run_script(api, "anything", str(self.tmp_path / "x.png"), key=None)
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("SLIDE_ALCHEMY_IMAGE_API_KEY", result.stderr)
+        self.assertEqual([], api.requests)
+
+
 if __name__ == "__main__":
     unittest.main()

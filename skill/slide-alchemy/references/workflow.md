@@ -4,6 +4,15 @@ Every editable-PPTX conversion must run the full workflow. Do not skip steps for
 
 Image generation/editing model use is mandatory for clean bases, `icon_png` asset sheets, `complex_png_whole` asset sheets, and regenerated visual assets. Do not replace those steps with local masking, local inpainting, direct source-image crops, copied screenshot fragments, PPT native shape approximations, or generic presentation templates.
 
+Use the runtime's own image tool when it has one. Otherwise run `scripts/generate_image.py`, passing the source page (or an existing sheet) as `--reference` for edits:
+
+```bash
+python scripts/generate_image.py @run/prompts/base_A.txt run/base/slide_001_base.png --reference run/source/slide_001.png
+python scripts/generate_image.py @run/prompts/icons_sheet_01.txt run/assets/sheets/icons_sheet_01.png --reference run/source/slide_003.png
+```
+
+It reads `SLIDE_ALCHEMY_IMAGE_API_KEY` (or `OPENAI_API_KEY`), `SLIDE_ALCHEMY_IMAGE_BASE_URL` (or `OPENAI_BASE_URL`), and `SLIDE_ALCHEMY_IMAGE_MODEL` (default `gpt-image-2`), and falls back to `/chat/completions` on gateways without an images endpoint. Keep prompts in files under `run/prompts/` so each regenerated image can be traced to its prompt.
+
 When regenerating any image asset, remove image noise and high-frequency visual artifacts while preserving all kept linework. Keep colors and brightness unchanged.
 
 Run this workflow in order. Each section produces an artifact that is required by the next section. Do not jump to final PPTX composition until source pages, base grouping, approved or unattended-run bases, element analysis, generated assets, sliced assets, text layout, and compose spec are ready.
