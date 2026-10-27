@@ -29,7 +29,7 @@ The following steps must always happen in order:
 5. SVG/OOXML generation for true layout geometry,
 6. PNG asset sheet generation with an image generation/editing model for icons and complex visuals,
 7. PNG slicing and contact-sheet QA,
-8. visual text extraction,
+8. OCR text extraction with pixel measurement,
 9. PPTX composition,
 10. preview export and visual QA.
 
@@ -93,7 +93,7 @@ The lead agent must merge all page-level outputs, deduplicate shared components,
    Inspect the source page images first, identify likely cover/content/ending/custom base groups, then present a recommended grouping to the user. This is the first hard gate: ask the user to accept or modify the recommendation before generating bases, unless the user explicitly asked for an unattended full run. Do not continue in the same turn after presenting the grouping.
 
 3. Generate clean bases with an image generation/editing model.
-   The default base is a general background: keep outer background, edge decoration, ambient texture, and theme visuals; remove all text, icons, cards, boxes, title bars, and central content. Remove image noise and high-frequency visual artifacts from kept areas while preserving kept linework, colors, and brightness. Only preserve central layout containers if the user explicitly asks for template containers.
+   The default base is a general background: keep outer background, edge decoration, ambient texture, and theme visuals; remove all text, icons, cards, boxes, title bars, and central content. Remove image noise and high-frequency visual artifacts from kept areas while preserving kept linework, colors, and brightness. Only preserve central layout containers if the user explicitly asks for template containers. The base must keep the source page's aspect ratio; regenerate it if it does not, and never stretch it to fit.
 
    This is the second hard gate: after generating base preview images, show the bases to the user and wait for approval before extracting elements, unless the user explicitly requested an unattended full run. Do not continue in the same turn after presenting base previews.
 
@@ -118,12 +118,13 @@ The lead agent must merge all page-level outputs, deduplicate shared components,
 
    Do not stop for approval after generating assets. Continue to text extraction and composition after edge checks and contact sheets are ready.
 
-9. Extract text with a visual model.
-   Record text content, source bbox, font size, color, bold/weight, alignment, line breaks, and approximate font family/style in `texts_layout.json`. PPTX XML may help verify, but visual extraction is the default method.
+9. Extract text with OCR and pixel measurement.
+   Run `scripts/extract_text.py` on the source page images to write `texts_layout.json`. OCR reads the characters. Position, font size, colour, weight, bullets, and paragraph line merging are measured from the pixels. Do not use a visual model to read text or estimate text boxes, because its coordinates are approximations. Copy each text's `bbox_px`/`bbox_frac`, style fields, and `line_spacing_pt` into the compose spec unchanged. If bold is wrong for a template, calibrate `--bold-mode ratio:<value>` from the recorded `metrics` instead of editing weights one by one. PPTX XML text may be passed with `--expected` to correct near-miss readings.
 
 10. Compose the final PPTX in this layer order:
     base PNG -> SVG/OOXML editable geometry -> PNG icons -> editable text boxes.
     Use `scripts/compose_component_pptx.py` with a compose spec when possible; do not rewrite ad hoc composition logic for every task.
+    Give each PNG image the drawing's own bbox from `element_analysis.json`; the default `fit: visible` aligns the PNG's drawn pixels to it and lets the transparent padding fall outside. Leave `slide_height_in` out so the slide follows the source page's aspect ratio. Record `corner_radius_px` for rounded cards.
 
 11. Export previews and QA visually.
     Compare preview pages with source pages. Check for over-preserved bases, missing elements, cut-off icons, polluted icon crops, duplicated elements, and text overflow.
@@ -153,13 +154,17 @@ run/
   analysis/
     element_analysis.json
     texts_layout.json
+    compose_spec.json
   assets/
     svg/
+    sheets/
+    crop_specs/
     png/
     contact_sheets/
   out/
     editable.pptx
     preview/
+    compare/
 ```
 
 ## References
@@ -169,7 +174,7 @@ Read only the relevant reference before acting:
 - `references/workflow.md`: detailed end-to-end sequence and required artifacts.
 - `references/element-classification.md`: classification rules, reuse rules, and common traps.
 - `references/icon-slicing-qa.md`: PNG asset sheet, chroma key, padding, edge-touch, and contact sheet rules.
-- `references/text-extraction.md`: visual text extraction schema and style fields.
+- `references/text-extraction.md`: OCR text extraction command, schema, measurement method, and bold calibration.
 - `references/base-prompt-template.md`: prompt template for clean base generation.
 - `references/base-grouping.md`: how to infer and present recommended base groups.
 - `references/icon-sheet-prompt-template.md`: prompt template for PNG icon asset sheets.
@@ -190,5 +195,6 @@ Use bundled scripts for deterministic checks:
 - `scripts/slice_asset_sheet.py`: slice a solid-key asset sheet from a JSON crop spec while preserving padding.
 - `scripts/simple_svg_to_pptx.py`: convert simple component SVG primitives into editable PPTX shapes for quick validation or component reuse.
 - `scripts/validate_element_analysis.py`: lightweight validation for `element_analysis.json` without external dependencies.
+- `scripts/extract_text.py`: OCR the source pages and measure text position, size, colour, weight, bullets, and line spacing into `texts_layout.json`.
 - `scripts/compose_component_pptx.py`: compose base images, editable shapes, PNG assets, and editable text into a PPTX from JSON.
 - `scripts/compare_preview.py`: create side-by-side and difference images from source/preview PNGs.

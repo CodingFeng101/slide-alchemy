@@ -3,6 +3,7 @@
   "ref_height": 941,
   "slide_width_in": 13.333333,
   "slide_height_in": 7.5,
+  "image_fit": "frame",
   "slides": [
     {
       "base": "../base/slide_001_base.png",

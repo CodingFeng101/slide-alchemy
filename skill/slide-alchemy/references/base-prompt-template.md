@@ -3,7 +3,7 @@
 Use this template when asking an image generation/editing model to create a base background. This model step is mandatory for clean bases; do not replace it with local white masks, local blur, local inpainting, or copied screenshot fragments.
 
 ```text
-Use the displayed slide image as the only edit target. Generate a 16:9 clean base background.
+Use the displayed slide image as the only edit target. Generate a clean base background with exactly the same aspect ratio as the displayed slide image.
 
 Remove image noise and high-frequency visual artifacts from all kept areas.
 Preserve all kept linework exactly. Keep colors and brightness unchanged.
@@ -27,3 +27,5 @@ Output a complete full-slide base image with no border.
 ```
 
 If the user explicitly asks for a template with containers, change the remove list to preserve those containers. Otherwise the default base is a general background, not a content template.
+
+After generation, compare the base's width/height ratio with the source page's. If they differ by more than 1%, regenerate; do not stretch or crop the base to fit, because every position on the page is measured against the source.

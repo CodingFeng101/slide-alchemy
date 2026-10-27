@@ -29,24 +29,34 @@ Use PNG for standalone icons and complex composites. A line-art icon is still an
 
 ## PowerPoint-Safe SVG Subset
 
-Prefer this subset for generated component SVGs:
+`scripts/simple_svg_to_pptx.py` converts this subset. Anything outside it raises an error rather than being dropped or approximated.
 
-- `<rect x y width height rx ry fill stroke stroke-width fill-opacity stroke-opacity>`
-- `<circle cx cy r ...>`
-- `<ellipse cx cy rx ry ...>`
-- `<line x1 y1 x2 y2 ...>`
-- `<polyline points ...>`
-- `<polygon points ...>` for simple stars or diamonds
-- `<path d ...>` only for simple curves that cannot be expressed by primitives
+| SVG | PowerPoint result |
+| --- | --- |
+| `<rect x y width height>` | rectangle |
+| `<rect ... rx ry>` | rounded rectangle; one radius for all corners (the smaller of `rx`/`ry`) |
+| `<circle>`, `<ellipse>` | oval |
+| `<line>` | straight connector; skipped when it has no stroke, as in SVG |
+| `<polygon>`, `<polyline>` | freeform shape (diamonds, stars, chevrons, any straight-edged outline) |
+| `<path d>` with `M L H V Z` (absolute or relative) | freeform shape; several subpaths become one shape, so a hole stays a hole |
+| `<g>` | grouping only; its paint and `transform` apply to its children |
 
-Avoid:
+Paint and geometry:
 
-- CSS stylesheets,
-- filters and blur,
-- masks and clip paths,
-- marker-based arrows,
-- `rgba(...)`; use hex color plus opacity attributes,
-- deeply nested transforms.
+- `fill`, `stroke`, `stroke-width`, `fill-opacity`, `stroke-opacity`, `opacity`, as attributes or inline `style`, inherited from `<g>`.
+- Colours: `#rgb`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`, CSS colour names, `none`. As in SVG, an element with no `fill` is filled black.
+- `transform`: `translate`, `scale`, `rotate`, `matrix`, and nesting. A rect or ellipse may be rotated or scaled, but not skewed or mirrored; polygons and paths accept any transform.
+- Stroke widths are in viewBox units and are scaled onto the slide.
+- Group `opacity` is multiplied into each child, which differs from SVG only where children overlap.
+- Shapes carry no shadow; the theme's default effect is switched off.
+
+Not supported (error):
+
+- curves in paths (`C S Q T A`): flatten to straight segments or reclassify as PNG,
+- gradients, patterns, `url(#...)` paints,
+- `<style>` blocks, CSS classes, filters, masks, clip paths, markers,
+- `<use>`, `<image>`, `<text>`, nested `<svg>`,
+- skewed or mirrored rects and ellipses.
 
 ## Conversion Strategy
 

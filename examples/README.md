@@ -10,6 +10,11 @@ Each example contains:
 
 The full intermediate strict run is stored in `_strict-rebuild-run/`, including bases, `element_analysis.json`, `texts_layout.json`, icon sheets, sliced PNGs, contact sheets, previews, and comparison images.
 
+That run predates two later changes, so do not use it as a format reference for them:
+
+- Its `texts_layout.json` came from visual-model extraction. Current runs write it with `scripts/extract_text.py`, which adds `ink_bbox_*`, `line_spacing_pt`, `metrics`, and compose-ready text boxes (see `references/text-extraction.md`).
+- Its compose specs give image bboxes that already include the PNG padding, so they set `"image_fit": "frame"`. Current runs use the drawing's own bbox with the default `fit: visible` (see `references/compose-spec.md`).
+
 | Folder | Scenario |
 | --- | --- |
 | `01-smart-campus` | Blue smart-campus module slide. |

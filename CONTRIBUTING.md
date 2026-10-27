@@ -52,15 +52,18 @@ This is a small project. To respect everyone's time, please follow this guidance
 
 ## SVG Compatibility
 
-If your contribution involves SVG generation for the PPTX output, ensure your SVG does not use:
+If your contribution involves SVG generation for the PPTX output, keep to the subset `scripts/simple_svg_to_pptx.py` converts. `references/svg-to-ooxml.md` lists it in full.
 
-- `<mask>` or `opacity` attributes (PowerPoint does not reliably render them)
-- `<style>` blocks with CSS classes (PowerPoint ignores embedded stylesheets)
-- `foreignObject` (not supported in PowerPoint SVG import)
-- `<use>` with external references (PowerPoint cannot resolve them)
-- Non-standard fonts or system-dependent font names
+Supported: `rect` (with `rx`/`ry`), `circle`, `ellipse`, `line`, `polygon`, `polyline`, and `path` with straight segments; paint as attributes or inline `style`, inherited from `<g>`; `fill-opacity`, `stroke-opacity`, and `opacity`; and `transform`.
 
-Prefer inline `style` attributes with absolute values (colors as hex, dimensions in px or emu).
+Not supported (the converter raises an error):
+
+- curves in paths, gradients, and patterns
+- `<style>` blocks and CSS classes, `<mask>`, clip paths, filters, and markers
+- `<use>`, `<image>`, `<text>`, `foreignObject`, and nested `<svg>`
+- skewed or mirrored rects and ellipses
+
+Text never goes into SVG; it belongs in `texts_layout.json`.
 
 ## Bug Reports
 

@@ -96,7 +96,7 @@ Review stop: after base images are generated, show the base previews and wait fo
 
 Required output before step 4:
 
-- clean base image for each accepted base group,
+- clean base image for each accepted base group, with the same aspect ratio as its source pages,
 - user approval or unattended-run instruction.
 
 ## 4. Element Analysis
@@ -106,7 +106,7 @@ For each page, create `element_analysis.json` before making PNG sheets.
 The file should contain:
 
 - `components`: reusable component definitions and category decisions,
-- `instances`: per-slide placements with `bbox_px` and `bbox_frac`,
+- `instances`: per-slide placements with `bbox_px` and `bbox_frac`. For PNG components the bbox covers everything the generated asset will contain (a glyph and its backing disc, if the disc is part of the asset), because the composer fits the asset's drawn pixels to it,
 - `png_asset_sheet_plan`: only the components that should become PNGs.
 
 Repeated elements must reference one component.
@@ -142,11 +142,13 @@ Required output before step 6:
 
 ## 6. Text Extraction
 
-Use visual extraction by default. Store text separately from visual elements. Do not rasterize normal text into icon assets.
+Run `scripts/extract_text.py` on the source page images. OCR reads the characters, and position, size, colour, weight, bullets, and line spacing are measured from the pixels. Do not use a visual model for text. See `text-extraction.md`.
+
+Store text separately from visual elements. Do not rasterize normal text into icon assets. Symbols such as arrows and chevrons are not text; OCR drops them, so they must already be in `element_analysis.json`.
 
 Required output before step 7:
 
-- `analysis/texts_layout.json` with text content, style, and bboxes.
+- `analysis/texts_layout.json` with text content, measured style, compose-ready text boxes, and ink bboxes.
 
 ## 7. Compose and QA
 

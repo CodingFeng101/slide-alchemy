@@ -24,6 +24,11 @@ This document provides remediation guidance when a workflow step fails or produc
 1. Include explicit color references in the prompt (e.g., "Preserve the exact teal-to-navy gradient (#00B4D8 to #1B263B) on the left half").
 2. If the model cannot match colors, consider splitting the page into multiple base regions with simpler gradients.
 
+### Base aspect ratio differs from the source
+
+1. Regenerate and state the source's exact pixel size or ratio in the prompt (e.g., "Output 1600x1200, the same 4:3 ratio as the input").
+2. Do NOT stretch, pad, or crop the base to fit. Every bbox is measured against the source page, so a reshaped base misplaces everything above it.
+
 ---
 
 ## Element Analysis Problems
@@ -102,20 +107,19 @@ Remediation:
 
 ### SVG does not render correctly in PowerPoint
 
-Common causes: Use of `<mask>`, `<style>` with CSS classes, `foreignObject`, external `<use>` references, or non-standard fonts.
+Common causes: `<style>` blocks with CSS classes, `<mask>`, `<clipPath>`, filters, gradients, `<use>`, `foreignObject`, or `<text>`.
 
 Remediation:
-1. Replace all `<style>` blocks with inline `style` attributes.
-2. Convert CSS classes to direct attribute values.
-3. Remove `<mask>` and replace with solid fills or opacity-based workarounds.
-4. Replace `foreignObject` text with SVG `<text>` elements.
-5. Inline any `<use>` references that point to external resources.
-6. Use standard font families (Arial, Calibri, etc.) or font names that exist in the target system.
+1. Replace `<style>` blocks and CSS classes with presentation attributes (`fill="#..."`) or inline `style="fill:#..."`. `simple_svg_to_pptx.py` reads both, and children inherit paint from their `<g>`.
+2. Remove `<mask>`, `<clipPath>`, and filters; use solid fills with `fill-opacity` instead.
+3. Replace gradients with a solid fill, or reclassify the component as PNG.
+4. Expand `<use>` references into the elements they point to.
+5. Remove text from the SVG entirely. Text belongs in `texts_layout.json`, not in geometry.
 
 ### SVG shapes are misaligned or incorrectly sized in PPTX
 
-1. Verify the conversion uses the correct scale factor: 1 px = 914400 / 96 EMU.
-2. Check that `viewBox` coordinates are correctly mapped to the PPTX canvas dimensions.
+1. The converter maps the whole `viewBox` onto the slide (`--slide-width` x `--slide-height` inches) and ignores the root `width`/`height`. Check that the viewBox covers the area the coordinates were measured in, and that its ratio matches the slide.
+2. Stroke widths are in viewBox units and scale with the mapping and with any `transform`.
 3. Use `scripts/simple_svg_to_pptx.py` for validation on a single element before batch conversion.
 
 ### `simple_svg_to_pptx.py` cannot represent a component
@@ -130,28 +134,36 @@ Do not claim arbitrary SVG path conversion works unless verified in a generated 
 
 ## Text Problems
 
-### Text overflows its bounding box
+### Text overflows its bounding box or wraps
 
-1. Reduce font size.
-2. Adjust line breaks and line spacing.
-3. Then adjust bbox.
+1. Check that the compose spec used `bbox_px`/`bbox_frac`, not `ink_bbox_*`. The ink box is too tight to compose into.
+2. Check that `slide_width_in` in the compose spec matches the `--slide-width-in` used for extraction.
+3. Then adjust font size or bbox for that text only.
 
 ### Text position is wrong
 
 1. Check the source bbox coordinate system.
 2. Verify `ref_width` and `ref_height`.
-3. Re-export preview and compare visually.
+3. For a merged paragraph, check that the composer applied `line_spacing_pt`. Without it, the lines pack tighter than the source.
+4. Re-export preview and compare visually.
 
-### Visual model misreads content
+### Bold is wrong
 
-1. Re-extract that text region only.
-2. Do not rasterize normal text as an icon.
+1. Compare `metrics.stroke_ratio` of blocks that should and should not be bold.
+2. Re-run with `--bold-mode ratio:<value between them>`, or `off`/`on` for a single-weight deck.
+3. Reuse the value for every page of the same template. Do not edit weights block by block.
 
-### Extracted text is incorrect or incomplete
+### OCR misreads content
 
-1. Cross-reference with PPTX XML if available (some source files embed extractable text).
-2. Re-extract with a focused prompt: "Extract every visible text string from this slide image, including small labels and captions. Preserve line breaks and approximate font sizes."
-3. For CJK text, ensure the model supports the target language and script.
+1. If PPTX XML text exists, re-run with `--expected` pointing to a file of those strings.
+2. Otherwise correct the `text` field in `texts_layout.json` directly. Keep the measured bbox and style.
+3. Do not rasterize normal text as an icon.
+
+### Extracted text is incomplete
+
+1. Check whether the missing item is actually a symbol (arrow, chevron, tick). If so, it belongs in `element_analysis.json`, not in text.
+2. Low-confidence short strings and lone Latin glyphs are filtered on purpose, because they are usually icons. If a real label was dropped, add it by hand: take its bbox from the source image and copy the style from a similar block.
+3. Text that sits on a busy texture may fail the ink mask. Add it by hand the same way.
 
 ---
 
@@ -160,8 +172,14 @@ Do not claim arbitrary SVG path conversion works unless verified in a generated 
 ### Elements overlap incorrectly in the final PPTX
 
 1. Verify the composition follows the correct layer order: base PNG (bottom) -> SVG/OOXML geometry -> PNG icons -> text boxes (top).
-2. Check `scripts/compose_component_pptx.py` compose spec for correct `z_order` values.
+2. Within each layer, array order in the compose spec is the stacking order (there is no `z_order` field). Move a container before the shapes that sit on it.
 3. If using ad hoc composition, ensure each element is added in the correct sequence.
+
+### Icons come out smaller or larger than in the source
+
+1. Smaller: either the image bbox covers less than the PNG depicts (for example the glyph's bounds while the asset also contains its backing disc), or the bbox was widened for padding while `fit` is `visible`. Re-measure the bbox around everything the asset draws.
+2. Larger: the bbox includes padding and `fit` is `visible`, or the bbox is the drawing's bounds and `fit` is `frame`. Match the two: drawing bounds with `visible`, padded bounds with `frame`.
+3. If the icon is the right size but off-centre, the sliced PNG probably still holds a fragment of a neighbour, which counts as drawn pixels. Recheck the contact sheet and regenerate the sheet.
 
 ### Final PPTX file size is unexpectedly large
 

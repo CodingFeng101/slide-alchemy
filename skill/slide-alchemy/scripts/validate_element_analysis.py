@@ -65,8 +65,14 @@ def component_category(components, component_id):
     return component.get("category") if isinstance(component, dict) else None
 
 
-def validate_asset_sheet_plan(errors, plan, components):
+def validate_asset_sheet_plan(errors, warnings, plan, components):
+    png_ids = sorted(
+        cid for cid, comp in components.items()
+        if isinstance(comp, dict) and comp.get("category") in SHEET_CAPACITY
+    )
     if plan is None:
+        if png_ids:
+            err(errors, f"png_asset_sheet_plan is required for PNG components: {', '.join(png_ids)}")
         return
     if not isinstance(plan, dict):
         err(errors, "png_asset_sheet_plan must be an object")
@@ -74,6 +80,9 @@ def validate_asset_sheet_plan(errors, plan, components):
 
     sheets = plan.get("sheets")
     if sheets is None:
+        # Runs written before the sheets array existed map sheet names to
+        # component lists; their packing cannot be checked.
+        warnings.append("png_asset_sheet_plan has no sheets array; sheet packing and coverage were not checked")
         return
     if not isinstance(sheets, list):
         err(errors, "png_asset_sheet_plan: sheets must be an array")
@@ -83,11 +92,14 @@ def validate_asset_sheet_plan(errors, plan, components):
         err(errors, "png_asset_sheet_plan: key_color must be a #RRGGBB string")
 
     category_sheets = {category: [] for category in SHEET_CAPACITY}
+    placed = {}
     for index, sheet in enumerate(sheets, start=1):
         context = f"png_asset_sheet_plan sheet {index}"
         if not isinstance(sheet, dict):
             err(errors, f"{context}: must be an object")
             continue
+        if not isinstance(sheet.get("id"), str) or not sheet.get("id"):
+            err(errors, f"{context}: id must be a non-empty string")
         asset_ids = sheet.get("components")
         if not isinstance(asset_ids, list) or not asset_ids:
             err(errors, f"{context}: components must be a non-empty array")
@@ -95,6 +107,12 @@ def validate_asset_sheet_plan(errors, plan, components):
         if not all(isinstance(asset_id, str) and asset_id for asset_id in asset_ids):
             err(errors, f"{context}: component ids must be non-empty strings")
             continue
+        for asset_id in asset_ids:
+            base_id = asset_id.split(":", 1)[0]
+            if base_id in placed:
+                err(errors, f"{context}: component {base_id} is already on {placed[base_id]}")
+            else:
+                placed[base_id] = context
 
         categories = {component_category(components, asset_id) for asset_id in asset_ids}
         if None in categories:
@@ -127,6 +145,10 @@ def validate_asset_sheet_plan(errors, plan, components):
         for context, count in entries[:-1]:
             if count != capacity:
                 err(errors, f"{context}: {category} sheets must contain {capacity} assets except for the final remainder sheet, got {count}")
+
+    unplanned = [cid for cid in png_ids if cid not in placed]
+    if unplanned:
+        err(errors, f"png_asset_sheet_plan: PNG components on no sheet: {', '.join(unplanned)}")
 
 
 def report(errors):
@@ -206,8 +228,11 @@ def main():
             validate_box(errors, f"slide {sid} instance {iid}", "bbox_px", inst.get("bbox_px"))
             validate_box(errors, f"slide {sid} instance {iid}", "bbox_frac", inst.get("bbox_frac"), frac=True)
 
-    validate_asset_sheet_plan(errors, data.get("png_asset_sheet_plan"), components)
+    warnings = []
+    validate_asset_sheet_plan(errors, warnings, data.get("png_asset_sheet_plan"), components)
 
+    for warning in warnings:
+        print(f"WARNING\t{warning}")
     if errors:
         report(errors)
 
