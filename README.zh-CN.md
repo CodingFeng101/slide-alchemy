@@ -5,9 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>🧪 把图片式幻灯片重新炼成</strong><br>
-  <span style="font-size: 42px; color: #ff2d2d; font-weight: 900;">真正可编辑</span><br>
-  <strong>组件化的 PowerPoint。</strong>
+  <strong>🧪 把图片式幻灯片重新炼成真正可编辑、组件化的 PowerPoint。</strong>
 </p>
 
 > 把幻灯片截图、扫描版 PPT 或图片型 PPTX 变成真正能修改的 PowerPoint：文字是文本框，几何元素是原生对象，复杂视觉素材保持稳定。

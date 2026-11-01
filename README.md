@@ -5,9 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>🧪 Reforge image-based slides into</strong><br>
-  <span style="font-size: 42px; color: #ff2d2d; font-weight: 900;">TRULY EDITABLE</span><br>
-  <strong>component-based PowerPoint decks.</strong>
+  <strong>🧪 Reforge image-based slides into TRULY EDITABLE, component-based PowerPoint decks.</strong>
 </p>
 
 > Turn a slide screenshot, scanned deck, or image-based PPTX into a PowerPoint you can actually edit: real text boxes, native geometry, and stable visual assets.
