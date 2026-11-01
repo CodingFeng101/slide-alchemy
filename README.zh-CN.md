@@ -9,7 +9,6 @@
 > 把幻灯片截图、扫描版 PPT 或图片型 PPTX 变成真正能修改的 PowerPoint：文字是文本框，几何元素是原生对象，复杂视觉素材保持稳定。
 
 [![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
-[![Latest release](https://img.shields.io/github/v/release/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/releases/latest)
 [![License](https://img.shields.io/github/license/CodingFeng101/slide-alchemy?style=flat-square)](LICENSE)
 
 如果它帮你省下了手工重做幻灯片的时间，欢迎给仓库点个 **Star**，让更多需要处理 AI 幻灯片的人找到它。
