@@ -24,6 +24,10 @@ source slide image
 -> editable PPTX
 ```
 
+## 🎬 Demo Video
+
+https://github.com/user-attachments/assets/da4675ac-5296-4938-b162-6c674a16d19f
+
 ## ✨ Core Strengths
 
 | Strength | What It Means |

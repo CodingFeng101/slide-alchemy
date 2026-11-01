@@ -24,6 +24,10 @@ Slide Alchemy 是一个可用于 Codex 和 Claude Code 的 Skill，用来把图�
 -> 可编辑 PPTX
 ```
 
+## 🎬 演示视频
+
+https://github.com/user-attachments/assets/da4675ac-5296-4938-b162-6c674a16d19f
+
 ## ✨ 核心优势
 
 | 优势 | 说明 |
