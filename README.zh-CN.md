@@ -1,6 +1,10 @@
 # Slide Alchemy
 
 <p align="center">
+  <a href="README.md">English</a> | <b>简体中文</b>
+</p>
+
+<p align="center">
   <strong>🧪 把图片式幻灯片重新炼成</strong><br>
   <span style="font-size: 42px; color: #ff2d2d; font-weight: 900;">真正可编辑</span><br>
   <strong>组件化的 PowerPoint。</strong>

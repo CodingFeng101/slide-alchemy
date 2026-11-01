@@ -1,6 +1,10 @@
 # Slide Alchemy
 
 <p align="center">
+  <b>English</b> | <a href="README.zh-CN.md">简体中文</a>
+</p>
+
+<p align="center">
   <strong>🧪 Reforge image-based slides into</strong><br>
   <span style="font-size: 42px; color: #ff2d2d; font-weight: 900;">TRULY EDITABLE</span><br>
   <strong>component-based PowerPoint decks.</strong>
