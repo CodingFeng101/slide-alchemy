@@ -153,9 +153,3 @@ PNG 图标和复杂 PNG 组件必须用图像生成/编辑模型生成素材图�
 ## 📄 许可证
 
 MIT
-
-## 💬 交流群
-
-欢迎加入 **智构开源社** 群聊，一起讨论幻灯片还原、Codex Skill 和开源项目。
-
-<img src="docs/assets/community-qr.png" alt="智构开源社群聊二维码" width="360">

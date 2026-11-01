@@ -153,9 +153,3 @@ Semantic icons stay PNG by default, even when they are flat or line-art icons. S
 ## 📄 License
 
 MIT
-
-## 💬 Community
-
-Welcome to join the **智构开源社** group chat to discuss slide reconstruction, Codex skills, and open-source projects together.
-
-<img src="docs/assets/community-qr.png" alt="智构开源社群聊二维码" width="360">
