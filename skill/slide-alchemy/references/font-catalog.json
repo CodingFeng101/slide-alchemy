@@ -1,0 +1,1710 @@
+{
+  "version": 1,
+  "release": "v1",
+  "assets": [
+    {
+      "id": "source-han-sans-cn-extralight",
+      "family": "Source Han Sans CN",
+      "style": "ExtraLight",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/SubsetOTF/CN/SourceHanSansCN-ExtraLight.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-sans-cn-extralight.otf",
+      "bytes": 7612056,
+      "sha256": "cbeba9e956a628fdc6c518ad174fe6686929211477ad4b518f9be9c950227d77",
+      "license_path": "licenses/source-han-sans-cn.txt",
+      "license_sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "face_name": "Source Han Sans CN ExtraLight"
+    },
+    {
+      "id": "source-han-sans-cn-light",
+      "family": "Source Han Sans CN",
+      "style": "Light",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/SubsetOTF/CN/SourceHanSansCN-Light.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-sans-cn-light.otf",
+      "bytes": 8416432,
+      "sha256": "c406ec4c795fe71ec443a8a55570d7df53dea560ea93d4117eadab6e2b19680d",
+      "license_path": "licenses/source-han-sans-cn.txt",
+      "license_sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "face_name": "Source Han Sans CN Light"
+    },
+    {
+      "id": "source-han-sans-cn-normal",
+      "family": "Source Han Sans CN",
+      "style": "Normal",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/SubsetOTF/CN/SourceHanSansCN-Normal.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-sans-cn-normal.otf",
+      "bytes": 8434332,
+      "sha256": "9fc9ad5b64f086a2b342087865623923c216e346f879142a84df37c7ffd323c5",
+      "license_path": "licenses/source-han-sans-cn.txt",
+      "license_sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "face_name": "Source Han Sans CN Normal"
+    },
+    {
+      "id": "source-han-sans-cn-regular",
+      "family": "Source Han Sans CN",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/SubsetOTF/CN/SourceHanSansCN-Regular.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/source-han-sans-cn-regular.otf",
+      "bytes": 8429224,
+      "sha256": "e2bc8a2e7f37474b774fff8db758681ece40bb6947a90d571bce9dd60671a8e4",
+      "license_path": "licenses/source-han-sans-cn.txt",
+      "license_sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "face_name": "Source Han Sans CN"
+    },
+    {
+      "id": "source-han-sans-cn-medium",
+      "family": "Source Han Sans CN",
+      "style": "Medium",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/SubsetOTF/CN/SourceHanSansCN-Medium.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/source-han-sans-cn-medium.otf",
+      "bytes": 8406556,
+      "sha256": "a94e558a2fe972bee4f46bce0843abff37063fd68c33f1e7d9058f6f09432b01",
+      "license_path": "licenses/source-han-sans-cn.txt",
+      "license_sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "face_name": "Source Han Sans CN Medium"
+    },
+    {
+      "id": "source-han-sans-cn-bold",
+      "family": "Source Han Sans CN",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/SubsetOTF/CN/SourceHanSansCN-Bold.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/source-han-sans-cn-bold.otf",
+      "bytes": 8569308,
+      "sha256": "62383707c086a32f3afd5e293f34c7eff64c7fea31f579fdc6cbe34d920519a6",
+      "license_path": "licenses/source-han-sans-cn.txt",
+      "license_sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "face_name": "Source Han Sans CN Bold"
+    },
+    {
+      "id": "source-han-sans-cn-heavy",
+      "family": "Source Han Sans CN",
+      "style": "Heavy",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/SubsetOTF/CN/SourceHanSansCN-Heavy.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-sans-cn-heavy.otf",
+      "bytes": 8808068,
+      "sha256": "88c749b0a54a0800124ded6544e399302ed224aa49992ea364b88769f825c54c",
+      "license_path": "licenses/source-han-sans-cn.txt",
+      "license_sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "face_name": "Source Han Sans CN Heavy"
+    },
+    {
+      "id": "source-han-serif-cn-extralight",
+      "family": "Source Han Serif CN",
+      "style": "ExtraLight",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/SubsetOTF/CN/SourceHanSerifCN-ExtraLight.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-serif-cn-extralight.otf",
+      "bytes": 10444316,
+      "sha256": "583b60e03535bf04892ae7cb6cad3f54d042552911cbbbf42ff72989b93410cf",
+      "license_path": "licenses/source-han-serif-cn.txt",
+      "license_sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903",
+      "face_name": "Source Han Serif CN ExtraLight"
+    },
+    {
+      "id": "source-han-serif-cn-light",
+      "family": "Source Han Serif CN",
+      "style": "Light",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/SubsetOTF/CN/SourceHanSerifCN-Light.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-serif-cn-light.otf",
+      "bytes": 11495436,
+      "sha256": "e2e51701c3c5da146c0f5a587abd55a7d12e114338bc86cb4d05c316e727c228",
+      "license_path": "licenses/source-han-serif-cn.txt",
+      "license_sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903",
+      "face_name": "Source Han Serif CN Light"
+    },
+    {
+      "id": "source-han-serif-cn-regular",
+      "family": "Source Han Serif CN",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/SubsetOTF/CN/SourceHanSerifCN-Regular.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/source-han-serif-cn-regular.otf",
+      "bytes": 11626108,
+      "sha256": "3754ea669c530e2473354f8f6d9f79680a44d7e26ec7d00eeabee4a7e0753c5d",
+      "license_path": "licenses/source-han-serif-cn.txt",
+      "license_sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903",
+      "face_name": "Source Han Serif CN"
+    },
+    {
+      "id": "source-han-serif-cn-medium",
+      "family": "Source Han Serif CN",
+      "style": "Medium",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/SubsetOTF/CN/SourceHanSerifCN-Medium.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-serif-cn-medium.otf",
+      "bytes": 11734704,
+      "sha256": "f7906890686d17e122980efd2d6097d1caefed76312994baeaf220819e818f3a",
+      "license_path": "licenses/source-han-serif-cn.txt",
+      "license_sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903",
+      "face_name": "Source Han Serif CN Medium"
+    },
+    {
+      "id": "source-han-serif-cn-semibold",
+      "family": "Source Han Serif CN",
+      "style": "SemiBold",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/SubsetOTF/CN/SourceHanSerifCN-SemiBold.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-serif-cn-semibold.otf",
+      "bytes": 11771824,
+      "sha256": "50d3f12201ce2dd840650b6bfa47ebb8572ecf767eec0e5ccb20a247b5bfa805",
+      "license_path": "licenses/source-han-serif-cn.txt",
+      "license_sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903",
+      "face_name": "Source Han Serif CN SemiBold"
+    },
+    {
+      "id": "source-han-serif-cn-bold",
+      "family": "Source Han Serif CN",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/SubsetOTF/CN/SourceHanSerifCN-Bold.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/source-han-serif-cn-bold.otf",
+      "bytes": 12094680,
+      "sha256": "4ee555ae58b3d22f6a95c2c494f2c36b7cccfc1d2224635f6461a03756f0e3c1",
+      "license_path": "licenses/source-han-serif-cn.txt",
+      "license_sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903",
+      "face_name": "Source Han Serif CN Bold"
+    },
+    {
+      "id": "source-han-serif-cn-heavy",
+      "family": "Source Han Serif CN",
+      "style": "Heavy",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/SubsetOTF/CN/SourceHanSerifCN-Heavy.otf",
+      "license_url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/LICENSE.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-han-serif-cn-heavy.otf",
+      "bytes": 11862952,
+      "sha256": "053e911fdb1a55d4d8512a1f11203f1fb9a7291e34bc260474b8c80358c69fa6",
+      "license_path": "licenses/source-han-serif-cn.txt",
+      "license_sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903",
+      "face_name": "Source Han Serif CN Heavy"
+    },
+    {
+      "id": "lxgw-wenkai-light",
+      "family": "LXGW WenKai",
+      "style": "Light",
+      "url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai/main/fonts/TTF/LXGWWenKai-Light.ttf",
+      "license_url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai/main/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/lxgw-wenkai-light.ttf",
+      "bytes": 28625516,
+      "sha256": "9a50e3f0f51fad60d68152d5191bce1a495bfc4b9ceb1cee24833835511d1dca",
+      "license_path": "licenses/lxgw-wenkai.txt",
+      "license_sha256": "1a25e35da1031c6c3436fde545bb9cb5aca954e9873afe510c834b8b79bd21a0",
+      "face_name": "LXGW WenKai Light"
+    },
+    {
+      "id": "lxgw-wenkai-regular",
+      "family": "LXGW WenKai",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai/main/fonts/TTF/LXGWWenKai-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai/main/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/lxgw-wenkai-regular.ttf",
+      "bytes": 25928940,
+      "sha256": "2d73eea94ad808999d90c0000c239a84a33b09d4bc6ab6c5b8bbf1eda8a7fc8b",
+      "license_path": "licenses/lxgw-wenkai.txt",
+      "license_sha256": "1a25e35da1031c6c3436fde545bb9cb5aca954e9873afe510c834b8b79bd21a0",
+      "face_name": "LXGW WenKai"
+    },
+    {
+      "id": "lxgw-wenkai-medium",
+      "family": "LXGW WenKai",
+      "style": "Medium",
+      "url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai/main/fonts/TTF/LXGWWenKai-Medium.ttf",
+      "license_url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai/main/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/lxgw-wenkai-medium.ttf",
+      "bytes": 25800076,
+      "sha256": "f4b8a34d1f838fe411540cb7c97b1c384ac9738a876c4104500bc42508b2312a",
+      "license_path": "licenses/lxgw-wenkai.txt",
+      "license_sha256": "1a25e35da1031c6c3436fde545bb9cb5aca954e9873afe510c834b8b79bd21a0",
+      "face_name": "LXGW WenKai Medium"
+    },
+    {
+      "id": "smiley-sans-oblique",
+      "family": "Smiley Sans",
+      "style": "Oblique",
+      "url": "https://github.com/atelier-anchor/smiley-sans/releases/download/v2.0.1/smiley-sans-v2.0.1.zip",
+      "license_url": "https://raw.githubusercontent.com/atelier-anchor/smiley-sans/main/LICENSE",
+      "member": "SmileySans-Oblique.ttf",
+      "weight": null,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/smiley-sans-oblique.ttf",
+      "bytes": 2629764,
+      "sha256": "b447d7e781f08bc95c4c9f23ba71ed2b8ebb639aa7184485c71c4ca5afcd25c4",
+      "license_path": "licenses/smiley-sans.txt",
+      "license_sha256": "9401f4050f1b66c26b6ccdc8b0e14a3c1cc37aac122eda84386f25854a9bec72",
+      "face_name": "Smiley Sans Oblique"
+    },
+    {
+      "id": "douyin-sans-bold",
+      "family": "Douyin Sans",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/bytedance/fonts/main/DouyinSans/DouyinSansBold.ttf",
+      "license_url": "https://raw.githubusercontent.com/bytedance/fonts/main/DouyinSans/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/douyin-sans-bold.ttf",
+      "bytes": 1919404,
+      "sha256": "fbecfacdfac33982774e301073a8d357a09c698cd3134bb6ddec0f5bfc268fa1",
+      "license_path": "licenses/douyin-sans.txt",
+      "license_sha256": "a6d5700a002ea32bcfbe3310253d603997683dac8ac63777e375d06c07c30ea6",
+      "face_name": "DouyinSans Bold"
+    },
+    {
+      "id": "glow-sans-sc-thin",
+      "family": "Glow Sans SC",
+      "style": "Thin",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-Thin.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-thin.otf",
+      "bytes": 9426768,
+      "sha256": "4187f280a993a1b5b7ecd6f14c80e6df75f8addfcfffd62056b7f5a7f151ed67",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal Thin"
+    },
+    {
+      "id": "glow-sans-sc-extralight",
+      "family": "Glow Sans SC",
+      "style": "ExtraLight",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-ExtraLight.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-extralight.otf",
+      "bytes": 9351744,
+      "sha256": "68e1d0d4df9f5a0281a88c238c2a88270af0b5a307ef51e13710df3cc4647566",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal ExtraLight"
+    },
+    {
+      "id": "glow-sans-sc-light",
+      "family": "Glow Sans SC",
+      "style": "Light",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-Light.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-light.otf",
+      "bytes": 9339456,
+      "sha256": "74d681e9da1dc54d46d8d2b0636065c06a03bb2a6c47d52ac5aa4ab5ad92670b",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal Light"
+    },
+    {
+      "id": "glow-sans-sc-regular",
+      "family": "Glow Sans SC",
+      "style": "Regular",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-Regular.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-regular.otf",
+      "bytes": 9119372,
+      "sha256": "ca7d34947401b2fa6dd4fd46676d970a8cc47a40ee60c022eb7dd5068bee67ff",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal Regular"
+    },
+    {
+      "id": "glow-sans-sc-book",
+      "family": "Glow Sans SC",
+      "style": "Book",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-Book.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-book.otf",
+      "bytes": 9186344,
+      "sha256": "28a16d9ccea079d08ed6a52949a280ddb0627eff7068a0c92e5a18ddeaf17028",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal Book"
+    },
+    {
+      "id": "glow-sans-sc-medium",
+      "family": "Glow Sans SC",
+      "style": "Medium",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-Medium.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-medium.otf",
+      "bytes": 9176176,
+      "sha256": "56481618894253fb71427a097706f9a440806b4957a7381946dc6464b98aa192",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal Medium"
+    },
+    {
+      "id": "glow-sans-sc-bold",
+      "family": "Glow Sans SC",
+      "style": "Bold",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-Bold.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-bold.otf",
+      "bytes": 9148860,
+      "sha256": "b8381b3457bfb612e57e19517d000a169686485f57f4f9504cda59b28b4c590a",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal Bold"
+    },
+    {
+      "id": "glow-sans-sc-heavy",
+      "family": "Glow Sans SC",
+      "style": "Heavy",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-Heavy.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-heavy.otf",
+      "bytes": 9241072,
+      "sha256": "6f7c4704c1ebf564cbd5fbefed3f497fc7d735521364debe2feb3b38153ec321",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal Heavy"
+    },
+    {
+      "id": "glow-sans-sc-extrabold",
+      "family": "Glow Sans SC",
+      "style": "ExtraBold",
+      "url": "https://github.com/welai/glow-sans/releases/download/v0.93/GlowSansSC-Normal-v0.93.zip",
+      "license_url": "https://raw.githubusercontent.com/welai/glow-sans/master/OFL.txt",
+      "member": "GlowSansSC-Normal-ExtraBold.otf",
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/glow-sans-sc-extrabold.otf",
+      "bytes": 9165648,
+      "sha256": "9275b784cee7d885bdb5d9b1bf54b275de8caf79169b989b9f42aa84f20800fa",
+      "license_path": "licenses/glow-sans-sc.txt",
+      "license_sha256": "294348a0b170240633883e62548c2d3bc76306a5571a5235b2e407e0ace3b232",
+      "face_name": "Glow Sans SC Normal ExtraBold"
+    },
+    {
+      "id": "ma-shan-zheng-regular",
+      "family": "Ma Shan Zheng",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/mashanzheng/MaShanZheng-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/mashanzheng/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/ma-shan-zheng-regular.ttf",
+      "bytes": 5857936,
+      "sha256": "6d2546bb189c732a8ca29af9e22457b152387d158aa459e4ac2ce1e51788b7fb",
+      "license_path": "licenses/ma-shan-zheng.txt",
+      "license_sha256": "d7bdb1cee215b689e23c2f95672a6084c790542170648267a55114103d756a08",
+      "face_name": "Ma Shan Zheng Regular"
+    },
+    {
+      "id": "zhi-mang-xing-regular",
+      "family": "Zhi Mang Xing",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zhimangxing/ZhiMangXing-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zhimangxing/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/zhi-mang-xing-regular.ttf",
+      "bytes": 4063532,
+      "sha256": "644e0cae9b40f0b10ab729a01bd32032e3973bac22be3dccae01bf6ae7fde969",
+      "license_path": "licenses/zhi-mang-xing.txt",
+      "license_sha256": "10947328199e369a3e6b4a67e8e5507ed99d5bbb264a1f156415aa9b665e4d15",
+      "face_name": "Zhi Mang Xing Regular"
+    },
+    {
+      "id": "zcool-kuaile-regular",
+      "family": "ZCOOL KuaiLe",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zcoolkuaile/ZCOOLKuaiLe-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zcoolkuaile/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/zcool-kuaile-regular.ttf",
+      "bytes": 1514968,
+      "sha256": "812a6fc1fe54b6d73a419245c32dfeba8aa33104d5be90d1cf6af082007cb71d",
+      "license_path": "licenses/zcool-kuaile.txt",
+      "license_sha256": "538078469839b4a2e7ad22bef4ebe41681a4e53749bb2a072144024f1d6d703d",
+      "face_name": "ZCOOL KuaiLe Regular"
+    },
+    {
+      "id": "zcool-qingke-huangyou-regular",
+      "family": "ZCOOL QingKe HuangYou",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zcoolqingkehuangyou/ZCOOLQingKeHuangYou-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zcoolqingkehuangyou/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/zcool-qingke-huangyou-regular.ttf",
+      "bytes": 8328684,
+      "sha256": "54f0c0df4308cd74cd0f2fd3494ae054dbc4a1fd6fa7d71f4807eb4cdd8b4136",
+      "license_path": "licenses/zcool-qingke-huangyou.txt",
+      "license_sha256": "f1bce31b817dee01c1e4ef8bc45d8ecb95f01f4abbf0a985007cb3cd0fd8123d",
+      "face_name": "ZCOOL QingKe HuangYou Regular"
+    },
+    {
+      "id": "zcool-xiaowei-regular",
+      "family": "ZCOOL XiaoWei",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zcoolxiaowei/ZCOOLXiaoWei-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/zcoolxiaowei/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/zcool-xiaowei-regular.ttf",
+      "bytes": 6313808,
+      "sha256": "a42b620140f493db42f741351dfbf343c0936d58588ee8004b8b2a218d997ff1",
+      "license_path": "licenses/zcool-xiaowei.txt",
+      "license_sha256": "a094514ca57cf8f9c5e8d8d1adab5d8cd3a377297ff016f9df2c05b3ecd77f0a",
+      "face_name": "ZCOOL XiaoWei Regular"
+    },
+    {
+      "id": "wdxl-lubrifont-sc-regular",
+      "family": "WDXL Lubrifont SC",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/wdxllubrifontsc/WDXLLubrifontSC-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/wdxllubrifontsc/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/wdxl-lubrifont-sc-regular.ttf",
+      "bytes": 10344488,
+      "sha256": "0134ed261d56aab8fa1860df677858c5d0d3ca899b2aa5430581c458a752e914",
+      "license_path": "licenses/wdxl-lubrifont-sc.txt",
+      "license_sha256": "048eba87d28b5d74c432cfa38ca44737e86a5508cf912c1b2cc211c45944e1d9",
+      "face_name": "WDXL Lubrifont SC"
+    },
+    {
+      "id": "noto-sans-tc-regular",
+      "family": "Noto Sans TC",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanstc/NotoSansTC%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanstc/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/noto-sans-tc-regular.ttf",
+      "bytes": 7149204,
+      "sha256": "7b0244e8b04033fb7d3167cdf51745706a88e1b21b73c98b503177906699d557",
+      "license_path": "licenses/noto-sans-tc.txt",
+      "license_sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9",
+      "face_name": "Noto Sans TC Regular"
+    },
+    {
+      "id": "noto-sans-tc-bold",
+      "family": "Noto Sans TC",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanstc/NotoSansTC%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanstc/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/noto-sans-tc-bold.ttf",
+      "bytes": 7143732,
+      "sha256": "d5aae3ea80aba03911dec4993e9ea1a2ff67dd9fab68b8aea154e6182bc0dffb",
+      "license_path": "licenses/noto-sans-tc.txt",
+      "license_sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9",
+      "face_name": "Noto Sans TC Bold"
+    },
+    {
+      "id": "inter-regular",
+      "family": "Inter",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/inter-regular.ttf",
+      "bytes": 341384,
+      "sha256": "fb703769ccc738f28042099f628956835cbaa73434336511e1a93914436ab5d5",
+      "license_path": "licenses/inter.txt",
+      "license_sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57",
+      "face_name": "Inter Regular"
+    },
+    {
+      "id": "inter-bold",
+      "family": "Inter",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/inter-bold.ttf",
+      "bytes": 343060,
+      "sha256": "eef4a95e26184c911f26aec8ccbdbca52ea60be73a9a10b934991d458154bf71",
+      "license_path": "licenses/inter.txt",
+      "license_sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57",
+      "face_name": "Inter Bold"
+    },
+    {
+      "id": "inter-italic",
+      "family": "Inter",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter-Italic%5Bopsz%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/inter-italic.ttf",
+      "bytes": 344816,
+      "sha256": "78702dccdd62d3ddb36dbd031c42f6e2dd4748b2dc40d2cb22e46555a5922e52",
+      "license_path": "licenses/inter.txt",
+      "license_sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57",
+      "face_name": "Inter Italic"
+    },
+    {
+      "id": "inter-bold-italic",
+      "family": "Inter",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter-Italic%5Bopsz%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/inter-bold-italic.ttf",
+      "bytes": 346712,
+      "sha256": "135e50dc3f704ac71361f33fb2f73a60fda3537ad6e4ba3d2e719509b2d3d7fa",
+      "license_path": "licenses/inter.txt",
+      "license_sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57",
+      "face_name": "Inter Bold Italic"
+    },
+    {
+      "id": "roboto-regular",
+      "family": "Roboto",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/Roboto%5Bwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/roboto-regular.ttf",
+      "bytes": 157664,
+      "sha256": "a165e4e9b5959b968b59553bf3d9780f31ef711dff43bd5fdf7b9c82d9bc1d09",
+      "license_path": "licenses/roboto.txt",
+      "license_sha256": "061402327a96aadb0bfb694a960ed289ecd38d383e396243831ab81feb109c41",
+      "face_name": "Roboto Regular"
+    },
+    {
+      "id": "roboto-bold",
+      "family": "Roboto",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/Roboto%5Bwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/roboto-bold.ttf",
+      "bytes": 158364,
+      "sha256": "c7231ed8d79874d48be4a8e24b7164005c5e6374bae8d006c153dbc8161f8995",
+      "license_path": "licenses/roboto.txt",
+      "license_sha256": "061402327a96aadb0bfb694a960ed289ecd38d383e396243831ab81feb109c41",
+      "face_name": "Roboto Bold"
+    },
+    {
+      "id": "roboto-italic",
+      "family": "Roboto",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/Roboto-Italic%5Bwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/roboto-italic.ttf",
+      "bytes": 163292,
+      "sha256": "a271002ada74dfd7fdb4c60b79eff76840263c00dfe17aa326ffde9d23126954",
+      "license_path": "licenses/roboto.txt",
+      "license_sha256": "061402327a96aadb0bfb694a960ed289ecd38d383e396243831ab81feb109c41",
+      "face_name": "Roboto Italic"
+    },
+    {
+      "id": "roboto-bold-italic",
+      "family": "Roboto",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/Roboto-Italic%5Bwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/roboto-bold-italic.ttf",
+      "bytes": 164228,
+      "sha256": "9758c3ecbe35fc3fd8069302e45b09a4f213688aff86fe18f20c709b5c5152ba",
+      "license_path": "licenses/roboto.txt",
+      "license_sha256": "061402327a96aadb0bfb694a960ed289ecd38d383e396243831ab81feb109c41",
+      "face_name": "Roboto Bold Italic"
+    },
+    {
+      "id": "open-sans-regular",
+      "family": "Open Sans",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OpenSans%5Bwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/open-sans-regular.ttf",
+      "bytes": 130516,
+      "sha256": "c991e61e9d35c9f3b5fa1c93412190046f08a3e93750c2389fca29f99722e9fc",
+      "license_path": "licenses/open-sans.txt",
+      "license_sha256": "fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602",
+      "face_name": "Open Sans Regular"
+    },
+    {
+      "id": "open-sans-bold",
+      "family": "Open Sans",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OpenSans%5Bwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/open-sans-bold.ttf",
+      "bytes": 130504,
+      "sha256": "673c071fcf8411ddb71b28b27df1f5720d8fcda28241ca6926313f4e0a9e7b9c",
+      "license_path": "licenses/open-sans.txt",
+      "license_sha256": "fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602",
+      "face_name": "Open Sans Bold"
+    },
+    {
+      "id": "open-sans-italic",
+      "family": "Open Sans",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OpenSans-Italic%5Bwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/open-sans-italic.ttf",
+      "bytes": 136056,
+      "sha256": "2cc3044b5f09817f9f7e04a63cc9d290da73091e110df4731ab68ae533af581f",
+      "license_path": "licenses/open-sans.txt",
+      "license_sha256": "fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602",
+      "face_name": "Open Sans Italic"
+    },
+    {
+      "id": "open-sans-bold-italic",
+      "family": "Open Sans",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OpenSans-Italic%5Bwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/opensans/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/open-sans-bold-italic.ttf",
+      "bytes": 135784,
+      "sha256": "eea77fb608383bda84e6769d7412143d67422476322d2a434916e0b8a989a78d",
+      "license_path": "licenses/open-sans.txt",
+      "license_sha256": "fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602",
+      "face_name": "Open Sans Bold Italic"
+    },
+    {
+      "id": "lato-regular",
+      "family": "Lato",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/Lato-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/lato-regular.ttf",
+      "bytes": 656568,
+      "sha256": "d636e4683231f931eda222d588e944d082bfd3bdba02f928bee461c0f185b251",
+      "license_path": "licenses/lato.txt",
+      "license_sha256": "74ba064d03f1f1c4a952da936c3eb71866c34404916734de3cae73b34357e59e",
+      "face_name": "Lato Regular"
+    },
+    {
+      "id": "lato-italic",
+      "family": "Lato",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/Lato-Italic.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/lato-italic.ttf",
+      "bytes": 722900,
+      "sha256": "e399c44efe1387100531d26c7e4800c5d12251b890d6654a3098c7c679cb1786",
+      "license_path": "licenses/lato.txt",
+      "license_sha256": "74ba064d03f1f1c4a952da936c3eb71866c34404916734de3cae73b34357e59e",
+      "face_name": "Lato Italic"
+    },
+    {
+      "id": "lato-bold",
+      "family": "Lato",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/Lato-Bold.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/lato-bold.ttf",
+      "bytes": 656544,
+      "sha256": "8a0aace75d33794eece4b28187bfc1df0bbd2888b5d8a56e01788c8d65d16be1",
+      "license_path": "licenses/lato.txt",
+      "license_sha256": "74ba064d03f1f1c4a952da936c3eb71866c34404916734de3cae73b34357e59e",
+      "face_name": "Lato Bold"
+    },
+    {
+      "id": "lato-bold-italic",
+      "family": "Lato",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/Lato-BoldItalic.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/lato-bold-italic.ttf",
+      "bytes": 698364,
+      "sha256": "62c1b7f0d2e74b45960154c3520efc337b553db0961bfdc950d5618334596cc8",
+      "license_path": "licenses/lato.txt",
+      "license_sha256": "74ba064d03f1f1c4a952da936c3eb71866c34404916734de3cae73b34357e59e",
+      "face_name": "Lato Bold Italic"
+    },
+    {
+      "id": "montserrat-regular",
+      "family": "Montserrat",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/Montserrat%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/montserrat-regular.ttf",
+      "bytes": 374520,
+      "sha256": "9f87e98a2c13ec26913a1dce3a68241eb571b07e03d882341f3a67ab9c35d484",
+      "license_path": "licenses/montserrat.txt",
+      "license_sha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e",
+      "face_name": "Montserrat Regular"
+    },
+    {
+      "id": "montserrat-bold",
+      "family": "Montserrat",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/Montserrat%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/montserrat-bold.ttf",
+      "bytes": 374628,
+      "sha256": "ab73ccfcb9a0c752f6847bc3470a49ca630b3b9356ae37536a25a31fa2f61409",
+      "license_path": "licenses/montserrat.txt",
+      "license_sha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e",
+      "face_name": "Montserrat Bold"
+    },
+    {
+      "id": "montserrat-italic",
+      "family": "Montserrat",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/Montserrat-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/montserrat-italic.ttf",
+      "bytes": 384544,
+      "sha256": "25d68ed5875176a644844bf8c8881e9394bc02dc63a3159df6f4816f64367dcc",
+      "license_path": "licenses/montserrat.txt",
+      "license_sha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e",
+      "face_name": "Montserrat Italic"
+    },
+    {
+      "id": "montserrat-bold-italic",
+      "family": "Montserrat",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/Montserrat-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/montserrat-bold-italic.ttf",
+      "bytes": 384772,
+      "sha256": "1b89f1456e60c43c5f8095fc72237b3a3c8ac6857fdbac24feed4483cc32e770",
+      "license_path": "licenses/montserrat.txt",
+      "license_sha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e",
+      "face_name": "Montserrat Bold Italic"
+    },
+    {
+      "id": "poppins-regular",
+      "family": "Poppins",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/poppins-regular.ttf",
+      "bytes": 160316,
+      "sha256": "7e65201e9b79159e2300267cc885e16c8dcef2424cdfa09a29bfb0980a94a7ba",
+      "license_path": "licenses/poppins.txt",
+      "license_sha256": "6be04893d770899a015649c7aa3b582f871b272f8747a92b78b17c3e5c8b2573",
+      "face_name": "Poppins Regular"
+    },
+    {
+      "id": "poppins-italic",
+      "family": "Poppins",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Italic.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/poppins-italic.ttf",
+      "bytes": 184544,
+      "sha256": "4fa76ae75b40f926420514044722cb97f32186cafd3b38263cc34dad7174d46d",
+      "license_path": "licenses/poppins.txt",
+      "license_sha256": "6be04893d770899a015649c7aa3b582f871b272f8747a92b78b17c3e5c8b2573",
+      "face_name": "Poppins Italic"
+    },
+    {
+      "id": "poppins-bold",
+      "family": "Poppins",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Bold.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/poppins-bold.ttf",
+      "bytes": 155996,
+      "sha256": "983676516167748b74de6f4771fb384c664fd913acb8b471122ecacf5da5ea6c",
+      "license_path": "licenses/poppins.txt",
+      "license_sha256": "6be04893d770899a015649c7aa3b582f871b272f8747a92b78b17c3e5c8b2573",
+      "face_name": "Poppins Bold"
+    },
+    {
+      "id": "poppins-bold-italic",
+      "family": "Poppins",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-BoldItalic.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/poppins-bold-italic.ttf",
+      "bytes": 179108,
+      "sha256": "3572ac8116a0ac7317d342262b29937bcbaf94d8f03f90df6fe666fa7e2fb43a",
+      "license_path": "licenses/poppins.txt",
+      "license_sha256": "6be04893d770899a015649c7aa3b582f871b272f8747a92b78b17c3e5c8b2573",
+      "face_name": "Poppins Bold Italic"
+    },
+    {
+      "id": "oswald-regular",
+      "family": "Oswald",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/oswald/Oswald%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/oswald/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/oswald-regular.ttf",
+      "bytes": 88588,
+      "sha256": "cd16c925e93789c360a22e977814b34cd28fddf9150a4fd18735aa92b8760c3a",
+      "license_path": "licenses/oswald.txt",
+      "license_sha256": "0fd731a904b729a4e02eaf5e8ebd06783edd9abe400e8882760160230675b652",
+      "face_name": "Oswald Regular"
+    },
+    {
+      "id": "oswald-bold",
+      "family": "Oswald",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/oswald/Oswald%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/oswald/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/oswald-bold.ttf",
+      "bytes": 88940,
+      "sha256": "ddda5b98a5fdfc413b434f5d4db74b77efdbe5c276c7d9e89f5bd9671b07fb35",
+      "license_path": "licenses/oswald.txt",
+      "license_sha256": "0fd731a904b729a4e02eaf5e8ebd06783edd9abe400e8882760160230675b652",
+      "face_name": "Oswald Bold"
+    },
+    {
+      "id": "raleway-regular",
+      "family": "Raleway",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/Raleway%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/raleway-regular.ttf",
+      "bytes": 164684,
+      "sha256": "26a741bfb649b626070b7169a946a3efb04541734a49bb23c0dd024a272db1ff",
+      "license_path": "licenses/raleway.txt",
+      "license_sha256": "7e946cf1171784d1015279e7dc35f827957a6b5d1f1f659ae0c98e5f5e37ed9b",
+      "face_name": "SlideAlchemy Sans A Regular"
+    },
+    {
+      "id": "raleway-bold",
+      "family": "Raleway",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/Raleway%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/raleway-bold.ttf",
+      "bytes": 164548,
+      "sha256": "d5ecda2334839d51b8119742189aca0e67a5c8c5b64ffce1b5a91b91191a8a3a",
+      "license_path": "licenses/raleway.txt",
+      "license_sha256": "7e946cf1171784d1015279e7dc35f827957a6b5d1f1f659ae0c98e5f5e37ed9b",
+      "face_name": "SlideAlchemy Sans A Bold"
+    },
+    {
+      "id": "raleway-italic",
+      "family": "Raleway",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/Raleway-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/raleway-italic.ttf",
+      "bytes": 165552,
+      "sha256": "210a594e56f06ed5c4a0c7fbe3d063843aaf7ba4be0788560380d8d214d4abb3",
+      "license_path": "licenses/raleway.txt",
+      "license_sha256": "7e946cf1171784d1015279e7dc35f827957a6b5d1f1f659ae0c98e5f5e37ed9b",
+      "face_name": "SlideAlchemy Sans A Italic"
+    },
+    {
+      "id": "raleway-bold-italic",
+      "family": "Raleway",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/Raleway-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/raleway-bold-italic.ttf",
+      "bytes": 165740,
+      "sha256": "3450bb679ae9b8321217779a404f6e1148366d537bc5e92cff03715ea7870e33",
+      "license_path": "licenses/raleway.txt",
+      "license_sha256": "7e946cf1171784d1015279e7dc35f827957a6b5d1f1f659ae0c98e5f5e37ed9b",
+      "face_name": "SlideAlchemy Sans A Bold Italic"
+    },
+    {
+      "id": "merriweather-regular",
+      "family": "Merriweather",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/Merriweather%5Bopsz%2Cwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/merriweather-regular.ttf",
+      "bytes": 1075276,
+      "sha256": "c791616609412f8d34c1f8f086e37c9acfe04c363e67d49d90723cfb9ac0d69c",
+      "license_path": "licenses/merriweather.txt",
+      "license_sha256": "715bd349bfa6116f99e351e1548321dcfa25b91df65502d22ca8d624557697d2",
+      "face_name": "SlideAlchemy Serif A Regular"
+    },
+    {
+      "id": "merriweather-bold",
+      "family": "Merriweather",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/Merriweather%5Bopsz%2Cwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/merriweather-bold.ttf",
+      "bytes": 1075544,
+      "sha256": "5994094a2ca2fe6ea0fc4a62f30697a0df158d7890fac0c10044738871f52d53",
+      "license_path": "licenses/merriweather.txt",
+      "license_sha256": "715bd349bfa6116f99e351e1548321dcfa25b91df65502d22ca8d624557697d2",
+      "face_name": "SlideAlchemy Serif A Bold"
+    },
+    {
+      "id": "merriweather-italic",
+      "family": "Merriweather",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/Merriweather-Italic%5Bopsz%2Cwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/merriweather-italic.ttf",
+      "bytes": 1077516,
+      "sha256": "ec4dc613568f1876b261befd38c4db671d2138a4587e87a0f49a94306f30ee70",
+      "license_path": "licenses/merriweather.txt",
+      "license_sha256": "715bd349bfa6116f99e351e1548321dcfa25b91df65502d22ca8d624557697d2",
+      "face_name": "SlideAlchemy Serif A Italic"
+    },
+    {
+      "id": "merriweather-bold-italic",
+      "family": "Merriweather",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/Merriweather-Italic%5Bopsz%2Cwdth%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/merriweather/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/merriweather-bold-italic.ttf",
+      "bytes": 1077684,
+      "sha256": "add43d498cfc7823a4ccaeaa9b2d0ed39d8803c3c899be2049be7dc08b3d2f93",
+      "license_path": "licenses/merriweather.txt",
+      "license_sha256": "715bd349bfa6116f99e351e1548321dcfa25b91df65502d22ca8d624557697d2",
+      "face_name": "SlideAlchemy Serif A Bold Italic"
+    },
+    {
+      "id": "playfair-display-regular",
+      "family": "Playfair Display",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/playfair-display-regular.ttf",
+      "bytes": 194636,
+      "sha256": "07f1de1007a194a384c4a7062e900f692ce36600d43adb2f85196c4d31b3474f",
+      "license_path": "licenses/playfair-display.txt",
+      "license_sha256": "566be814f8e96e93dfa16101331557eb6b5467e9e03f627c0910fe93ca12300e",
+      "face_name": "SlideAlchemy Display A Regular"
+    },
+    {
+      "id": "playfair-display-bold",
+      "family": "Playfair Display",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/playfair-display-bold.ttf",
+      "bytes": 194980,
+      "sha256": "9573747428fee4f66d847f7b19b66b2e829ed75e9a90156e7171a6257bd05bc1",
+      "license_path": "licenses/playfair-display.txt",
+      "license_sha256": "566be814f8e96e93dfa16101331557eb6b5467e9e03f627c0910fe93ca12300e",
+      "face_name": "SlideAlchemy Display A Bold"
+    },
+    {
+      "id": "playfair-display-italic",
+      "family": "Playfair Display",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/playfair-display-italic.ttf",
+      "bytes": 177932,
+      "sha256": "d0baeb20d6d740ed46d08dddebc51ada13c9beb4b911e16c3d932b81017e2496",
+      "license_path": "licenses/playfair-display.txt",
+      "license_sha256": "566be814f8e96e93dfa16101331557eb6b5467e9e03f627c0910fe93ca12300e",
+      "face_name": "SlideAlchemy Display A Italic"
+    },
+    {
+      "id": "playfair-display-bold-italic",
+      "family": "Playfair Display",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/playfair-display-bold-italic.ttf",
+      "bytes": 178364,
+      "sha256": "f4d32a9db796a8c079fafa6a1b61d7f4c3083d463883eddcf50bee8dab473032",
+      "license_path": "licenses/playfair-display.txt",
+      "license_sha256": "566be814f8e96e93dfa16101331557eb6b5467e9e03f627c0910fe93ca12300e",
+      "face_name": "SlideAlchemy Display A Bold Italic"
+    },
+    {
+      "id": "source-sans-3-regular",
+      "family": "Source Sans 3",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourcesans3/SourceSans3%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourcesans3/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-sans-3-regular.ttf",
+      "bytes": 379572,
+      "sha256": "c2dbfd1b71e359df69bd1d40709511b7e8818fe7eca9dc1de5862867c1307415",
+      "license_path": "licenses/source-sans-3.txt",
+      "license_sha256": "09746787287a289323b0ec3cff4d1a4a801331b82b7207c1e186f5d26619a392",
+      "face_name": "SlideAlchemy Sans B Regular"
+    },
+    {
+      "id": "source-sans-3-bold",
+      "family": "Source Sans 3",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourcesans3/SourceSans3%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourcesans3/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-sans-3-bold.ttf",
+      "bytes": 379444,
+      "sha256": "da9caf1ae6eaab9b22f366d1b5dccf6dc8ab382355bea6f66f985f4d45e68e83",
+      "license_path": "licenses/source-sans-3.txt",
+      "license_sha256": "09746787287a289323b0ec3cff4d1a4a801331b82b7207c1e186f5d26619a392",
+      "face_name": "SlideAlchemy Sans B Bold"
+    },
+    {
+      "id": "source-sans-3-italic",
+      "family": "Source Sans 3",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourcesans3/SourceSans3-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourcesans3/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-sans-3-italic.ttf",
+      "bytes": 240392,
+      "sha256": "f15cf5608a40fdeceedcdd5bf6199ee5e7283e2e9a9490e6f230dda37f2db088",
+      "license_path": "licenses/source-sans-3.txt",
+      "license_sha256": "09746787287a289323b0ec3cff4d1a4a801331b82b7207c1e186f5d26619a392",
+      "face_name": "SlideAlchemy Sans B Italic"
+    },
+    {
+      "id": "source-sans-3-bold-italic",
+      "family": "Source Sans 3",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourcesans3/SourceSans3-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourcesans3/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-sans-3-bold-italic.ttf",
+      "bytes": 240380,
+      "sha256": "23dbded18469ae6d00e65e70cea56cfb896cbdcb5694f2de68919589e77c842a",
+      "license_path": "licenses/source-sans-3.txt",
+      "license_sha256": "09746787287a289323b0ec3cff4d1a4a801331b82b7207c1e186f5d26619a392",
+      "face_name": "SlideAlchemy Sans B Bold Italic"
+    },
+    {
+      "id": "source-serif-4-regular",
+      "family": "Source Serif 4",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/SourceSerif4%5Bopsz%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/source-serif-4-regular.ttf",
+      "bytes": 330340,
+      "sha256": "f88e218f5a4e22c038ca1c684992fb2948d7b45bf3d473fa1390edd9b9b4bdc3",
+      "license_path": "licenses/source-serif-4.txt",
+      "license_sha256": "5f94c3fd3a23131a417ab5a0c8452de57e70c3cfb9f604d88241f7065ebf9fd9",
+      "face_name": "Source Serif 4 Regular"
+    },
+    {
+      "id": "source-serif-4-bold",
+      "family": "Source Serif 4",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/SourceSerif4%5Bopsz%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server",
+        "core"
+      ],
+      "path": "fonts/source-serif-4-bold.ttf",
+      "bytes": 330440,
+      "sha256": "8e108c1e2747f18b6b19bdb27924ccdabd45454e8f9d7121de4de63e849ec8b6",
+      "license_path": "licenses/source-serif-4.txt",
+      "license_sha256": "5f94c3fd3a23131a417ab5a0c8452de57e70c3cfb9f604d88241f7065ebf9fd9",
+      "face_name": "Source Serif 4 Bold"
+    },
+    {
+      "id": "source-serif-4-italic",
+      "family": "Source Serif 4",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/SourceSerif4-Italic%5Bopsz%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-serif-4-italic.ttf",
+      "bytes": 207592,
+      "sha256": "d2044e409133c7bd75a046ad2f99a03c5c98525488abb98c0b3f9123077d8565",
+      "license_path": "licenses/source-serif-4.txt",
+      "license_sha256": "5f94c3fd3a23131a417ab5a0c8452de57e70c3cfb9f604d88241f7065ebf9fd9",
+      "face_name": "Source Serif 4 Italic"
+    },
+    {
+      "id": "source-serif-4-bold-italic",
+      "family": "Source Serif 4",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/SourceSerif4-Italic%5Bopsz%2Cwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/source-serif-4-bold-italic.ttf",
+      "bytes": 207668,
+      "sha256": "3bd590f7b1f503c927c9e14c616dd0f958e86f86a646dfbb8dae50e0a10a4591",
+      "license_path": "licenses/source-serif-4.txt",
+      "license_sha256": "5f94c3fd3a23131a417ab5a0c8452de57e70c3cfb9f604d88241f7065ebf9fd9",
+      "face_name": "Source Serif 4 Bold Italic"
+    },
+    {
+      "id": "jetbrains-mono-regular",
+      "family": "JetBrains Mono",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/JetBrainsMono%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/jetbrains-mono-regular.ttf",
+      "bytes": 115192,
+      "sha256": "61d5b2a22622f10a82df2e7fb7267d64a0fa5fb3d88d3eb0bbc6f6ff359fc868",
+      "license_path": "licenses/jetbrains-mono.txt",
+      "license_sha256": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d",
+      "face_name": "JetBrains Mono Regular"
+    },
+    {
+      "id": "jetbrains-mono-bold",
+      "family": "JetBrains Mono",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/JetBrainsMono%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/jetbrains-mono-bold.ttf",
+      "bytes": 115112,
+      "sha256": "c6dff55d4c8d6120db3775e10f2924ec13e6147b36d57c515ef7ce4446178a92",
+      "license_path": "licenses/jetbrains-mono.txt",
+      "license_sha256": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d",
+      "face_name": "JetBrains Mono Bold"
+    },
+    {
+      "id": "jetbrains-mono-italic",
+      "family": "JetBrains Mono",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/JetBrainsMono-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/jetbrains-mono-italic.ttf",
+      "bytes": 118000,
+      "sha256": "606393e0623ebfe1dc1113af7232abc56a9b57c6b207b18d759aa6ea5a6c5fbc",
+      "license_path": "licenses/jetbrains-mono.txt",
+      "license_sha256": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d",
+      "face_name": "JetBrains Mono Italic"
+    },
+    {
+      "id": "jetbrains-mono-bold-italic",
+      "family": "JetBrains Mono",
+      "style": "Bold Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/JetBrainsMono-Italic%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/jetbrains-mono-bold-italic.ttf",
+      "bytes": 118000,
+      "sha256": "b4a4401fec5729c6f96bd9d3090a9e71f34d734daa8f120336ce4e6d62adeb40",
+      "license_path": "licenses/jetbrains-mono.txt",
+      "license_sha256": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d",
+      "face_name": "JetBrains Mono Bold Italic"
+    },
+    {
+      "id": "anton-regular",
+      "family": "Anton",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/anton/Anton-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/anton/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/anton-regular.ttf",
+      "bytes": 170812,
+      "sha256": "a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab",
+      "license_path": "licenses/anton.txt",
+      "license_sha256": "ee67e6ee22790b7929f1a3769ca2801d565c64b5a9096942c1adf5596de9c9e4",
+      "face_name": "Anton Regular"
+    },
+    {
+      "id": "bebas-neue-regular",
+      "family": "Bebas Neue",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/bebasneue/BebasNeue-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/bebasneue/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/bebas-neue-regular.ttf",
+      "bytes": 61400,
+      "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73",
+      "license_path": "licenses/bebas-neue.txt",
+      "license_sha256": "72082f6cb4d04be2ecf7cc7d9e1e7d73787f0af8a5a278a47cade70c16b78341",
+      "face_name": "Bebas Neue Regular"
+    },
+    {
+      "id": "dm-serif-display-regular",
+      "family": "DM Serif Display",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmserifdisplay/DMSerifDisplay-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmserifdisplay/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/dm-serif-display-regular.ttf",
+      "bytes": 76580,
+      "sha256": "8cc3643535edf039aa5d95440a8542735e9197e4f4b8d9303e980fefbf5ab616",
+      "license_path": "licenses/dm-serif-display.txt",
+      "license_sha256": "a3e5cdd67d4571dd0a24fcc968de0efde7ae97ef752daf0906e4767619dd7231",
+      "face_name": "DM Serif Display Regular"
+    },
+    {
+      "id": "dm-serif-display-italic",
+      "family": "DM Serif Display",
+      "style": "Italic",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmserifdisplay/DMSerifDisplay-Italic.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmserifdisplay/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/dm-serif-display-italic.ttf",
+      "bytes": 71208,
+      "sha256": "df74c0ac387baeaeb0fe4f2324e1668e6a3ed8c09cd9796fe162c71753e19e45",
+      "license_path": "licenses/dm-serif-display.txt",
+      "license_sha256": "a3e5cdd67d4571dd0a24fcc968de0efde7ae97ef752daf0906e4767619dd7231",
+      "face_name": "DM Serif Display Italic"
+    },
+    {
+      "id": "caveat-regular",
+      "family": "Caveat",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/caveat/Caveat%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/caveat/OFL.txt",
+      "member": null,
+      "weight": 400,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/caveat-regular.ttf",
+      "bytes": 266112,
+      "sha256": "619b1e10c2d7e51097e55e1075371987f1f61e0b91c59330f34171c309d48080",
+      "license_path": "licenses/caveat.txt",
+      "license_sha256": "1f9d81d094273d82f3898a1ee8b598a717d050ecbf5ff7bede105b704880157b",
+      "face_name": "Caveat Regular"
+    },
+    {
+      "id": "caveat-bold",
+      "family": "Caveat",
+      "style": "Bold",
+      "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/caveat/Caveat%5Bwght%5D.ttf",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/caveat/OFL.txt",
+      "member": null,
+      "weight": 700,
+      "profiles": [
+        "server"
+      ],
+      "path": "fonts/caveat-bold.ttf",
+      "bytes": 266468,
+      "sha256": "86ec164e7a7a74c9dd5aad57faf11d6f6a9042570d9b62d48b392385fb0e2aaa",
+      "license_path": "licenses/caveat.txt",
+      "license_sha256": "1f9d81d094273d82f3898a1ee8b598a717d050ecbf5ff7bede105b704880157b",
+      "face_name": "Caveat Bold"
+    },
+    {
+      "id": "lxgw-wenkai-lite-regular",
+      "family": "LXGW WenKai Lite",
+      "style": "Regular",
+      "url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai-Lite/main/fonts/TTF/LXGWWenKaiLite-Regular.ttf",
+      "license_url": "https://raw.githubusercontent.com/lxgw/LxgwWenKai-Lite/main/OFL.txt",
+      "member": null,
+      "weight": null,
+      "profiles": [
+        "core"
+      ],
+      "path": "fonts/lxgw-wenkai-lite-regular.ttf",
+      "bytes": 13949472,
+      "sha256": "f799a538a3355877e597a0ae04050e897932c9ae7689eb9227c2953c5dd549ea",
+      "license_path": "licenses/lxgw-wenkai-lite.txt",
+      "license_sha256": "0333a85fe077b6849f8e417acc44e8bd879442ceb681e271acf93e2d57fd4e2e",
+      "face_name": "LXGW WenKai Lite"
+    }
+  ],
+  "model": {
+    "path": "font_encoder.onnx",
+    "sha256": "04e88f96bb247b219485ee819c611dd55b460cb5ca3340485cecb3cf0da31bfb",
+    "bytes": 493250
+  },
+  "profiles": {
+    "core": {
+      "families": 8,
+      "faces": 14,
+      "bytes": 71429896
+    },
+    "server": {
+      "families": 30,
+      "faces": 92,
+      "bytes": 375551368
+    }
+  }
+}

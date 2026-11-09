@@ -178,6 +178,7 @@ Read only the relevant reference before acting:
 - `references/element-classification.md`: classification rules, reuse rules, and common traps.
 - `references/icon-slicing-qa.md`: PNG asset sheet, chroma key, padding, edge-touch, and contact sheet rules.
 - `references/text-extraction.md`: OCR text extraction command, schema, measurement method, and bold calibration.
+- `references/font-distribution.md`: core font cache, remote expansion, release catalog, and installation commands.
 - `references/base-prompt-template.md`: prompt template for clean base generation.
 - `references/base-grouping.md`: how to infer and present recommended base groups.
 - `references/icon-sheet-prompt-template.md`: prompt template for PNG icon asset sheets.
@@ -200,5 +201,7 @@ Use bundled scripts for deterministic checks:
 - `scripts/simple_svg_to_pptx.py`: convert simple component SVG primitives into editable PPTX shapes for quick validation or component reuse.
 - `scripts/validate_element_analysis.py`: lightweight validation for `element_analysis.json` without external dependencies.
 - `scripts/extract_text.py`: OCR the source pages and measure text position, size, colour, weight, bullets, and line spacing into `texts_layout.json`.
+- `scripts/font_store.py`: install the checked core font pack and cache selected remote matches.
+- `scripts/serve_fonts.py`: serve the expanded font matcher behind Nginx.
 - `scripts/compose_component_pptx.py`: compose base images, editable shapes, PNG assets, and editable text into a PPTX from JSON.
 - `scripts/compare_preview.py`: create side-by-side and difference images from source/preview PNGs.

@@ -153,6 +153,8 @@ Required output before step 6:
 
 Run `scripts/extract_text.py` on the source page images. OCR reads the characters, and position, size, colour, weight, bullets, and line spacing are measured from the pixels. Do not use a visual model for text. See `text-extraction.md`.
 
+For mixed inline styles or decorative text effects, use `--rich-text` with the local font index/model. Copy the resulting `runs` and their `effects` into the compose spec, and review entries flagged in `style_report`.
+
 Store text separately from visual elements. Do not rasterize normal text into icon assets. Symbols such as arrows and chevrons are not text; OCR drops them, so they must already be in `element_analysis.json`.
 
 Required output before step 7:

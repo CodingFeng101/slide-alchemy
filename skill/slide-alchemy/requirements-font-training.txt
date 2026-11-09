@@ -1,0 +1,5 @@
+# Optional dependencies for training/exporting the local font encoder.
+# Inference uses the main requirements.txt and ONNX Runtime.
+-r requirements.txt
+torch>=2.0
+onnx>=1.14

@@ -182,20 +182,52 @@ def add_text(slide, item, ref_w, ref_h, slide_w, slide_h):
     tf.margin_right = 0
     tf.margin_top = 0
     tf.margin_bottom = 0
-    # A run cannot hold a line break; each line becomes its own paragraph.
-    for index, line in enumerate(str(item.get("text", "")).split("\n")):
-        p = tf.paragraphs[0] if index == 0 else tf.add_paragraph()
-        p.alignment = ALIGN.get(item.get("align", "center"), PP_ALIGN.CENTER)
-        if item.get("line_spacing_pt"):
-            p.line_spacing = Pt(float(item["line_spacing_pt"]))
-        run = p.add_run()
-        run.text = line
-        run.font.name = item.get("font_family", "Microsoft YaHei")
-        run.font.size = Pt(float(item.get("font_size_pt", 18)))
-        run.font.bold = as_bool(item.get("bold"), False)
-        run.font.italic = as_bool(item.get("italic"), False)
-        run.font.color.rgb = rgb(item.get("color"), "000000")
+    chunks = item.get("runs")
+    if chunks is None:
+        chunks = [{"text": str(item.get("text", ""))}]
+    if not isinstance(chunks, list) or not all(isinstance(chunk, dict) and isinstance(chunk.get("text"), str) for chunk in chunks):
+        raise ValueError("text runs must be a list of objects containing text strings")
+    if "text" in item and "".join(chunk["text"] for chunk in chunks) != str(item["text"]):
+        raise ValueError("concatenated runs must equal the text field")
+    p = tf.paragraphs[0]
+    for chunk in chunks:
+        style = dict(item, **chunk)
+        if "font_family" in chunk and "font_face" not in chunk:
+            style.pop("font_face", None)
+        # Each newline starts a paragraph while style spans stay in that paragraph.
+        for index, text in enumerate(chunk["text"].split("\n")):
+            if index:
+                p = tf.add_paragraph()
+            set_paragraph_style(p, item)
+            if text:
+                run = p.add_run()
+                run.text = text
+                set_run_style(run, style)
     return box
+
+
+def set_paragraph_style(p, item):
+    p.alignment = ALIGN.get(item.get("align", "center"), PP_ALIGN.CENTER)
+    if item.get("line_spacing_pt"):
+        p.line_spacing = Pt(float(item["line_spacing_pt"]))
+
+
+def set_run_style(run, item):
+    run.font.name = item.get("font_face") or item.get("font_family", "Microsoft YaHei")
+    # Explicit East Asian typeface prevents theme fonts replacing CJK text.
+    properties = run._r.get_or_add_rPr()
+    east_asian = properties.find(qn("a:ea"))
+    if east_asian is None:
+        east_asian = properties.makeelement(qn("a:ea"))
+        properties.append(east_asian)
+    east_asian.set("typeface", run.font.name)
+    run.font.size = Pt(float(item.get("font_size_pt", 18)))
+    run.font.bold = as_bool(item.get("bold"), False)
+    run.font.italic = as_bool(item.get("italic"), False)
+    run.font.color.rgb = rgb(item.get("color"), "000000")
+    if item.get("effects"):
+        from text_effects import apply_effects
+        apply_effects(run, item["effects"])
 
 
 def compose(spec_path, out_path):

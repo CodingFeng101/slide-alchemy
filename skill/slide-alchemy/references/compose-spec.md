@@ -96,6 +96,41 @@ Copy text entries from `texts_layout.json` (written by `scripts/extract_text.py`
 - `text`: each `\n` starts a new paragraph.
 - `line_spacing_pt`: optional; applied as exact line spacing to every paragraph of the box.
 - `font_size_pt`, `color`, `bold`, `italic`, `align`, `font_family`: run style.
+- `font_face`: optional full face name, taking precedence over the family name.
+- `runs`: optional inline spans. Concatenate their `text` strings to obtain the item's `text`, including spaces and newlines. A newline starts a paragraph. Each span inherits the item's style and can override `font_family`, `font_face`, `font_size_pt`, `color`, `bold`, `italic`, and `effects`. Changing `font_family` without specifying `font_face` clears the inherited face. An explicit `effects: {}` clears inherited effects for that span. Legacy entries containing just `text` continue to work.
+
+```json
+{
+  "text": "完成率 95%",
+  "font_family": "Microsoft YaHei",
+  "font_size_pt": 24,
+  "runs": [
+    {"text": "完成率 "},
+    {"text": "95%", "font_face": "Arial Bold", "bold": true, "color": "#D02020"}
+  ]
+}
+```
+
+### Native Text Effects
+
+Set `effects` on a text item or an individual run. The composer writes editable DrawingML text properties. Widths, offsets, and blur use points. Opacity ranges from 0 to 1. A gradient angle of 0 runs left to right, and 90 runs top to bottom. Stops use strictly increasing positions from 0 to 1. Writing supports two or more stops.
+
+```json
+{
+  "gradient": {
+    "angle": 90,
+    "stops": [
+      {"position": 0, "color": "#F41712"},
+      {"position": 1, "color": "#FFB600"}
+    ]
+  },
+  "outline": {"color": "#003399", "width_pt": 1.25},
+  "shadow": {
+    "color": "#000000", "opacity": 0.5,
+    "offset_x_pt": 2, "offset_y_pt": 2, "blur_pt": 1
+  }
+}
+```
 
 Keep `slide_width_in` equal to the width used for extraction, because font sizes are measured against it.
 

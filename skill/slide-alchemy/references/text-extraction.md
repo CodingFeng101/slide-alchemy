@@ -14,12 +14,53 @@ Options:
 
 - `--bold-mode auto|off|on|ratio:<value>`: how weight is decided. Default `auto`.
 - `--no-merge-lines`: keep one text box per OCR line instead of merging paragraphs.
-- `--expected <file>`: UTF-8 file of known text, one string per line (for example text pulled from PPTX XML). Near-miss OCR readings of the same length are corrected to it; it never adds text that OCR did not find.
+- `--expected <file>`: UTF-8 file of known text, one string per line (for example text pulled from PPTX XML). Near-miss OCR readings of the same length and whitespace-only differences are corrected to it; it never adds text that OCR did not find.
 - `--slide-width-in <inches>`: must match `slide_width_in` in the compose spec. Default `13.333333`.
+- `--font-index <file>` and `--font-model <file>`: enable local font matching with a trained ONNX encoder. Supply both together. The encoder ranks eligible fonts and OpenCV refines the first 10. Without these options the existing Microsoft YaHei measurement path is used.
+- `--rich-text`: measure inline style spans and fit common text gradients, outlines and shadows. Use with the font options to identify faces per span. The existing extraction mode remains available without this flag.
+- `--font-server <release-url>`: expand poor local matches through the remote pack. Without explicit index/model options, install the core pack and index it together with system fonts. Use `--font-cache <directory>` to select the download cache. See `font-distribution.md` for the release URL, file verification and review limits.
 
 Slide numbers come from the trailing digits of each file name (`slide_003.png` -> 3).
 
+## Local Font Matching
+
+Install the main requirements for inference. Training and ONNX export additionally require `requirements-font-training.txt`.
+
+```bash
+python scripts/match_fonts.py index --text "Campus2026" --out run/fonts/index.json
+python scripts/train_font_matcher.py --font-index run/fonts/index.json --out run/fonts/encoder.onnx --steps 4000
+python scripts/extract_text.py run/source/slide_*.png --font-index run/fonts/index.json --font-model run/fonts/encoder.onnx --out run/analysis/texts_layout.json
+```
+
+The index command accepts font files or directories, and scans system font directories when none are supplied. Use a curated font directory to control the candidate set. It indexes individual TTC faces, deduplicates family/style pairs, checks character coverage, and records file hashes. Rebuild the index after replacing a font file. Variable fonts contribute their default face. Export separate static font files for additional variable-font instances. The index records `fs_type` for later embedding work. Font licensing and embedding are separate from matching.
+
+Training generates synthetic text with paired augmentations and hard negative metric learning. Each batch renders the same text across several fonts. The small convolutional encoder exports 64-dimensional normalized features. ONNX Runtime handles inference without PyTorch. The training command also writes `encoder.evaluation.json` using held-out phrases and scale/blur/threshold perturbations. These results measure synthetic performance. Verify recognition separately on real slide screenshots.
+
+Matching runs on individual OCR lines before paragraph merging. Every eligible font renders the recognized text. The encoder selects up to 10 candidates, then OpenCV compares stroke distances, overlap, and dimensions. Refinement searches native pixel sizes and uniformly resized references to account for screenshot resampling. Full-width CJK lines at least 40 pixels high also use per-glyph comparison, which reduces the influence of tracking. Colour-connected growth recovers lighter edges around coloured gradient text. Neutral-colour text keeps the original mask. Fonts without an indexed bold face also try synthetic bold during refinement.
+
+Matching updates `font_family`, `font_face`, `bold`, `italic`, and `font_size_pt`. The fitted `size_px` is converted to points using the extraction slide width. `font_face` carries the full face name, including Medium/Light faces that a family name and bold flag cannot represent. The composer prefers this field and writes both Latin and East Asian typefaces. Older indexes are enriched with face metadata when loaded, and older layout files continue to use `font_family`.
+
+Blocks measured as the same size, colour, script, weight and slant can select a common near-best candidate. This uses the existing sibling-style measurements. The selected face must occur in every line's shortlist, with mean score penalty at most 0.025 and individual penalty at most 0.08. Original rankings remain available, while `selected_candidate` and `selection: shared_style` record the group choice. These grouping thresholds are heuristics and require verification when a page intentionally mixes fonts within otherwise similar styles.
+
+Each text record gains `font_matches`, with one report per original OCR line. Reports contain ranked candidates, model similarities, shape errors, the gap between the best two shape errors, and whether each face appeared in training. These are diagnostic scores, not calibrated probabilities. `needs_review` flags score gaps below 0.005, best shape errors above 0.12, or faces absent from training. These thresholds are provisional. OCR mistakes and very short strings also require review. `no_supported_font` leaves the original font selection in place.
+
+To match an existing tightly cropped single-line image directly, use the following command.
+
+```bash
+python scripts/match_fonts.py match line.png --text "Campus2026" --font-index run/fonts/index.json --font-model run/fonts/encoder.onnx --out run/fonts/match.json
+```
+
 ## Schema
+
+With `--rich-text`, text entries additionally contain `runs` and `style_report`. Run text concatenation preserves the full recognized string, including explicit newlines and bullet prefixes. Character boxes from RapidOCR 3.x locate colour/script changes. Persistent stroke-width changes propose weight boundaries. Explicit spaces propose boundaries when both sides contain at least three characters. Overlapping four-character retrieval also proposes boundaries when two confident windows on each side consistently favour different faces, with model similarity gaps above 0.08. These thresholds are heuristic. Short same-colour font changes can be missed and require review. Plain punctuation inherits the neighbouring writing system. The fitting uses antialias coverage near strong fill and an outer exclusion band to separate ordinary edges and outlines from displaced shadows. Stroke-covered fills are expanded before font matching to account for outlines. Close font candidates within 0.005 shape error use model similarity to resolve ties. The original rankings remain available.
+
+Automatic effect fitting currently covers two-stop linear gradients, coloured outlines up to four source pixels, and one outer shadow with offsets from -4 to 4 pixels and blur candidates 0, 1 and 2 pixels. Fitted parameters are converted to points. Native writing also accepts explicit multistop gradients and arbitrary valid effect parameters. Complex bevels, textured/metallic fills and low-confidence boundaries require review. The `style_fit.pixel_rmse` and `needs_review` fields expose approximation error. Missing character positions also mark the result for review. Weak shadows and shadows combined with outlines can be missed even when `needs_review` is false. Validate on held-out real renderings before relying on automatic segmentation or effect recovery.
+
+Example command for mixed styles and effects follows.
+
+```bash
+python scripts/extract_text.py run/source/slide_*.png --rich-text --font-index run/fonts/index.json --font-model run/fonts/encoder.onnx --out run/analysis/texts_layout.json
+```
 
 `texts_layout.json`:
 
@@ -107,7 +148,7 @@ Use `off` or `on` when the whole deck is a single weight.
 
 ## Limits
 
-- No serif detection. Every box gets `Microsoft YaHei`. Stroke variation rises with size and weight, not with serifs, so it cannot tell Songti from a heavy sans. If the source is clearly a serif face, set `font_family` in the compose spec by hand.
+- Without the optional font matcher, every box gets `Microsoft YaHei`. Stroke measurements alone cannot reliably distinguish Songti from a heavy sans. Set `font_family` by hand or use the trained font matcher.
 - Arrows, chevrons, and other symbols (→, ›, ✓) are not text. OCR drops them. They belong in `element_analysis.json` as geometry or icons.
 - Rotated or vertical text is left out.
 - Artistic lettering with gradient, warped shape, or texture may be treated as a PNG decoration only when normal text cannot approximate it.

@@ -253,6 +253,12 @@ class TextBlock:
     line_pitch: float = 0.0
     conf: float = 1.0
     metrics: TextMetrics = field(default_factory=TextMetrics)
+    font_family: str = "Microsoft YaHei"
+    font_face: str = ""
+    font_matches: list = field(default_factory=list)
+    source_box: OcrBox = None
+    runs: list = field(default_factory=list)
+    style_report: dict = field(default_factory=dict)
 
 
 def clamp_bbox(x, y, w, h):
@@ -743,6 +749,7 @@ def extract_text(image_path, slide_id, bold_mode="auto", expected=None,
                 bullet=had_bullet_char,
                 mark_x=(box.x + mark_left) / page_w,
                 conf=round(box.conf, 3),
+                source_box=box,
                 metrics=TextMetrics(
                     stroke_px=round(stroke_px, 2),
                     stroke_ratio=round(stroke_px / em_px, 3) if em_px > 0 else 0.0,
@@ -773,6 +780,9 @@ def snap_to_expected(blocks, expected):
         if not current or current in pool:
             continue
         for candidate in pool:
+            if "".join(candidate.split()) == "".join(current.split()):
+                block.text = candidate
+                break
             if len(candidate) != len(current):
                 continue
             differences = sum(1 for a, b in zip(candidate, current) if a != b)
@@ -810,6 +820,10 @@ def continues(previous, block):
         and colour_distance(block.color, previous.color) <= MERGE_COLOUR_TOLERANCE
         and block.bold == previous.bold
         and block.bullet == previous.bullet
+        and block.font_family == previous.font_family
+        and block.font_face == previous.font_face
+        and (not (block.font_matches or previous.font_matches)
+             or block.italic == previous.italic)
     )
 
 
@@ -866,6 +880,12 @@ def merge_lines(blocks):
             (b.bbox[1] + b.bbox[3]) - (a.bbox[1] + a.bbox[3])
             for a, b in zip(chain, chain[1:])
         ]
+        runs = []
+        if all(block.runs for block in chain):
+            for block in chain:
+                if runs:
+                    runs.append({"text": "\n"})
+                runs.extend(block.runs)
         merged.append(
             TextBlock(
                 id=head.id,
@@ -882,6 +902,13 @@ def merge_lines(blocks):
                 line_pitch=float(np.median(pitches)),
                 conf=min(b.conf for b in chain),
                 metrics=head.metrics,
+                font_family=head.font_family,
+                font_face=head.font_face,
+                font_matches=[match for b in chain for match in b.font_matches],
+                runs=runs,
+                style_report={"lines": [b.style_report for b in chain],
+                              "needs_review": any(b.style_report.get("needs_review", False) for b in chain)}
+                if any(b.style_report for b in chain) else {},
             )
         )
 
@@ -909,7 +936,10 @@ def text_frame(block, slide_width_pt, slide_height_pt):
     extra_w = TEXT_WIDTH_EXTRA_PT / slide_width_pt
     extra_h = TEXT_HEIGHT_EXTRA_PT / slide_height_pt
     top = max(0.0, y - lift)
-    return clamp_bbox(x, top, w * TEXT_WIDTH_SLACK + extra_w, h + lift + extra_h)
+    height = h + lift + extra_h
+    if block.font_matches or block.runs:
+        height = max(height, block.font_size_pt * 1.3 / slide_height_pt)
+    return clamp_bbox(x, top, w * TEXT_WIDTH_SLACK + extra_w, height)
 
 
 def slide_number(path, index):
@@ -946,7 +976,7 @@ def block_record(block, page_w, page_h, slide_width_pt):
         "bold": block.bold,
         "italic": block.italic,
         "align": block.align,
-        "font_family": "Microsoft YaHei",
+        "font_family": block.font_family,
         "bullet": block.bullet,
         "script": block.script,
         "conf": block.conf,
@@ -959,6 +989,12 @@ def block_record(block, page_w, page_h, slide_width_pt):
             "slant": block.metrics.slant,
         },
     }
+    if block.font_matches:
+        record["font_matches"] = block.font_matches
+        record["font_face"] = block.font_face
+    if block.runs:
+        record["runs"] = block.runs
+        record["style_report"] = block.style_report
     if block.line_pitch > 0:
         # Merged lines keep the page's own spacing; PowerPoint's default
         # single spacing packs them much tighter than most slide designs.
@@ -966,8 +1002,47 @@ def block_record(block, page_w, page_h, slide_width_pt):
     return record
 
 
+def harmonise_font_matches(blocks):
+    """Choose a common near-best face for blocks already measured as one style."""
+    groups = []
+    for block in blocks:
+        if not block.font_matches or not block.font_matches[0]["candidates"]:
+            continue
+        group = next((group for group in groups
+                      if all(siblings(block, member) and block.script == member.script
+                             and block.bold == member.bold and block.italic == member.italic
+                             for member in group)), None)
+        if group is None:
+            groups.append([block])
+        else:
+            group.append(block)
+
+    for group in groups:
+        if len(group) < 2:
+            continue
+        rankings = []
+        for block in group:
+            candidates = block.font_matches[0]["candidates"]
+            rankings.append({(c.get("face_name", c["family"]), c["bold"], c["italic"]): c
+                             for c in candidates})
+        shared = set.intersection(*(set(ranking) for ranking in rankings))
+        if not shared:
+            continue
+        chosen = min(sorted(shared), key=lambda key: sum(ranking[key]["shape_error"]
+                                                         for ranking in rankings))
+        # A shared style is only accepted when it stays close to every line's
+        # own best result. Preserve individual rankings for later inspection.
+        penalties = [ranking[chosen]["shape_error"] - min(c["shape_error"] for c in ranking.values())
+                     for ranking in rankings]
+        if max(penalties) > 0.08 or float(np.mean(penalties)) > 0.025:
+            continue
+        for block, ranking in zip(group, rankings):
+            block.font_matches[0]["selected_candidate"] = ranking[chosen]
+            block.font_matches[0]["selection"] = "shared_style"
+
+
 def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
-                 slide_width_in=DEFAULT_SLIDE_WIDTH_IN):
+                 slide_width_in=DEFAULT_SLIDE_WIDTH_IN, font_matcher=None, rich_text=False):
     slide_width_pt = slide_width_in * 72
     slides = []
     ref_w = ref_h = None
@@ -999,6 +1074,31 @@ def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
 
     for path, number, page_w, page_h, blocks in pages:
         line_count = len(blocks)
+        if rich_text:
+            from rich_text import analyse_line
+            image = read_image(path)
+            for block in blocks:
+                analyse_line(image, block, slide_width_pt / page_w, font_matcher)
+        elif font_matcher is not None:
+            from match_fonts import crop_mask
+
+            image = read_image(path)
+            for block in blocks:
+                mask = crop_mask(image, to_px(block.bbox, page_w, page_h))
+                result = font_matcher.match(mask, block.text)
+                result["line_id"] = block.id
+                block.font_matches = [result]
+            harmonise_font_matches(blocks)
+            for block in blocks:
+                result = block.font_matches[0]
+                if result["candidates"]:
+                    best = result.get("selected_candidate", result["candidates"][0])
+                    block.font_family = best["family"]
+                    block.font_face = best.get("face_name", best["family"])
+                    block.bold = best["bold"]
+                    block.italic = best["italic"]
+                    if best.get("size_px"):
+                        block.font_size_pt = round(best["size_px"] * slide_width_pt / page_w, 2)
         if merge:
             blocks = merge_lines(blocks)
         print(f"{Path(path).name}: {line_count} lines -> {len(blocks)} text boxes")
@@ -1038,10 +1138,31 @@ def main():
                                        "(e.g. text from PPTX XML) to correct near-miss OCR")
     ap.add_argument("--slide-width-in", type=float, default=DEFAULT_SLIDE_WIDTH_IN,
                     help="Composed slide width; must match slide_width_in in the compose spec")
+    ap.add_argument("--font-index", help="Local font index from match_fonts.py index")
+    ap.add_argument("--font-model", help="Trained ONNX font encoder from train_font_matcher.py")
+    ap.add_argument("--rich-text", action="store_true",
+                    help="Measure inline style runs and fit simple editable text effects")
+    ap.add_argument("--font-server", help="Expand poor font matches through a font release URL ending in /fonts/v1")
+    ap.add_argument("--font-cache", type=Path, help="Downloaded font cache directory")
     args = ap.parse_args()
 
     if args.slide_width_in <= 0:
         raise SystemExit("--slide-width-in must be positive")
+    if bool(args.font_index) != bool(args.font_model):
+        ap.error("--font-index and --font-model must be supplied together")
+    store = None
+    if args.font_server:
+        from font_store import FontStore
+        store = FontStore(args.font_server, args.font_cache)
+        if not args.font_index:
+            args.font_index, args.font_model = store.install_core(include_system=True)
+    font_matcher = None
+    if args.font_model:
+        from match_fonts import FontMatcher
+        font_matcher = FontMatcher(args.font_index, args.font_model)
+        if store is not None:
+            from font_store import RemoteFontMatcher
+            font_matcher = RemoteFontMatcher(font_matcher, store)
     expected = None
     if args.expected:
         expected = Path(args.expected).read_text(encoding="utf-8-sig").splitlines()
@@ -1052,6 +1173,8 @@ def main():
         merge=not args.no_merge_lines,
         expected=expected,
         slide_width_in=args.slide_width_in,
+        font_matcher=font_matcher,
+        rich_text=args.rich_text,
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
