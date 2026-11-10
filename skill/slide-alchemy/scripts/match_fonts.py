@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import unicodedata
+import warnings
 from functools import lru_cache
 from pathlib import Path
 
@@ -14,6 +15,32 @@ from PIL import Image, ImageDraw, ImageFont
 
 INPUT_HEIGHT = 48
 INPUT_WIDTH = 256
+DEFAULT_FONT_SERVER = "http://182.254.211.241/fonts/v1"
+
+
+def validate_font_matches(item):
+    """Require usable matching evidence for extracted text before composition."""
+    if not item.get("text", "").strip():
+        return
+    label = item.get("id", item["text"][:30])
+    reports = item.get("font_matches", [])
+    if not reports or any(not report.get("candidates") for report in reports):
+        raise ValueError(f"{label} requires font matching results before composition")
+    styles = [run for run in item.get("runs", []) if run["text"].strip()]
+    if styles and len(styles) != len(reports):
+        raise ValueError(f"{label} requires a font match for every text run")
+    if not styles:
+        styles = [item] * len(reports)
+    for style, report in zip(styles, reports):
+        selected = report.get("selected_candidate", report["candidates"][0])
+        if selected not in report["candidates"]:
+            raise ValueError(f"{label} selected font must appear in the matching candidates")
+        face = style.get("font_face") or style.get("font_family")
+        if face != selected.get("face_name", selected["family"]):
+            raise ValueError(f"{label} font face differs from its matching result")
+        for key in ("bold", "italic"):
+            if bool(style.get(key, False)) != bool(selected.get(key, False)):
+                raise ValueError(f"{label} {key} differs from its matching result")
 
 
 def font_directories():
@@ -256,15 +283,24 @@ class FontMatcher:
         # Normalize every candidate to the source ink height using uniform scale.
         rendered = []
         sizes = []
+        renderable = []
         for font in eligible:
-            probe = render_text(font, text, 48)
-            size = 48 * mask.shape[0] / probe.shape[0]
-            rendered.append(render_text(font, text, size))
+            try:
+                probe = render_text(font, text, 48)
+                size = 48 * mask.shape[0] / probe.shape[0]
+                reference = render_text(font, text, size)
+            except OSError as error:
+                warnings.warn(f"Skipping unrenderable font {font['family']}. {error}", RuntimeWarning)
+                continue
+            rendered.append(reference)
             sizes.append(size)
+            renderable.append(font)
+        if not rendered:
+            return [], len(eligible)
         features = self.encode([mask, *rendered])
         similarities = features[1:] @ features[0]
         shortlist = np.argsort(-similarities, kind="stable")[:top_k]
-        return [(eligible[position], sizes[position], float(similarities[position]))
+        return [(renderable[position], sizes[position], float(similarities[position]))
                 for position in shortlist], len(eligible)
 
     def match(self, mask, text, top_k=10):

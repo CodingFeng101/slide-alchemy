@@ -10,15 +10,22 @@ Division of labour: the OCR model (RapidOCR 3.x on onnxruntime, models bundled i
 python scripts/extract_text.py run/source/slide_*.png --out run/analysis/texts_layout.json
 ```
 
+The standard command enables local/remote font matching and rich text by default.
+It prepares the core font cache, scans system fonts and uses the bundled model.
+Every visible run must have a usable match before a layout is written. Setup
+failures and incomplete matches stop with an error. The output marks
+`font_matching_required: true`. Preserve the matching records when composing.
+
 Options:
 
 - `--bold-mode auto|off|on|ratio:<value>`: how weight is decided. Default `auto`.
 - `--no-merge-lines`: keep one text box per OCR line instead of merging paragraphs.
 - `--expected <file>`: UTF-8 file of known text, one string per line (for example text pulled from PPTX XML). Near-miss OCR readings of the same length and whitespace-only differences are corrected to it; it never adds text that OCR did not find.
 - `--slide-width-in <inches>`: must match `slide_width_in` in the compose spec. Default `13.333333`.
-- `--font-index <file>` and `--font-model <file>`: enable local font matching with a trained ONNX encoder. Supply both together. The encoder ranks eligible fonts and OpenCV refines the first 10. Without these options the existing Microsoft YaHei measurement path is used.
-- `--rich-text`: measure inline style spans and fit common text gradients, outlines and shadows. Use with the font options to identify faces per span. The existing extraction mode remains available without this flag.
-- `--font-server <release-url>`: expand poor local matches through the remote pack. Without explicit index/model options, install the core pack and index it together with system fonts. Use `--font-cache <directory>` to select the download cache. See `font-distribution.md` for the release URL, file verification and review limits.
+- `--font-index <file>` and `--font-model <file>`: select an explicit local font index and ONNX encoder. Supply both together. The encoder ranks eligible fonts and OpenCV refines the first 10. Otherwise the core pack, system fonts and bundled encoder are prepared automatically.
+- `--rich-text` / `--no-rich-text`: enable or disable inline style/effect extraction. The default is enabled. Disabling rich text keeps per-line font matching active.
+- `--font-server <release-url>`: select the remote library used to expand poor local matches. Defaults to `http://182.254.211.241/fonts/v1`. Use `--font-cache <directory>` to select the download cache. See `font-distribution.md` for file verification and review limits.
+- `--ocr-only`: explicit legacy OCR measurement analysis with the Microsoft YaHei estimation path. Font matching and rich text are disabled in this mode. Reconstructed slides require matching records before composition.
 
 Slide numbers come from the trailing digits of each file name (`slide_003.png` -> 3).
 

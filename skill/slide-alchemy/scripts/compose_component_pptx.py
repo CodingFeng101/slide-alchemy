@@ -174,6 +174,9 @@ def add_image(slide, path, item, fit, ref_w, ref_h, slide_w, slide_h):
 
 
 def add_text(slide, item, ref_w, ref_h, slide_w, slide_h):
+    if "ink_bbox_px" in item or "ink_bbox_frac" in item or "font_matches" in item:
+        from match_fonts import validate_font_matches
+        validate_font_matches(item)
     box = slide.shapes.add_textbox(*bbox(item, ref_w, ref_h, slide_w, slide_h))
     tf = box.text_frame
     tf.clear()
@@ -234,6 +237,11 @@ def compose(spec_path, out_path):
     spec_path = Path(spec_path)
     base_dir = spec_path.parent
     spec = json.loads(spec_path.read_text(encoding="utf-8-sig"))
+    if spec.get("font_matching_required"):
+        from match_fonts import validate_font_matches
+        for slide_spec in spec["slides"]:
+            for item in slide_spec.get("texts", []):
+                validate_font_matches(item)
     ref_w = spec.get("ref_width", 1920)
     ref_h = spec.get("ref_height", 1080)
     slide_w = float(spec.get("slide_width_in", 13.333333))

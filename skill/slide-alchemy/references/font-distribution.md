@@ -55,13 +55,16 @@ colours, sizes and text effects.
 ## Extract with remote expansion
 
 ```bash
-python scripts/extract_text.py run/source/slide_003.png --rich-text --font-server http://182.254.211.241/fonts/v1 --out run/analysis/texts_layout.json
+python scripts/extract_text.py run/source/slide_003.png --out run/analysis/texts_layout.json
 ```
 
-Without explicit font index/model arguments, this command installs the core
-pack and indexes it together with installed system fonts. Existing index/model
-arguments continue to select the local candidate set. `--font-cache` selects
-the download cache.
+This standard command enables matching, remote expansion and rich text.
+Without explicit font index/model arguments, it installs the core pack and
+indexes it together with installed system fonts. Existing index/model arguments
+continue to select the local candidate set. `--font-cache` selects the download
+cache and `--font-server` overrides the default release URL. `--no-rich-text`
+keeps per-line matching. `--ocr-only` provides explicit legacy measurement
+analysis. Reconstruction requires usable font evidence before composition.
 
 The local model and OpenCV run first. A missing supported face or a best shape
 error above 0.12 triggers remote matching. This is the existing provisional

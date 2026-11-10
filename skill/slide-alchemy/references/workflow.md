@@ -153,13 +153,13 @@ Required output before step 6:
 
 Run `scripts/extract_text.py` on the source page images. OCR reads the characters, and position, size, colour, weight, bullets, and line spacing are measured from the pixels. Do not use a visual model for text. See `text-extraction.md`.
 
-For mixed inline styles or decorative text effects, use `--rich-text` with the local font index/model. Copy the resulting `runs` and their `effects` into the compose spec, and review entries flagged in `style_report`.
+Font matching and `--rich-text` are enabled by default. The command prepares core and system-font candidates and uses the remote library when the local match is poor. See `font-distribution.md` for setup. Preserve `font_matches`, the selected `font_face`, `runs`, and their `effects` in the compose spec. Review entries flagged in `style_report`. A setup failure, empty font shortlist or missing run match stops extraction. Resolve the reported cause before continuing. `--ocr-only` supports explicit measurement analysis.
 
 Store text separately from visual elements. Do not rasterize normal text into icon assets. Symbols such as arrows and chevrons are not text; OCR drops them, so they must already be in `element_analysis.json`.
 
 Required output before step 7:
 
-- `analysis/texts_layout.json` with text content, measured style, compose-ready text boxes, and ink bboxes.
+- `analysis/texts_layout.json` with text content, measured style, compose-ready text boxes, ink bboxes, and usable matching records for every visible text run.
 
 ## 7. Compose and QA
 
@@ -171,6 +171,8 @@ Compose in this order:
 4. editable text.
 
 Use `compose-spec.md` and `scripts/compose_component_pptx.py` for deterministic composition when possible.
+
+Set `font_matching_required: true` in the reconstruction spec. The composer validates font evidence before saving. Check matched faces, original bounds and line breaks when text overflows, and rerun measurement before adjusting sizes. Avoid automatic shrinking of source text.
 
 Export preview PNGs. Use `scripts/compare_preview.py` to build side-by-side and diff images. Do not claim completion until the preview is visually checked.
 

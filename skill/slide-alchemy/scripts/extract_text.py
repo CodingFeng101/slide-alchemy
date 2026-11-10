@@ -1140,8 +1140,10 @@ def main():
                     help="Composed slide width; must match slide_width_in in the compose spec")
     ap.add_argument("--font-index", help="Local font index from match_fonts.py index")
     ap.add_argument("--font-model", help="Trained ONNX font encoder from train_font_matcher.py")
-    ap.add_argument("--rich-text", action="store_true",
-                    help="Measure inline style runs and fit simple editable text effects")
+    ap.add_argument("--rich-text", action=argparse.BooleanOptionalAction, default=True,
+                    help="Measure inline styles and editable effects (enabled by default)")
+    ap.add_argument("--ocr-only", action="store_true",
+                    help="Explicit legacy OCR measurement mode for analysis")
     ap.add_argument("--font-server", help="Expand poor font matches through a font release URL ending in /fonts/v1")
     ap.add_argument("--font-cache", type=Path, help="Downloaded font cache directory")
     args = ap.parse_args()
@@ -1150,19 +1152,22 @@ def main():
         raise SystemExit("--slide-width-in must be positive")
     if bool(args.font_index) != bool(args.font_model):
         ap.error("--font-index and --font-model must be supplied together")
-    store = None
-    if args.font_server:
-        from font_store import FontStore
-        store = FontStore(args.font_server, args.font_cache)
-        if not args.font_index:
-            args.font_index, args.font_model = store.install_core(include_system=True)
     font_matcher = None
-    if args.font_model:
-        from match_fonts import FontMatcher
-        font_matcher = FontMatcher(args.font_index, args.font_model)
-        if store is not None:
-            from font_store import RemoteFontMatcher
+    if args.ocr_only:
+        if args.font_index or args.font_model or args.font_server or args.font_cache:
+            ap.error("--ocr-only conflicts with font matching options")
+        args.rich_text = False
+    else:
+        from font_store import FontStore, RemoteFontMatcher
+        from match_fonts import DEFAULT_FONT_SERVER, FontMatcher
+        try:
+            store = FontStore(args.font_server or DEFAULT_FONT_SERVER, args.font_cache)
+            if not args.font_index:
+                args.font_index, args.font_model = store.install_core(include_system=True)
+            font_matcher = FontMatcher(args.font_index, args.font_model)
             font_matcher = RemoteFontMatcher(font_matcher, store)
+        except (OSError, ValueError) as error:
+            ap.exit(2, f"Font matching setup failed. Check the font server or cache. {error}\n")
     expected = None
     if args.expected:
         expected = Path(args.expected).read_text(encoding="utf-8-sig").splitlines()
@@ -1176,6 +1181,15 @@ def main():
         font_matcher=font_matcher,
         rich_text=args.rich_text,
     )
+    layout["font_matching_required"] = not args.ocr_only
+    if not args.ocr_only:
+        from match_fonts import validate_font_matches
+        try:
+            for slide in layout["slides"]:
+                for item in slide["texts"]:
+                    validate_font_matches(item)
+        except ValueError as error:
+            ap.exit(2, f"Font matching incomplete. {error}\n")
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(layout, ensure_ascii=False, indent=2), encoding="utf-8")

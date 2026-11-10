@@ -688,7 +688,7 @@ class ExtractTextOcrTests(unittest.TestCase):
             image.save(page)
 
             result = subprocess.run(
-                [sys.executable, str(SCRIPTS / "extract_text.py"), str(page), "--out", str(out)],
+                [sys.executable, str(SCRIPTS / "extract_text.py"), str(page), "--out", str(out), "--ocr-only"],
                 capture_output=True,
                 text=True,
             )

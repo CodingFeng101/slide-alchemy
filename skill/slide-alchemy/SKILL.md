@@ -123,12 +123,16 @@ The lead agent must merge all page-level outputs, deduplicate shared components,
 9. Extract text with OCR and pixel measurement.
    Run `scripts/extract_text.py` on the source page images to write `texts_layout.json`. OCR reads the characters. Position, font size, colour, weight, bullets, and paragraph line merging are measured from the pixels. Do not use a visual model to read text or estimate text boxes, because its coordinates are approximations. Copy each text's `bbox_px`/`bbox_frac`, style fields, and `line_spacing_pt` into the compose spec unchanged. If bold is wrong for a template, calibrate `--bold-mode ratio:<value>` from the recorded `metrics` instead of editing weights one by one. PPTX XML text may be passed with `--expected` to correct near-miss readings.
 
+   Font matching and mixed-style extraction are enabled by default. Read `references/font-distribution.md` for cache setup and server details. The standard command is `python scripts/extract_text.py run/source/slide_*.png --out run/analysis/texts_layout.json`. It prepares the core pack, scans installed fonts, matches locally, and expands poor matches through the remote library. Every visible text run must have a nonempty `font_matches` candidate record. Review low-confidence matches before composition. If setup or matching fails, stop and report the cause. `--ocr-only` is an explicit measurement-analysis mode. Reconstruction requires matching results.
+
 10. Compose the final PPTX in this layer order:
     base PNG -> SVG/OOXML editable geometry -> PNG icons -> editable text boxes.
     Use `scripts/compose_component_pptx.py` with a compose spec when possible; do not rewrite ad hoc composition logic for every task.
+    Set `font_matching_required: true` in the reconstruction compose spec. Preserve each OCR text record's `font_matches`, `font_face`, `runs`, and `style_report`. Composition checks the selected face and weight against the matching evidence and stops on missing results or conflicting styles. For text overflow, check the matched face, source bounds, line breaks and size estimates, then rerun matching or measurement. Avoid automatic font shrinking as an overflow repair.
     Give each PNG image the drawing's own bbox from `element_analysis.json`; the default `fit: visible` aligns the PNG's drawn pixels to it and lets the transparent padding fall outside. Leave `slide_height_in` out so the slide follows the source page's aspect ratio. Record `corner_radius_px` for rounded cards.
 
 11. Export previews and QA visually.
+    Ensure the selected font faces are installed in the environment rendering the preview and check PowerPoint's rendered text against the source.
     Compare preview pages with source pages. Check for over-preserved bases, missing elements, cut-off icons, polluted icon crops, duplicated elements, and text overflow.
     Use `scripts/compare_preview.py` after preview PNGs exist.
 

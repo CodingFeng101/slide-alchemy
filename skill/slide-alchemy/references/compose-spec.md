@@ -92,6 +92,14 @@ Geometry fields:
 
 Copy text entries from `texts_layout.json` (written by `scripts/extract_text.py`) as they are.
 
+Set `font_matching_required: true` on image-reconstruction specs. Every visible
+text item must then retain nonempty `font_matches` candidate records. OCR items
+with `ink_bbox_px`, `ink_bbox_frac`, or `font_matches` are also validated
+automatically. The composer checks each run's selected face, bold and italic
+against its matching report before writing the PPTX. Review uncertain matches
+and rerun matching after correcting OCR text. Check source frames, line breaks
+and font measurements when resolving overflow.
+
 - `bbox_px` / `bbox_frac`: the text box frame. Never use `ink_bbox_*` here.
 - `text`: each `\n` starts a new paragraph.
 - `line_spacing_pt`: optional; applied as exact line spacing to every paragraph of the box.
