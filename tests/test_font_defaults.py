@@ -2,6 +2,7 @@ import json
 import sys
 import tempfile
 import unittest
+import zipfile
 import numpy as np
 from pathlib import Path
 from unittest.mock import patch
@@ -109,6 +110,25 @@ class FontDefaultTests(unittest.TestCase):
             (root / "spec.json").write_text(json.dumps(spec), encoding="utf-8")
             compose(root / "spec.json", root / "out.pptx")
             self.assertTrue((root / "out.pptx").exists())
+
+    def test_matched_text_effects_compose_as_characters_without_png_assets(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            item = self.item()
+            item["effects"] = {
+                "gradient": {"angle": 90, "stops": [{"position": 0, "color": "#003399"}, {"position": 1, "color": "#00BBFF"}]},
+                "outline": {"color": "#FFFFFF", "width_pt": 1},
+                "shadow": {"color": "#000000", "offset_x_pt": 2, "offset_y_pt": 2},
+            }
+            spec = {"font_matching_required": True, "slides": [{"texts": [item]}]}
+            (root / "spec.json").write_text(json.dumps(spec), encoding="utf-8")
+            compose(root / "spec.json", root / "out.pptx")
+            with zipfile.ZipFile(root / "out.pptx") as archive:
+                xml = archive.read("ppt/slides/slide1.xml").decode()
+            self.assertIn("<a:t>Campus</a:t>", xml)
+            self.assertIn("<a:gradFill", xml)
+            self.assertIn("<a:outerShdw", xml)
+            self.assertNotIn("<p:pic>", xml)
 
     def test_unrenderable_system_face_is_excluded_from_model_ranking(self):
         matcher = match_fonts.FontMatcher.__new__(match_fonts.FontMatcher)

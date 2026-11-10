@@ -158,5 +158,5 @@ Use `off` or `on` when the whole deck is a single weight.
 - Without the optional font matcher, every box gets `Microsoft YaHei`. Stroke measurements alone cannot reliably distinguish Songti from a heavy sans. Set `font_family` by hand or use the trained font matcher.
 - Arrows, chevrons, and other symbols (→, ›, ✓) are not text. OCR drops them. They belong in `element_analysis.json` as geometry or icons.
 - Rotated or vertical text is left out.
-- Artistic lettering with gradient, warped shape, or texture may be treated as a PNG decoration only when normal text cannot approximate it.
-- Prefer editable text over raster text for all normal Chinese and English content.
+- All lettering remains native editable PowerPoint text, including artistic, warped, metallic and extruded lettering. Recreate available native effects and approximate unsupported effects, recording the visual differences in preview QA.
+- Preserve the recognized characters in text boxes/runs. Rasterized lettering and glyph outlines converted to shapes violate this requirement.

@@ -35,7 +35,7 @@ Check:
 - no missing edges,
 - no clipped glow/shadow,
 - no unrelated frame/line/card fragments,
-- no text labels unless the icon is intentionally artistic text,
+- no slide lettering or text labels in the sliced PNG assets,
 - transparent padding exists on every side.
 
 ## Failure Modes From Prior Runs

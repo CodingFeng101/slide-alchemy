@@ -8,7 +8,7 @@ Use the displayed slide image only as the visual reference/edit target. Regenera
 
 Make one 16:9 asset sheet with solid key-color background <run key_color>.
 Use the exact run-level key color supplied in `png_asset_sheet_plan`; do not choose or switch colors per sheet.
-Do not include any normal text, labels, page numbers, grid lines, frames, title bars, card boxes, stars, simple lines, or other simple geometry.
+Do not include any lettering, artistic text, labels, page numbers, grid lines, frames, title bars, card boxes, stars, simple lines, or other simple geometry.
 Each icon must have large empty space on all sides. Icons must not touch each other.
 Remove image noise and high-frequency visual artifacts from the regenerated icons.
 Preserve all icon linework exactly. Keep colors and brightness unchanged.

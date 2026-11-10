@@ -2,6 +2,17 @@
 
 Every editable-PPTX conversion must run the full workflow. Do not skip steps for small decks, partial decks, quick demos, outputs-only requests, or final-output requests.
 
+Evaluate every phase against the analyzed components. When zero non-text PNG
+components exist, an empty PNG sheet plan completes the generation, slicing and
+contact-sheet phases. Text-only pages can have empty `components` and
+`instances` collections.
+
+Every slide word remains native editable PowerPoint text, including artistic,
+warped, gradient, outlined, extruded and metallic lettering. Preserve actual
+characters in text runs, recreate supported effects and approximate unsupported
+ones. Record visual differences in QA. Classify separate non-text decorations
+independently. Continue to composition and preview to evaluate text fidelity.
+
 Image generation/editing model use is mandatory for clean bases, `icon_png` asset sheets, `complex_png_whole` asset sheets, and regenerated visual assets. Do not replace those steps with local masking, local inpainting, direct source-image crops, copied screenshot fragments, PPT native shape approximations, or generic presentation templates.
 
 Use the runtime's own image tool when it has one. Otherwise run `scripts/generate_image.py`, passing the source page (or an existing sheet) as `--reference` for edits:
@@ -36,7 +47,7 @@ After clean bases are approved, the lead agent may dispatch page-level subagents
 - page compose entries,
 - page QA notes.
 
-Page-level subagents must not create the final deck, skip element analysis, crop icons from source slides, rasterize normal text, or create their own incompatible shared component naming.
+Page-level subagents must not create the final deck, skip element analysis, crop icons from source slides, rasterize any slide text, or create their own incompatible shared component naming.
 
 The lead agent merges all page outputs, deduplicates shared components, normalizes categories, generates or reuses assets, verifies all pages are complete, composes the final PPTX, exports previews, and performs visual QA.
 
@@ -128,6 +139,10 @@ Required output before step 5:
 - validated component categories,
 - `png_asset_sheet_plan` for PNG components.
 
+When no PNG components exist, the plan contains a valid `key_color` and
+`sheets: []`. PNG image files, crop outputs and contact sheets are then not
+applicable, and text extraction can proceed after any required geometry work.
+
 ## 5. Asset Generation
 
 Create SVGs only for simple layout geometry and generated PNGs for semantic icons or complex composites.
@@ -145,9 +160,9 @@ After PNG assets are sliced, create contact sheets and summarize the element cla
 Required output before step 6:
 
 - SVG or shape specs for `simple_geometry_svg_ooxml`,
-- generated PNG asset sheets for `icon_png` and `complex_png_whole`,
-- sliced PNG assets with padding,
-- contact sheets and clean edge-touch checks.
+- generated PNG asset sheets for any `icon_png` and `complex_png_whole` components,
+- sliced PNG assets with padding when PNG components exist,
+- contact sheets and clean edge-touch checks when PNG components exist, or a validated empty PNG sheet plan.
 
 ## 6. Text Extraction
 
@@ -155,7 +170,7 @@ Run `scripts/extract_text.py` on the source page images. OCR reads the character
 
 Font matching and `--rich-text` are enabled by default. The command prepares core and system-font candidates and uses the remote library when the local match is poor. See `font-distribution.md` for setup. Preserve `font_matches`, the selected `font_face`, `runs`, and their `effects` in the compose spec. Review entries flagged in `style_report`. A setup failure, empty font shortlist or missing run match stops extraction. Resolve the reported cause before continuing. `--ocr-only` supports explicit measurement analysis.
 
-Store text separately from visual elements. Do not rasterize normal text into icon assets. Symbols such as arrows and chevrons are not text; OCR drops them, so they must already be in `element_analysis.json`.
+Store all text separately from visual elements as editable text runs, including artistic lettering. Symbols such as arrows and chevrons belong in `element_analysis.json` as editable geometry or suitable non-text assets.
 
 Required output before step 7:
 

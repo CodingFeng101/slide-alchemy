@@ -2,6 +2,20 @@
 
 ## Categories
 
+### Editable text
+
+All slide lettering belongs in `texts_layout.json` as native PowerPoint text
+boxes/runs containing editable characters. This includes artistic, gradient,
+outlined, warped, extruded and metallic lettering. Recreate supported native
+effects and approximate unsupported effects while preserving editable text.
+Record residual visual differences in preview QA. Rasterized lettering and
+letters converted to vector outlines violate the editable-text requirement.
+
+Classify separate underlines, backing plates and non-text decorations below.
+Text-only pages may have empty `components` and `instances`. When no PNG
+components exist, use a valid `key_color` with `sheets: []` in the PNG plan.
+Proceed through OCR/font matching and composition to evaluate the text result.
+
 ### simple_geometry_svg_ooxml
 
 Use only for non-semantic layout geometry that can become editable vector objects:
@@ -40,13 +54,13 @@ Default to this category for semantic icons. Do not recreate icons from PPT nati
 
 ### complex_png_whole
 
-Use for visuals that become worse when split:
+Use for non-text visuals that become worse when split:
 
 - large swirls,
 - multi-layer badges,
 - glow-heavy decorations,
 - complex illustrations,
-- compositions with many gradients, shadows, and masks.
+- non-text compositions with many gradients, shadows, and masks.
 
 Generate as one whole transparent PNG with an image generation/editing model, then slice it from the generated asset sheet. Do not split. Never crop this asset directly from the original/source slide image.
 
@@ -66,4 +80,4 @@ Generate as one whole transparent PNG with an image generation/editing model, th
 - Cropping `icon_png` or `complex_png_whole` assets directly from the source slide instead of regenerating them first.
 - Cropping icon assets tightly to their nontransparent bbox.
 - Splitting a complex decorative composition into many pieces that cannot be reassembled cleanly.
-- Treating decorative text or normal text as icons unless it is artistic lettering that cannot be represented by a text box.
+- Classifying any slide lettering as a PNG component or replacing editable characters with vector outlines.

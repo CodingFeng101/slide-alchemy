@@ -48,7 +48,7 @@ Common misclassifications:
 - A semantic icon (e.g., a trophy) forced into `simple_geometry_svg_ooxml`.
 
 Remediation:
-1. Apply the core judgment rule: "If an element can be described by outline, fill color, and stroke alone, it is `simple_geometry_svg_ooxml`. If it depends on texture, lighting, gradients, or fine detail stacking, it is a PNG category."
+1. Keep all lettering in native editable text runs. Apply the following judgment rule to separate non-text elements. Outline, fill and stroke layout geometry uses `simple_geometry_svg_ooxml`. Non-text composites that depend on texture, lighting or fine detail stacking use the appropriate PNG category.
 2. When in doubt, classify semantic icons as `icon_png` (they are more stable as generated PNGs).
 3. Update `element_analysis.json` and re-validate.
 
@@ -157,7 +157,7 @@ Do not claim arbitrary SVG path conversion works unless verified in a generated 
 
 1. If PPTX XML text exists, re-run with `--expected` pointing to a file of those strings.
 2. Otherwise correct the `text` field in `texts_layout.json` directly. Keep the measured bbox and style.
-3. Do not rasterize normal text as an icon.
+3. Keep all recognized characters in native editable text runs, including artistic lettering.
 
 ### Extracted text is incomplete
 

@@ -18,6 +18,13 @@ Keep this workflow lightweight. Do not use page workers or an editppt-style stat
 
 ## Non-Negotiable Rules
 
+Every slide word must remain native editable PowerPoint text, including artistic,
+outlined, gradient, warped, extruded and metallic lettering. Preserve the actual
+characters in text boxes/runs. PNG lettering and glyph outlines converted to
+vector shapes violate this requirement. Recreate supported effects as native
+text properties. Approximate unsupported effects while keeping the characters
+editable, then disclose the visual difference in preview QA.
+
 Any request to convert slides into an editable PPTX must run the complete workflow. Do not use a shortcut path for small decks, first pages only, quick demos, outputs-only requests, or final-PPTX requests. The workflow is mandatory even when the user asks for only one page.
 
 The following steps must always happen in order:
@@ -27,8 +34,8 @@ The following steps must always happen in order:
 3. clean base generation with an image generation/editing model,
 4. element analysis,
 5. SVG/OOXML generation for true layout geometry,
-6. PNG asset sheet generation with an image generation/editing model for icons and complex visuals,
-7. PNG slicing and contact-sheet QA,
+6. PNG asset sheet generation with an image generation/editing model when non-text PNG components are present,
+7. PNG slicing and contact-sheet QA when PNG components are present,
 8. OCR text extraction with pixel measurement,
 9. PPTX composition,
 10. preview export and visual QA.
@@ -39,6 +46,13 @@ Image generation/editing model use is mandatory for:
 - `icon_png` asset sheets;
 - `complex_png_whole` asset sheets;
 - any regenerated visual asset that must match the image PPT.
+
+Text effects follow the editable text path. Classify separate backing plates,
+underlines and other non-text decorations independently. When element analysis
+finds zero PNG components, record an empty sheet plan and continue to OCR/font
+matching, composition and preview. Unsupported text effects require an editable
+approximation and a QA note. They are insufficient grounds to abandon the page
+before trying the available text pipeline.
 
 Use the runtime's own image generation/editing tool when it has one, as Codex does. When it has none, as in Claude Code, run `scripts/generate_image.py`: it sends the prompt, plus the source page as `--reference` for edits, to an OpenAI-compatible Images API configured by `SLIDE_ALCHEMY_IMAGE_API_KEY`, `SLIDE_ALCHEMY_IMAGE_BASE_URL`, and `SLIDE_ALCHEMY_IMAGE_MODEL`. If neither is available, stop and tell the user how to configure the script; do not fall back to any of the replacements forbidden below.
 
@@ -56,8 +70,8 @@ Before starting each step, check that the prior step's required artifact exists:
 2. accepted base grouping exists before clean base generation;
 3. approved clean base previews, or unattended-run clean bases, exist before element analysis;
 4. `element_analysis.json` exists before SVG or PNG asset generation;
-5. generated PNG asset sheets exist before slicing PNG assets;
-6. sliced PNG assets and contact sheets exist before text extraction and composition;
+5. when PNG components exist, generated PNG asset sheets exist before slicing them;
+6. when PNG components exist, sliced PNG assets and contact sheets exist before text extraction and composition. A validated element analysis with zero PNG components and an empty sheet plan satisfies this phase for other pages;
 7. `texts_layout.json` exists before final PPTX composition;
 8. preview images exist before claiming the rebuild is complete.
 
@@ -82,7 +96,7 @@ After base approval, the lead agent may assign one subagent per slide, or one su
 - per-page compose entries,
 - page-specific QA notes.
 
-Page subagents must not compose the final deck, invent shared components independently, skip element analysis, rasterize normal text, crop icons from source slides, or bypass PNG asset QA.
+Page subagents must not compose the final deck, invent shared components independently, skip element analysis, rasterize any slide text, crop icons from source slides, or bypass PNG asset QA.
 
 The lead agent must merge all page-level outputs, deduplicate shared components, normalize categories and naming, generate or reuse shared assets, check for missing pages or missing elements, compose the full PPTX, export previews, and run final visual QA. If a page is incomplete, return that page to the page-level workflow instead of guessing.
 
@@ -102,10 +116,12 @@ The lead agent must merge all page-level outputs, deduplicate shared components,
 4. Analyze every non-text visual element before slicing.
    Create `element_analysis.json` with reusable components and per-slide instances. Do not put all elements into an icon sheet first.
 
+   Keep all lettering and text effects in `texts_layout.json`. Text-only pages can have `components: {}` and per-slide `instances: []`. Pages containing text and backing geometry list only that non-text geometry here. If no PNG components are needed, use `png_asset_sheet_plan` with a valid `key_color` and `sheets: []`.
+
 5. Classify each element:
    - `simple_geometry_svg_ooxml`: non-semantic layout geometry such as straight lines, dividers, stars, circles, rings, rounded rectangles, card bases, title bars, simple borders, and simple circuit-line decorations. Generate SVG first, then convert or recreate as editable OOXML/PPT shapes.
    - `icon_png`: standalone illustrative or semantic icons such as trophies, flowers, books, hands/heart, computer, chain link, organization badges, app pictograms, people, devices, buildings, or any recognizable object icon. Even if an icon looks like simple line art, keep it as generated PNG unless it is just a primitive layout shape.
-   - `complex_png_whole`: complex composite visuals that would look worse if split, such as swirls, layered badges, heavy gradients, glow assemblies, illustrations. Generate as one PNG and do not split.
+   - `complex_png_whole`: complex non-text composite visuals that would look worse if split, such as swirls, layered badges, glow assemblies and illustrations. Generate as one PNG and do not split. All lettering follows the editable text path.
 
    Validate the result against `references/element-analysis.schema.json` when practical.
 

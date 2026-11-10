@@ -319,6 +319,16 @@ class SliceAssetSheetTests(unittest.TestCase):
 
 
 class ValidateElementAnalysisTests(unittest.TestCase):
+    def test_text_only_and_geometry_only_pages_accept_empty_png_plan(self):
+        for components in [{}, {"card": {"category": "simple_geometry_svg_ooxml", "asset_plan": "svg_to_ooxml", "reuse": "once"}}]:
+            with self.subTest(components=components):
+                result = self.run_validator({
+                    "ref_width": 1448, "ref_height": 1086,
+                    "components": components, "slides": [{"slide": 1, "instances": []}],
+                    "png_asset_sheet_plan": {"key_color": "#00FF00", "sheets": []},
+                })
+                self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
     def run_validator(self, payload):
         with tempfile.TemporaryDirectory() as tmp:
             analysis_json = Path(tmp) / "element_analysis.json"

@@ -39,6 +39,10 @@ After assets are generated:
 - contact sheets are generated,
 - edge-touch checks are clean or explained.
 
+For pages with zero PNG components, validated element analysis and an empty PNG
+sheet plan satisfy this phase. Continue to editable text extraction, composition
+and preview QA. All lettering, including artistic text, stays in text boxes/runs.
+
 Use those artifacts for QA, but do not wait for user approval before composing the final PPTX.
 
 Regenerate assets only when QA finds a hard problem such as clipped icons, source-cropped assets, polluted crops, missing components, or simple geometry wrongly rasterized into PNG.
