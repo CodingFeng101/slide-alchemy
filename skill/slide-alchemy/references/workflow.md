@@ -149,6 +149,14 @@ Create SVGs only for simple layout geometry and generated PNGs for semantic icon
 
 PNG sheets must be generated with an image generation/editing model, then sliced. Never crop `icon_png` or `complex_png_whole` assets directly from the original/source slide image. The source slide can be used as a visual reference or edit target, but the deliverable icon assets must come from regenerated asset sheets.
 
+Real photographs are the exception: classify them `photo_source_crop` and cut them from the source pages.
+
+```bash
+python scripts/crop_source_photos.py run/analysis/element_analysis.json --source-dir run/source --out-dir run/assets/png/photos
+```
+
+Each photograph is written as `<instance id>.png`. Place it in the compose spec with the instance bbox and `"fit": "frame"`.
+
 PNG sheets must not mix simple geometry with icons. If a PNG icon is near a frame, line, or card in the sheet, regenerate the sheet with more whitespace or isolate that icon. Do not rebuild semantic icons with native PPT shapes just because they are made of simple lines; use generated PNG unless the user explicitly prioritizes editability over visual fidelity for that icon.
 
 Regenerated PNG sheets must be clean and low-noise. Remove high-frequency visual artifacts, preserve icon linework, and keep colors and brightness unchanged.
@@ -168,7 +176,9 @@ Required output before step 6:
 
 Run `scripts/extract_text.py` on the source page images. OCR reads the characters, and position, size, colour, weight, bullets, and line spacing are measured from the pixels. Do not use a visual model for text. See `text-extraction.md`.
 
-Font matching and `--rich-text` are enabled by default. The command prepares core and system-font candidates and uses the remote library when the local match is poor. See `font-distribution.md` for setup. Preserve `font_matches`, the selected `font_face`, `runs`, and their `effects` in the compose spec. Review entries flagged in `style_report`. A setup failure, empty font shortlist or missing run match stops extraction. Resolve the reported cause before continuing. `--ocr-only` supports explicit measurement analysis.
+Font matching and `--rich-text` are enabled by default. The command prepares core and system-font candidates and matches locally. Remote matching is off unless `--remote-match` is passed. An unreachable font server no longer stops the run: cached and installed fonts are used and the skipped downloads are listed on stderr. Progress is printed per text line. See `font-distribution.md` for setup. Preserve `font_matches`, the selected `font_face`, `runs`, and their `effects` in the compose spec. Review entries flagged in `style_report`. A setup failure, empty font shortlist or missing run match stops extraction. Resolve the reported cause before continuing. `--ocr-only` supports explicit measurement analysis.
+
+Text boxes are produced by this command only. Do not hand-write or estimate them when extraction is slow or fails; follow the text section of `failure-decision-tree.md`.
 
 Store all text separately from visual elements as editable text runs, including artistic lettering. Symbols such as arrows and chevrons belong in `element_analysis.json` as editable geometry or suitable non-text assets.
 
@@ -187,7 +197,13 @@ Compose in this order:
 
 Use `compose-spec.md` and `scripts/compose_component_pptx.py` for deterministic composition when possible.
 
-Set `font_matching_required: true` in the reconstruction spec. The composer validates font evidence before saving. Check matched faces, original bounds and line breaks when text overflows, and rerun measurement before adjusting sizes. Avoid automatic shrinking of source text.
+Set `font_matching_required: true` in the reconstruction spec. The composer validates font evidence before saving, and stops when a matched font is not installed, since PowerPoint would substitute it without warning. Install the cached fonts once per machine, then compose:
+
+```bash
+python scripts/font_store.py --install-fonts
+```
+
+Restart PowerPoint after installing. If the command reports a redirected font folder, compose with `--allow-missing-fonts` and pass the missing font list and this command on to the user. Check matched faces, original bounds and line breaks when text overflows, and rerun measurement before adjusting sizes. Avoid automatic shrinking of source text.
 
 Export preview PNGs. Use `scripts/compare_preview.py` to build side-by-side and diff images. Do not claim completion until the preview is visually checked.
 

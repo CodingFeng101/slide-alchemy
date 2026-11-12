@@ -10,6 +10,8 @@ VALID = {
     "simple_geometry_svg_ooxml": "svg_to_ooxml",
     "icon_png": "generate_png_asset",
     "complex_png_whole": "generate_png_whole",
+    # Real photographs are cropped from the source page, never regenerated.
+    "photo_source_crop": "crop_from_source",
 }
 
 SHEET_CAPACITY = {

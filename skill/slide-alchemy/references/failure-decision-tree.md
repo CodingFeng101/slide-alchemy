@@ -67,6 +67,12 @@ Remediation:
 2. Generate a new solid-key asset sheet with an image generation/editing model.
 3. Slice the regenerated asset with transparent padding.
 
+### A real photograph was regenerated
+
+1. Discard the generated version. Faces, banner text and signs in it are no longer the originals.
+2. Reclassify the component as `photo_source_crop` with `asset_plan: crop_from_source`.
+3. Run `scripts/crop_source_photos.py` and place the crop with `fit: frame`.
+
 ### Icon touches a crop edge
 
 1. Recrop with more padding (add 8-16px on each side).
@@ -133,6 +139,20 @@ Do not claim arbitrary SVG path conversion works unless verified in a generated 
 ---
 
 ## Text Problems
+
+### Text extraction is slow, stalls, or fails
+
+1. Watch stderr. The command prints `slide_001.png [3/12] ...` for every text line. New lines mean it is working; a dense page takes about a minute.
+2. If it was started with `--remote-match`, rerun without it. Remote matching stops by itself after two failed requests, but local matching is the default for a reason.
+3. `Font server unavailable; continuing without ...` is a notice, not a failure. The run uses cached and installed fonts.
+4. `Font matching setup failed` or `Font matching incomplete` is a failure. Report the message and stop.
+5. Never substitute hand-written text boxes, guessed fonts, or a visual-model reading. A deck built that way has no measurements behind it.
+
+### Composition stops because a font is not installed
+
+1. Run `python scripts/font_store.py --install-fonts`, restart PowerPoint, and compose again.
+2. If the command says the application redirects the user font folder, the agent runs inside a packaged desktop app and cannot install fonts. Compose with `--allow-missing-fonts`, then tell the user which fonts are missing and to run the command in PowerShell.
+3. Do not swap the matched font for an installed one by editing `texts_layout.json`.
 
 ### Text overflows its bounding box or wraps
 

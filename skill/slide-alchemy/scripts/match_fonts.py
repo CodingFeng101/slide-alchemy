@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import unicodedata
 import warnings
 from functools import lru_cache
@@ -87,7 +88,9 @@ def index_fonts(directories):
                     weight = font["OS/2"].usWeightClass if "OS/2" in font else 400
                     permissions = font["OS/2"].fsType if "OS/2" in font else None
                     italic = bool(font["head"].macStyle & 2)
+                    codepages = getattr(font["OS/2"], "ulCodePageRange1", None) if "OS/2" in font else None
                     fonts.append({"path": str(path), "index": face, "family": family,
+                                  "codepages": codepages,
                                   "style": style, "weight": weight, "italic": italic,
                                   "face_name": name.getDebugName(4) or family,
                                   "bold": bool(font["head"].macStyle & 1),
@@ -120,8 +123,57 @@ def load_index(path):
     return data["fonts"]
 
 
+def installed_font_names():
+    """Casefolded family and full names of fonts the operating system can render."""
+    from fontTools.ttLib import TTCollection, TTFont, TTLibError
+
+    names = set()
+    for directory in font_directories():
+        for path in Path(directory).rglob("*") if Path(directory).is_dir() else []:
+            if path.suffix.lower() not in (".ttf", ".otf", ".ttc", ".otc"):
+                continue
+            try:
+                count = 1
+                if path.suffix.lower() in (".ttc", ".otc"):
+                    with path.open("rb") as stream, TTCollection(stream, lazy=True) as collection:
+                        count = len(collection.fonts)
+                for face in range(count):
+                    with path.open("rb") as stream, TTFont(stream, fontNumber=face, lazy=True) as font:
+                        # Localised records too: a deck may name 微软雅黑.
+                        for record in font["name"].names:
+                            if record.nameID in (1, 4, 16):
+                                try:
+                                    names.add(record.toUnicode().casefold())
+                                except UnicodeDecodeError:
+                                    continue
+            except (OSError, TTLibError, KeyError):
+                continue
+    return names
+
+
+# OS/2 ulCodePageRange1 bits. A font built for another region covers the shared
+# Han characters with that region's glyph shapes, which read as wrong in a
+# Chinese deck even when the outline match is close.
+SIMPLIFIED_CHINESE = 1 << 18
+TRADITIONAL_CHINESE = 1 << 20
+HAN = re.compile(r"[㐀-鿿]")
+OTHER_CJK = re.compile(r"[぀-ヿ가-힯]")
+
+
+def region_allows(font, text):
+    """Keep Japanese, Korean and symbol-range fonts away from Chinese text."""
+    codepages = font.get("codepages")
+    if codepages is None or not HAN.search(text) or OTHER_CJK.search(text):
+        return True
+    try:
+        "".join(HAN.findall(text)).encode("gb2312")
+    except UnicodeEncodeError:
+        return bool(codepages & (SIMPLIFIED_CHINESE | TRADITIONAL_CHINESE))
+    return bool(codepages & SIMPLIFIED_CHINESE)
+
+
 def supports(font, text):
-    return set(text) - set(" \t\r\n") <= set(font["characters"])
+    return set(text) - set(" \t\r\n") <= set(font["characters"]) and region_allows(font, text)
 
 
 @lru_cache(maxsize=256)

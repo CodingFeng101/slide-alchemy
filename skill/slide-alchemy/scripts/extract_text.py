@@ -17,6 +17,7 @@ Two parts of the measurement chain are load-bearing and easy to get wrong:
 import argparse
 import json
 import re
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -1041,6 +1042,12 @@ def harmonise_font_matches(blocks):
             block.font_matches[0]["selection"] = "shared_style"
 
 
+def progress(path, position, total, block):
+    """One line per text line, so a long matching run is visibly alive."""
+    text = block.text.replace("\n", " ")
+    print(f"{Path(path).name} [{position}/{total}] {text[:24]}", file=sys.stderr, flush=True)
+
+
 def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
                  slide_width_in=DEFAULT_SLIDE_WIDTH_IN, font_matcher=None, rich_text=False):
     slide_width_pt = slide_width_in * 72
@@ -1077,13 +1084,15 @@ def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
         if rich_text:
             from rich_text import analyse_line
             image = read_image(path)
-            for block in blocks:
+            for position, block in enumerate(blocks, 1):
+                progress(path, position, line_count, block)
                 analyse_line(image, block, slide_width_pt / page_w, font_matcher)
         elif font_matcher is not None:
             from match_fonts import crop_mask
 
             image = read_image(path)
-            for block in blocks:
+            for position, block in enumerate(blocks, 1):
+                progress(path, position, line_count, block)
                 mask = crop_mask(image, to_px(block.bbox, page_w, page_h))
                 result = font_matcher.match(mask, block.text)
                 result["line_id"] = block.id
@@ -1144,7 +1153,9 @@ def main():
                     help="Measure inline styles and editable effects (enabled by default)")
     ap.add_argument("--ocr-only", action="store_true",
                     help="Explicit legacy OCR measurement mode for analysis")
-    ap.add_argument("--font-server", help="Expand poor font matches through a font release URL ending in /fonts/v1")
+    ap.add_argument("--font-server", help="Font release URL ending in /fonts/v1, used to download the core pack")
+    ap.add_argument("--remote-match", action="store_true",
+                    help="Also send poor local matches to the font server (off by default)")
     ap.add_argument("--font-cache", type=Path, help="Downloaded font cache directory")
     args = ap.parse_args()
 
@@ -1154,7 +1165,7 @@ def main():
         ap.error("--font-index and --font-model must be supplied together")
     font_matcher = None
     if args.ocr_only:
-        if args.font_index or args.font_model or args.font_server or args.font_cache:
+        if args.font_index or args.font_model or args.font_server or args.font_cache or args.remote_match:
             ap.error("--ocr-only conflicts with font matching options")
         args.rich_text = False
     else:
@@ -1165,7 +1176,10 @@ def main():
             if not args.font_index:
                 args.font_index, args.font_model = store.install_core(include_system=True)
             font_matcher = FontMatcher(args.font_index, args.font_model)
-            font_matcher = RemoteFontMatcher(font_matcher, store)
+            # Local fonts decide by default. The server is opt-in because a slow
+            # response stalls every poorly matched line.
+            if args.remote_match:
+                font_matcher = RemoteFontMatcher(font_matcher, store)
         except (OSError, ValueError) as error:
             ap.exit(2, f"Font matching setup failed. Check the font server or cache. {error}\n")
     expected = None

@@ -64,6 +64,24 @@ Use for non-text visuals that become worse when split:
 
 Generate as one whole transparent PNG with an image generation/editing model, then slice it from the generated asset sheet. Do not split. Never crop this asset directly from the original/source slide image.
 
+### photo_source_crop
+
+Use only for real photographs: group photos, event and venue shots, portraits,
+product or equipment photos, scanned certificates and screenshots of real
+documents. Set `asset_plan` to `crop_from_source`.
+
+Crop these from the source page with `scripts/crop_source_photos.py`. Do not
+regenerate them. An image model redraws faces, removes the writing on banners
+and signs, and leaves key-colour fringes, which turns a record of a real event
+into a different picture. Keep photographs off PNG asset sheets.
+
+Record the bbox of the picture area itself. A rounded frame, border or shadow
+around the photograph is separate `simple_geometry_svg_ooxml`. Text printed
+inside the photograph stays part of the photograph and is not extracted.
+
+Drawn artwork does not belong here. Icons, flat illustrations, 3D renders and
+decorative scenes remain `icon_png` or `complex_png_whole`.
+
 ## Reuse Rules
 
 - One star component should serve all star instances through copy/scale.
@@ -78,6 +96,7 @@ Generate as one whole transparent PNG with an image generation/editing model, th
 - Rebuilding semantic icons as native PPT shapes and losing visual fidelity.
 - Putting stars, frames, title bars, and icon PNGs in the same asset sheet.
 - Cropping `icon_png` or `complex_png_whole` assets directly from the source slide instead of regenerating them first.
+- Regenerating a real photograph instead of classifying it `photo_source_crop`.
 - Cropping icon assets tightly to their nontransparent bbox.
 - Splitting a complex decorative composition into many pieces that cannot be reassembled cleanly.
 - Classifying any slide lettering as a PNG component or replacing editable characters with vector outlines.

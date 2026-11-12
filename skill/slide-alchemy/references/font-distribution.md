@@ -16,16 +16,36 @@ appear in both packs share a single server file.
 python scripts/font_store.py --server http://182.254.211.241/fonts/v1 --include-system
 ```
 
-The default cache is `%LOCALAPPDATA%/slide-alchemy/fonts/v1` on Windows and
-`~/.cache/slide-alchemy/fonts/v1` elsewhere. `--cache` selects another directory.
+The default cache is `~/.slide-alchemy/fonts/v1` on every platform, so every
+agent and terminal on the machine shares one copy. `--cache` or the
+`SLIDE_ALCHEMY_FONT_CACHE` environment variable selects another directory.
+Files found in the earlier `%LOCALAPPDATA%` or `~/.cache` location are copied
+over instead of downloaded again.
 The installer checks SHA-256 before accepting a file, repairs damaged cache
 entries, and keeps the previous file if a replacement fails validation.
 `--include-system` also indexes installed system fonts. The generated index
 records the cache paths, so rebuild it after moving the cache.
 
-The cache provides font files to the matcher. PowerPoint itself needs the
-selected face installed through the operating system when rendering editable
-text. Cross-device font embedding remains a separate task.
+If the server cannot be reached, the installer reports the fonts it skipped
+and continues with whatever is cached. The first failed download marks the
+server unavailable, so the remaining fonts do not each wait for a timeout.
+
+## Install cached fonts for PowerPoint
+
+The cache provides font files to the matcher. PowerPoint only renders faces
+installed in the operating system and silently substitutes the rest.
+
+```bash
+python scripts/font_store.py --install-fonts
+```
+
+This copies every cached font that is not yet installed into the current
+user's font folder and registers it, without administrator rights. Restart
+PowerPoint afterwards. Packaged desktop apps redirect that folder into a
+private copy that PowerPoint cannot see; the command detects this and asks to
+be run from a regular terminal. The composer refuses a reconstruction spec
+whose matched fonts are not installed unless `--allow-missing-fonts` is given.
+Cross-device font embedding remains a separate task.
 
 ## Download fonts to a user-selected folder
 
@@ -52,17 +72,34 @@ These commands download desktop font files. Install the selected files through
 the operating system when PowerPoint needs to render them. The PPT stores
 colours, sizes and text effects.
 
-## Extract with remote expansion
+## Extract
 
 ```bash
 python scripts/extract_text.py run/source/slide_003.png --out run/analysis/texts_layout.json
 ```
 
-This standard command enables matching, remote expansion and rich text.
-Without explicit font index/model arguments, it installs the core pack and
-indexes it together with installed system fonts. Existing index/model arguments
-continue to select the local candidate set. `--font-cache` selects the download
-cache and `--font-server` overrides the default release URL. `--no-rich-text`
+This standard command enables local matching and rich text. Without explicit
+font index/model arguments, it installs the core pack and indexes it together
+with installed system fonts. Existing index/model arguments continue to select
+the local candidate set. `--font-cache` selects the download cache and
+`--font-server` overrides the default release URL.
+
+Candidates are filtered by region before ranking. Text made of Chinese
+characters only considers fonts whose OS/2 table declares Simplified Chinese
+coverage, or Traditional Chinese when the text has characters outside GB2312.
+Japanese and Korean fonts cover many of the same code points with different
+glyph shapes and are skipped. Text containing kana or hangul is not filtered.
+
+## Remote expansion
+
+Remote matching is opt-in.
+
+```bash
+python scripts/extract_text.py run/source/slide_003.png --out run/analysis/texts_layout.json --remote-match
+```
+
+It sends the measured ink mask and the recognised text of each poorly matched
+line to the font server over HTTP. Leave it off for confidential decks. `--no-rich-text`
 keeps per-line matching. `--ocr-only` provides explicit legacy measurement
 analysis. Reconstruction requires usable font evidence before composition.
 
@@ -73,7 +110,9 @@ up to 10 candidates. If its best candidate improves on the local result, the
 client downloads that face and its license. The report retains the remote
 shortlist and the selected local cache path. Equal or worse remote results
 preserve the local face. An unreachable server preserves the local result and
-adds `remote_unavailable` to the review reasons.
+adds `remote_unavailable` to the review reasons. Each request waits at most 30
+seconds, and after two consecutive failures the rest of the run skips the
+server.
 
 `match_fonts.py match` also accepts `--font-server` and `--font-cache`. Inline
 boundary proposal continues to use local fonts. Short same-colour boundaries

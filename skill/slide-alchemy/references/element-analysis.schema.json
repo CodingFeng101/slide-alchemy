@@ -15,11 +15,11 @@
         "properties": {
           "category": {
             "type": "string",
-            "enum": ["simple_geometry_svg_ooxml", "icon_png", "complex_png_whole"]
+            "enum": ["simple_geometry_svg_ooxml", "icon_png", "complex_png_whole", "photo_source_crop"]
           },
           "asset_plan": {
             "type": "string",
-            "enum": ["svg_to_ooxml", "generate_png_asset", "generate_png_whole"]
+            "enum": ["svg_to_ooxml", "generate_png_asset", "generate_png_whole", "crop_from_source"]
           },
           "reuse": { "type": "string" },
           "svg_hint": { "type": "string" },

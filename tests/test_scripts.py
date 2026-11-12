@@ -329,6 +329,50 @@ class ValidateElementAnalysisTests(unittest.TestCase):
                 })
                 self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
+    def test_photographs_are_cropped_from_source_and_kept_off_asset_sheets(self):
+        components = {"team_photo": {"category": "photo_source_crop", "asset_plan": "crop_from_source", "reuse": "single"}}
+        payload = {"ref_width": 200, "ref_height": 100, "components": components,
+                   "slides": [{"slide": 1, "instances": []}]}
+        result = self.run_validator(payload)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        result = self.run_validator(dict(payload, png_asset_sheet_plan={
+            "key_color": "#00FF00", "sheets": [{"id": "photos", "components": ["team_photo"]}]}))
+        self.assertEqual(1, result.returncode)
+        self.assertIn("only PNG component categories belong on asset sheets", result.stdout)
+        components["team_photo"]["asset_plan"] = "generate_png_whole"
+        result = self.run_validator(payload)
+        self.assertIn("expects asset_plan crop_from_source", result.stdout)
+
+    def test_photo_crop_keeps_source_pixels_and_scales_reference_boxes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "source").mkdir()
+            page = Image.new("RGB", (400, 200), "white")
+            page.paste((200, 30, 30), (100, 40, 300, 160))
+            page.save(root / "source/slide_002.png")
+            analysis = {
+                "ref_width": 200, "ref_height": 100,
+                "components": {
+                    "photo": {"category": "photo_source_crop", "asset_plan": "crop_from_source", "reuse": "single"},
+                    "icon": {"category": "icon_png", "asset_plan": "generate_png_asset", "reuse": "single"},
+                },
+                "slides": [{"slide": 2, "instances": [
+                    {"component": "photo", "id": "team_photo", "bbox_px": [50, 20, 100, 60], "bbox_frac": [0.25, 0.2, 0.5, 0.6]},
+                    {"component": "icon", "id": "trophy", "bbox_px": [0, 0, 10, 10], "bbox_frac": [0, 0, 0.05, 0.1]},
+                ]}],
+            }
+            (root / "analysis.json").write_text(json.dumps(analysis), encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(SCRIPTS / "crop_source_photos.py"), str(root / "analysis.json"),
+                 "--source-dir", str(root / "source"), "--out-dir", str(root / "photos")],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertEqual(["team_photo.png"], [path.name for path in (root / "photos").iterdir()])
+            with Image.open(root / "photos/team_photo.png") as crop:
+                self.assertEqual((200, 120), crop.size)
+                self.assertEqual([(200, 30, 30)], [colour for _, colour in crop.getcolors()])
+
     def run_validator(self, payload):
         with tempfile.TemporaryDirectory() as tmp:
             analysis_json = Path(tmp) / "element_analysis.json"

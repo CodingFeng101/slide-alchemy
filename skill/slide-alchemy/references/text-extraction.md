@@ -10,10 +10,12 @@ Division of labour: the OCR model (RapidOCR 3.x on onnxruntime, models bundled i
 python scripts/extract_text.py run/source/slide_*.png --out run/analysis/texts_layout.json
 ```
 
-The standard command enables local/remote font matching and rich text by default.
+The standard command enables local font matching and rich text by default.
 It prepares the core font cache, scans system fonts and uses the bundled model.
-Every visible run must have a usable match before a layout is written. Setup
-failures and incomplete matches stop with an error. The output marks
+It needs no network once the core pack is cached, and falls back to cached and
+installed fonts when the font server is unreachable. One progress line per
+text line goes to stderr. Every visible run must have a usable match before a
+layout is written. Setup failures and incomplete matches stop with an error. The output marks
 `font_matching_required: true`. Preserve the matching records when composing.
 
 Options:
@@ -24,7 +26,8 @@ Options:
 - `--slide-width-in <inches>`: must match `slide_width_in` in the compose spec. Default `13.333333`.
 - `--font-index <file>` and `--font-model <file>`: select an explicit local font index and ONNX encoder. Supply both together. The encoder ranks eligible fonts and OpenCV refines the first 10. Otherwise the core pack, system fonts and bundled encoder are prepared automatically.
 - `--rich-text` / `--no-rich-text`: enable or disable inline style/effect extraction. The default is enabled. Disabling rich text keeps per-line font matching active.
-- `--font-server <release-url>`: select the remote library used to expand poor local matches. Defaults to `http://182.254.211.241/fonts/v1`. Use `--font-cache <directory>` to select the download cache. See `font-distribution.md` for file verification and review limits.
+- `--font-server <release-url>`: select the release the core pack is downloaded from. Defaults to `http://182.254.211.241/fonts/v1`. Use `--font-cache <directory>` to select the download cache. See `font-distribution.md` for file verification and review limits.
+- `--remote-match`: also send poorly matched lines to the font server's larger library. Off by default, because it uploads the line's ink mask and text and waits on the network.
 - `--ocr-only`: explicit legacy OCR measurement analysis with the Microsoft YaHei estimation path. Font matching and rich text are disabled in this mode. Reconstructed slides require matching records before composition.
 
 Slide numbers come from the trailing digits of each file name (`slide_003.png` -> 3).

@@ -35,7 +35,7 @@ The following steps must always happen in order:
 4. element analysis,
 5. SVG/OOXML generation for true layout geometry,
 6. PNG asset sheet generation with an image generation/editing model when non-text PNG components are present,
-7. PNG slicing and contact-sheet QA when PNG components are present,
+7. PNG slicing and contact-sheet QA when PNG components are present, plus source crops for real photographs,
 8. OCR text extraction with pixel measurement,
 9. PPTX composition,
 10. preview export and visual QA.
@@ -59,6 +59,10 @@ Use the runtime's own image generation/editing tool when it has one, as Codex do
 Every regenerated image asset must remove image noise and high-frequency visual artifacts while preserving all kept linework. Colors and brightness must remain unchanged.
 
 Do not replace those model steps with local white masks, local inpainting, direct source-image crops, copied screenshot fragments, PPT native shape approximations, or generic presentation templates.
+
+Real photographs are the single exception to the source-crop rule. A photograph of real people, places, events or documents is classified `photo_source_crop` and cut from the source page with `scripts/crop_source_photos.py`. Regenerating it changes faces and erases banner or sign text, so never send a photograph through an image model or an asset sheet. Icons, illustrations and rendered 3D art are still regenerated.
+
+Text boxes come only from `scripts/extract_text.py`. Never write, estimate or hand-place text boxes, fonts, sizes or effects yourself, including when extraction is slow or fails. A failed or stalled extraction is fixed by rerunning it as described in `references/failure-decision-tree.md`; if it still fails, stop and report the error. This rule outranks the instruction to keep going on unsupported text effects, which applies only after extraction has produced `texts_layout.json`.
 
 ## Execution Discipline
 
@@ -122,6 +126,7 @@ The lead agent must merge all page-level outputs, deduplicate shared components,
    - `simple_geometry_svg_ooxml`: non-semantic layout geometry such as straight lines, dividers, stars, circles, rings, rounded rectangles, card bases, title bars, simple borders, and simple circuit-line decorations. Generate SVG first, then convert or recreate as editable OOXML/PPT shapes.
    - `icon_png`: standalone illustrative or semantic icons such as trophies, flowers, books, hands/heart, computer, chain link, organization badges, app pictograms, people, devices, buildings, or any recognizable object icon. Even if an icon looks like simple line art, keep it as generated PNG unless it is just a primitive layout shape.
    - `complex_png_whole`: complex non-text composite visuals that would look worse if split, such as swirls, layered badges, glow assemblies and illustrations. Generate as one PNG and do not split. All lettering follows the editable text path.
+   - `photo_source_crop`: real photographs. Crop them from the source page with `scripts/crop_source_photos.py` and place them with `fit: frame`. They stay off PNG asset sheets.
 
    Validate the result against `references/element-analysis.schema.json` when practical.
 
@@ -139,12 +144,12 @@ The lead agent must merge all page-level outputs, deduplicate shared components,
 9. Extract text with OCR and pixel measurement.
    Run `scripts/extract_text.py` on the source page images to write `texts_layout.json`. OCR reads the characters. Position, font size, colour, weight, bullets, and paragraph line merging are measured from the pixels. Do not use a visual model to read text or estimate text boxes, because its coordinates are approximations. Copy each text's `bbox_px`/`bbox_frac`, style fields, and `line_spacing_pt` into the compose spec unchanged. If bold is wrong for a template, calibrate `--bold-mode ratio:<value>` from the recorded `metrics` instead of editing weights one by one. PPTX XML text may be passed with `--expected` to correct near-miss readings.
 
-   Font matching and mixed-style extraction are enabled by default. Read `references/font-distribution.md` for cache setup and server details. The standard command is `python scripts/extract_text.py run/source/slide_*.png --out run/analysis/texts_layout.json`. It prepares the core pack, scans installed fonts, matches locally, and expands poor matches through the remote library. Every visible text run must have a nonempty `font_matches` candidate record. Review low-confidence matches before composition. If setup or matching fails, stop and report the cause. `--ocr-only` is an explicit measurement-analysis mode. Reconstruction requires matching results.
+   Font matching and mixed-style extraction are enabled by default. Read `references/font-distribution.md` for cache setup and server details. The standard command is `python scripts/extract_text.py run/source/slide_*.png --out run/analysis/texts_layout.json`. It prepares the core pack, scans installed fonts and matches locally. It works without network access once the core pack is cached, and continues with installed fonts when the font server cannot be reached. Remote matching is off by default; add `--remote-match` only when the user asks for the server library. The command prints one progress line per text line on stderr and a page takes roughly a minute, so wait for it instead of treating a quiet minute as a hang. Every visible text run must have a nonempty `font_matches` candidate record. Review low-confidence matches before composition. If setup or matching fails, stop and report the cause. `--ocr-only` is an explicit measurement-analysis mode. Reconstruction requires matching results.
 
 10. Compose the final PPTX in this layer order:
     base PNG -> SVG/OOXML editable geometry -> PNG icons -> editable text boxes.
     Use `scripts/compose_component_pptx.py` with a compose spec when possible; do not rewrite ad hoc composition logic for every task.
-    Set `font_matching_required: true` in the reconstruction compose spec. Preserve each OCR text record's `font_matches`, `font_face`, `runs`, and `style_report`. Composition checks the selected face and weight against the matching evidence and stops on missing results or conflicting styles. For text overflow, check the matched face, source bounds, line breaks and size estimates, then rerun matching or measurement. Avoid automatic font shrinking as an overflow repair.
+    Set `font_matching_required: true` in the reconstruction compose spec. Preserve each OCR text record's `font_matches`, `font_face`, `runs`, and `style_report`. Composition checks the selected face and weight against the matching evidence and stops on missing results or conflicting styles. It also stops when a matched font is not installed on this machine, because PowerPoint would silently substitute another face. Run `python scripts/font_store.py --install-fonts` and compose again. When that command reports that the application redirects the font folder, compose with `--allow-missing-fonts`, then give the user the list of missing fonts and that command to run in a regular terminal; the preview is not a valid QA result until they have. For text overflow, check the matched face, source bounds, line breaks and size estimates, then rerun matching or measurement. Avoid automatic font shrinking as an overflow repair.
     Give each PNG image the drawing's own bbox from `element_analysis.json`; the default `fit: visible` aligns the PNG's drawn pixels to it and lets the transparent padding fall outside. Leave `slide_height_in` out so the slide follows the source page's aspect ratio. Record `corner_radius_px` for rounded cards.
 
 11. Export previews and QA visually.
@@ -221,7 +226,8 @@ Use bundled scripts for deterministic checks:
 - `scripts/simple_svg_to_pptx.py`: convert simple component SVG primitives into editable PPTX shapes for quick validation or component reuse.
 - `scripts/validate_element_analysis.py`: lightweight validation for `element_analysis.json` without external dependencies.
 - `scripts/extract_text.py`: OCR the source pages and measure text position, size, colour, weight, bullets, and line spacing into `texts_layout.json`.
-- `scripts/font_store.py`: install the checked core font pack and cache selected remote matches.
+- `scripts/font_store.py`: install the checked core font pack, cache selected remote matches, and install cached fonts for PowerPoint with `--install-fonts`.
+- `scripts/crop_source_photos.py`: crop `photo_source_crop` photographs from the source pages.
 - `scripts/serve_fonts.py`: serve the expanded font matcher behind Nginx.
 - `scripts/compose_component_pptx.py`: compose base images, editable shapes, PNG assets, and editable text into a PPTX from JSON.
 - `scripts/compare_preview.py`: create side-by-side and difference images from source/preview PNGs.

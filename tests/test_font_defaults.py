@@ -22,11 +22,25 @@ class FontDefaultTests(unittest.TestCase):
                 "bbox_frac": [0.1, 0.1, 0.7, 0.2], "ink_bbox_px": [10, 10, 100, 30],
                 "font_matches": [{"candidates": [candidate]}]}
 
-    def test_plain_command_enables_model_remote_and_rich_text(self):
+    def test_plain_command_matches_locally_without_the_font_server(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "layout.json"
             layout = {"slides": [{"texts": [self.item()]}]}
             with patch.object(sys, "argv", ["extract_text.py", "slide.png", "--out", str(output)]), \
+                    patch("font_store.FontStore") as store, patch("match_fonts.FontMatcher") as matcher, \
+                    patch("font_store.RemoteFontMatcher") as remote, patch.object(extract_text, "build_layout", return_value=layout) as build:
+                store.return_value.install_core.return_value = ("index.json", "model.onnx")
+                extract_text.main()
+                remote.assert_not_called()
+                self.assertIs(matcher.return_value, build.call_args.kwargs["font_matcher"])
+                self.assertTrue(build.call_args.kwargs["rich_text"])
+            self.assertTrue(json.loads(output.read_text(encoding="utf-8"))["font_matching_required"])
+
+    def test_remote_match_flag_enables_server_expansion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "layout.json"
+            layout = {"slides": [{"texts": [self.item()]}]}
+            with patch.object(sys, "argv", ["extract_text.py", "slide.png", "--out", str(output), "--remote-match"]), \
                     patch("font_store.FontStore") as store, patch("match_fonts.FontMatcher") as matcher, \
                     patch("font_store.RemoteFontMatcher") as remote, patch.object(extract_text, "build_layout", return_value=layout) as build:
                 store.return_value.install_core.return_value = ("index.json", "model.onnx")
@@ -129,6 +143,44 @@ class FontDefaultTests(unittest.TestCase):
             self.assertIn("<a:gradFill", xml)
             self.assertIn("<a:outerShdw", xml)
             self.assertNotIn("<p:pic>", xml)
+
+    def test_uninstalled_matched_font_stops_composition_unless_allowed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            spec = {"font_matching_required": True, "slides": [{"texts": [self.item()]}]}
+            (root / "spec.json").write_text(json.dumps(spec), encoding="utf-8")
+            with patch("match_fonts.installed_font_names", return_value={"simsun"}):
+                with self.assertRaisesRegex(ValueError, "not installed.*Arial.*--install-fonts"):
+                    compose(root / "spec.json", root / "out.pptx")
+                self.assertFalse((root / "out.pptx").exists())
+                with patch("sys.stderr"):
+                    compose(root / "spec.json", root / "out.pptx", allow_missing_fonts=True)
+            self.assertTrue((root / "out.pptx").exists())
+
+    def test_installed_font_check_reads_each_run_and_ignores_case(self):
+        from compose_component_pptx import missing_fonts
+        item = {"text": "A B", "font_family": "Arial",
+                "runs": [{"text": "A", "font_face": "Arial Bold"}, {"text": " "}, {"text": "B", "font_family": "Roboto"}]}
+        with patch("match_fonts.installed_font_names", return_value={"arial bold"}):
+            self.assertEqual(["Roboto"], missing_fonts({"slides": [{"texts": [item]}]}))
+
+    def test_chinese_text_excludes_fonts_built_for_other_regions(self):
+        simplified, traditional, japanese = 1 << 18, 1 << 20, 1 << 17
+        font = lambda pages: {"characters": "以赛促学體a", "codepages": pages}
+        self.assertTrue(match_fonts.supports(font(simplified), "以赛促学"))
+        self.assertFalse(match_fonts.supports(font(japanese), "以赛促学"))
+        self.assertFalse(match_fonts.supports(font(traditional), "以赛促学"))
+        # Characters outside GB2312 mark traditional text, which either region serves.
+        self.assertTrue(match_fonts.supports(font(traditional), "體"))
+        self.assertTrue(match_fonts.supports(font(japanese), "a"))
+        # Indexes written before the field existed stay usable.
+        self.assertTrue(match_fonts.supports({"characters": "以赛促学"}, "以赛促学"))
+
+    def test_extraction_reports_progress_for_every_line(self):
+        block = extract_text.TextBlock(id="s1_t1", text="标题\n第二行", bbox=(0, 0, 1, 1), font_size_pt=12)
+        with patch("sys.stderr") as stream:
+            extract_text.progress("run/slide_001.png", 2, 5, block)
+        self.assertIn("slide_001.png [2/5] 标题 第二行", "".join(call.args[0] for call in stream.write.call_args_list))
 
     def test_unrenderable_system_face_is_excluded_from_model_ranking(self):
         matcher = match_fonts.FontMatcher.__new__(match_fonts.FontMatcher)

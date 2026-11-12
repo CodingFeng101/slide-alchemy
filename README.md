@@ -142,6 +142,7 @@ In Claude Code:
 | 📐 `simple_geometry_svg_ooxml` | lines, stars, circles, rings, cards, title bars, borders, simple circuit lines | editable PPT geometry |
 | 🖼️ `icon_png` | trophy, flowers, book, hands/heart, computer, chain link, badges | transparent PNG |
 | 🧩 `complex_png_whole` | swirls, glow-heavy decorations, multi-layer badges, complex illustrations | one whole transparent PNG |
+| 📷 `photo_source_crop` | real photographs of people, events, places, documents | cropped from the source page, never regenerated |
 
 Core rule:
 

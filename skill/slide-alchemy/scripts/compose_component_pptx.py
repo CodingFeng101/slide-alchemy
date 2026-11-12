@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from PIL import Image
@@ -215,8 +216,36 @@ def set_paragraph_style(p, item):
         p.line_spacing = Pt(float(item["line_spacing_pt"]))
 
 
+def typeface(item):
+    return item.get("font_face") or item.get("font_family", "Microsoft YaHei")
+
+
+def run_styles(item):
+    """Each visible run's merged style, as add_text applies it."""
+    for chunk in item.get("runs") or [{"text": str(item.get("text", ""))}]:
+        style = dict(item, **chunk)
+        if "font_family" in chunk and "font_face" not in chunk:
+            style.pop("font_face", None)
+        if str(chunk.get("text", "")).strip():
+            yield style
+
+
+def missing_fonts(spec):
+    """Typefaces the deck names that this machine cannot render.
+
+    PowerPoint silently substitutes a missing face, which turns a correct
+    match into the wrong lettering without any error.
+    """
+    from match_fonts import installed_font_names
+
+    wanted = {typeface(style) for slide_spec in spec["slides"]
+              for item in slide_spec.get("texts", []) for style in run_styles(item)}
+    installed = installed_font_names()
+    return sorted(name for name in wanted if name.casefold() not in installed)
+
+
 def set_run_style(run, item):
-    run.font.name = item.get("font_face") or item.get("font_family", "Microsoft YaHei")
+    run.font.name = typeface(item)
     # Explicit East Asian typeface prevents theme fonts replacing CJK text.
     properties = run._r.get_or_add_rPr()
     east_asian = properties.find(qn("a:ea"))
@@ -233,7 +262,7 @@ def set_run_style(run, item):
         apply_effects(run, item["effects"])
 
 
-def compose(spec_path, out_path):
+def compose(spec_path, out_path, allow_missing_fonts=False):
     spec_path = Path(spec_path)
     base_dir = spec_path.parent
     spec = json.loads(spec_path.read_text(encoding="utf-8-sig"))
@@ -242,6 +271,15 @@ def compose(spec_path, out_path):
         for slide_spec in spec["slides"]:
             for item in slide_spec.get("texts", []):
                 validate_font_matches(item)
+        missing = missing_fonts(spec)
+        if missing:
+            message = ("fonts selected by matching are not installed, so PowerPoint would substitute them: "
+                       + ", ".join(missing)
+                       + ". Run `python scripts/font_store.py --install-fonts` from a regular terminal, "
+                       "or pass --allow-missing-fonts and report this list to the user.")
+            if not allow_missing_fonts:
+                raise ValueError(message)
+            print("WARNING " + message, file=sys.stderr, flush=True)
     ref_w = spec.get("ref_width", 1920)
     ref_h = spec.get("ref_height", 1080)
     slide_w = float(spec.get("slide_width_in", 13.333333))
@@ -280,8 +318,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("compose_json")
     ap.add_argument("output_pptx")
+    ap.add_argument("--allow-missing-fonts", action="store_true",
+                    help="Compose even when a matched font is not installed; PowerPoint will substitute it")
     args = ap.parse_args()
-    print(compose(args.compose_json, args.output_pptx))
+    try:
+        print(compose(args.compose_json, args.output_pptx, args.allow_missing_fonts))
+    except ValueError as error:
+        ap.exit(2, f"Composition stopped. {error}\n")
 
 
 if __name__ == "__main__":

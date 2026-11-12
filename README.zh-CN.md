@@ -142,6 +142,7 @@ Use $slide-alchemy to convert these image-style PPT slides into an editable PPTX
 | 📐 `simple_geometry_svg_ooxml` | 线条、星星、圆形、圆环、卡片、标题条、边框、简单电路线 | PPT 可编辑几何元素 |
 | 🖼️ `icon_png` | 奖杯、花、书本、爱心托举、电脑、链条、徽章 | 透明 PNG |
 | 🧩 `complex_png_whole` | 漩涡、复杂光效、多层徽章、复杂插画 | 整体透明 PNG |
+| 📷 `photo_source_crop` | 真实照片：合影、活动现场、场地、证书文件 | 直接从原图裁切，不重新生成 |
 
 核心判断：
 

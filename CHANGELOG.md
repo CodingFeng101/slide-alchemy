@@ -4,6 +4,20 @@ This file records the notable changes in each Slide Alchemy release.
 
 ## [Unreleased]
 
+### Reliability of font matching
+
+- Match fonts locally by default. Remote matching against the font server is now opt-in through `--remote-match`; it stalled extraction whenever the server was slow and uploaded each poorly matched line.
+- Keep going when the font server is unreachable: cached and installed fonts are used, the skipped downloads are listed, and only the first failed download waits for a timeout. Remote requests wait 30 seconds instead of 120 and stop after two consecutive failures.
+- Print one progress line per text line during extraction.
+- Move the font cache to `~/.slide-alchemy/fonts/v1` so that packaged desktop agents and terminals share one copy, and seed it from the earlier location.
+- Stop composition when a matched font is not installed, since PowerPoint substitutes it silently. `font_store.py --install-fonts` installs the cached fonts for the current user; `--allow-missing-fonts` composes anyway.
+- Skip Japanese, Korean and Traditional Chinese fonts when matching Simplified Chinese text.
+- State in the skill that text boxes come only from `extract_text.py` and are never written by hand.
+
+### Photographs
+
+- Add the `photo_source_crop` category and `scripts/crop_source_photos.py`. Real photographs are cropped from the source page instead of being regenerated, which redrew faces and erased banner text.
+
 ### Claude Code support
 
 - Add `scripts/generate_image.py`, which generates or edits images through an OpenAI-compatible Images API (configured by `SLIDE_ALCHEMY_IMAGE_*` environment variables) for runtimes without an image tool, such as Claude Code. A reference image makes the request an edit; gateways without an images endpoint fall back to `/chat/completions`.
