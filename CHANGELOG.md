@@ -14,9 +14,18 @@ This file records the notable changes in each Slide Alchemy release.
 - Skip Japanese, Korean and Traditional Chinese fonts when matching Simplified Chinese text.
 - State in the skill that text boxes come only from `extract_text.py` and are never written by hand.
 
+### Text boxes
+
+- Split an OCR line that runs across side-by-side labels into one box per label, at a gap of an em or at a narrower gap between visibly different lettering.
+- Merge centred lines into one centred paragraph, and cut a merged chain where the line pitch changes.
+- Match each word of a line on its own and give the line one face by majority, instead of matching the whole line or keeping one font per word.
+- Give runs of the same size, colour and script on a page one face and size, so that the cards of one design and the lines of one paragraph no longer come out in different fonts.
+- Keep punctuation in the run beside it; an interpunct no longer gets a symbol font of its own.
+
 ### Photographs
 
 - Add the `photo_source_crop` category and `scripts/crop_source_photos.py`. Real photographs are cropped from the source page instead of being regenerated, which redrew faces and erased banner text.
+- Add `extract_text.py --element-analysis`, which leaves text inside cropped photographs in the photograph.
 
 ### Claude Code support
 

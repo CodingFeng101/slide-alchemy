@@ -135,6 +135,26 @@ NO_SPACE_BEFORE = set("，。、；：！？）》”’】〕」』")
 INTERPUNCT_LOOKALIKES = "•・･∙"
 CJK_PATTERN = re.compile(r"[㐀-鿿豈-﫿　-〿]")
 
+# --- columns -----------------------------------------------------------------
+
+# OCR reads side-by-side labels on one row as a single line. A gap this wide
+# is never a space inside one phrase (a space with an interpunct spans 0.7 em).
+COLUMN_GAP_EM = 1.0
+# A narrower gap still parts two labels when the lettering on either side is
+# visibly different. A title with a wide space keeps one style and stays whole.
+STYLE_GAP_EM = 0.4
+# Tracked-out titles have wide gaps everywhere; a column gap stands out.
+COLUMN_GAP_OVER_TYPICAL = 3.0
+COLUMN_COLOUR_DISTANCE = 90
+COLUMN_HEIGHT_RATIO = 1.12
+COLUMN_SLANT_DIFFERENCE = 0.09
+
+# --- paragraphs --------------------------------------------------------------
+
+# Lines of one paragraph keep one pitch; the next list item sits further down.
+PARAGRAPH_PITCH_TOLERANCE = 0.25
+CENTRE_TOLERANCE = 0.008
+
 DEFAULT_SLIDE_WIDTH_IN = 13.333333
 
 _engine = None
@@ -303,6 +323,86 @@ def read_boxes(image):
         boxes.append(OcrBox(text, conf, int(x), int(y), int(round(w)), int(round(h)), chars))
 
     return boxes
+
+
+def any_ink(crop, background):
+    """Everything that is not background, whatever its colour."""
+    distance = np.abs(crop.astype(np.int16) - background.astype(np.int16)).sum(axis=2)
+    return (distance >= max(35, float(distance.max()) * 0.25)).astype(np.uint8)
+
+
+def segment_style(crop, background):
+    mask, colour = ink_mask(crop, background)
+    rows = np.where(mask.any(axis=1))[0]
+    height = float(rows[-1] - rows[0] + 1) if rows.size else 0.0
+    return colour.astype(np.float32), height, slant(mask)
+
+
+def styles_differ(left, right):
+    (colour_a, height_a, slant_a), (colour_b, height_b, slant_b) = left, right
+    if min(height_a, height_b) <= 0:
+        return False
+    return (
+        float(np.abs(colour_a - colour_b).sum()) > COLUMN_COLOUR_DISTANCE
+        or max(height_a, height_b) / min(height_a, height_b) > COLUMN_HEIGHT_RATIO
+        or abs(slant_a - slant_b) >= COLUMN_SLANT_DIFFERENCE
+    )
+
+
+def split_columns(image, box):
+    """Part an OCR line that runs across side-by-side labels.
+
+    One box for two labels gives both a single font, colour and size, and
+    leaves the second label's position to the width of a space.
+    """
+    glyphs = [i for i, char in enumerate(box.text) if not char.isspace()]
+    if not box.chars or len(box.chars) != len(glyphs) or len(glyphs) < 4:
+        return [box]
+    crop = image[box.y:box.y + box.h, box.x:box.x + box.w]
+    if crop.size == 0:
+        return [box]
+    background = ring_background(image, box)
+    ink = any_ink(crop, background)
+    columns = np.where(ink.any(axis=0))[0]
+    rows = np.where(ink.any(axis=1))[0]
+    if columns.size < 2:
+        return [box]
+    em = float(rows[-1] - rows[0] + 1)
+    blanks = [(int(a) + 1, int(b)) for a, b in zip(columns, columns[1:]) if b - a > 1]
+    wide = [(a, b) for a, b in blanks if b - a >= STYLE_GAP_EM * em]
+    if not wide:
+        return [box]
+    typical = float(np.median([b - a for a, b in blanks if (a, b) not in wide] or [0]))
+    wide = [(a, b) for a, b in wide if b - a >= COLUMN_GAP_OVER_TYPICAL * typical]
+
+    boundaries = [(box.chars[k][1] + box.chars[k + 1][0]) / 2.0 for k in range(len(glyphs) - 1)]
+    edges = [int(columns[0]), *[x for gap in wide for x in gap], int(columns[-1]) + 1]
+    spans = list(zip(edges[::2], edges[1::2]))
+    styles = [segment_style(crop[:, a:b], background) for a, b in spans]
+    cuts = []
+    for index, (a, b) in enumerate(wide):
+        centre = box.x + (a + b) / 2.0
+        k = min(range(len(boundaries)), key=lambda n: abs(boundaries[n] - centre))
+        if abs(boundaries[k] - centre) > em * 0.6:
+            continue
+        if b - a >= COLUMN_GAP_EM * em or styles_differ(styles[index], styles[index + 1]):
+            cuts.append((k + 1, a, b))
+    # Every part keeps at least two characters; a lone glyph is a mark.
+    cuts = [cut for cut in cuts if 2 <= cut[0] <= len(glyphs) - 2]
+    if not cuts:
+        return [box]
+
+    parts = []
+    starts = [(0, int(columns[0])), *[(k, b) for k, _, b in cuts]]
+    stops = [*[(k, a) for k, a, _ in cuts], (len(glyphs), int(columns[-1]) + 1)]
+    for (first, left), (last, right) in zip(starts, stops):
+        if last - first < 2:
+            return [box]
+        text = box.text[glyphs[first]:glyphs[last - 1] + 1].strip()
+        left, right = max(0, left - 2), min(box.w, right + 2)
+        parts.append(OcrBox(text, box.conf, box.x + left, box.y, right - left, box.h,
+                            box.chars[first:last]))
+    return parts
 
 
 def ring_background(image, box):
@@ -676,8 +776,27 @@ def harmonise_siblings(blocks, offset=0.0):
             block.bold = verdict
 
 
+def photo_regions(analysis_path):
+    """Photograph boxes per slide, as page fractions, from element_analysis.json."""
+    data = json.loads(Path(analysis_path).read_text(encoding="utf-8-sig"))
+    components = data.get("components", {})
+    regions = {}
+    for slide in data.get("slides", []):
+        for instance in slide.get("instances", []):
+            if components.get(instance.get("component"), {}).get("category") == "photo_source_crop":
+                x, y, w, h = instance["bbox_px"]
+                regions.setdefault(slide["slide"], []).append(
+                    (x / data["ref_width"], y / data["ref_height"], w / data["ref_width"], h / data["ref_height"]))
+    return regions
+
+
+def inside(box, regions, page_w, page_h):
+    cx, cy = (box.x + box.w / 2) / page_w, (box.y + box.h / 2) / page_h
+    return any(x <= cx <= x + w and y <= cy <= y + h for x, y, w, h in regions)
+
+
 def extract_text(image_path, slide_id, bold_mode="auto", expected=None,
-                 slide_width_pt=DEFAULT_SLIDE_WIDTH_IN * 72):
+                 slide_width_pt=DEFAULT_SLIDE_WIDTH_IN * 72, skip_regions=()):
     """Read one page into text blocks with measured style."""
     image = read_image(image_path)
     page_h, page_w = image.shape[:2]
@@ -685,7 +804,11 @@ def extract_text(image_path, slide_id, bold_mode="auto", expected=None,
 
     blocks = []
 
-    for index, box in enumerate(read_boxes(image)):
+    # Writing on a banner or sign inside a photograph stays in the cropped
+    # photograph; rebuilt as text boxes it would be drawn twice.
+    boxes = [part for box in read_boxes(image) if not inside(box, skip_regions, page_w, page_h)
+             for part in split_columns(image, box)]
+    for index, box in enumerate(boxes):
         crop = image[box.y:box.y + box.h, box.x:box.x + box.w]
         if crop.size == 0:
             continue
@@ -804,6 +927,30 @@ def colour_distance(left, right):
     return sum(abs(x - y) for x, y in zip(a, b))
 
 
+def left_aligned(previous, block):
+    return abs(block.bbox[0] - previous.bbox[0]) <= max(0.006, previous.bbox[2] * 0.15)
+
+
+def centred(previous, block):
+    middle = lambda b: b.bbox[0] + b.bbox[2] / 2
+    return abs(middle(block) - middle(previous)) <= CENTRE_TOLERANCE
+
+
+def even_pitch(chain):
+    """Cut a chain where the line pitch changes: that is the next paragraph."""
+    parts, current, pitch = [], [chain[0]], None
+    for previous, block in zip(chain, chain[1:]):
+        step = (block.bbox[1] + block.bbox[3]) - (previous.bbox[1] + previous.bbox[3])
+        if pitch is not None and abs(step - pitch) > pitch * PARAGRAPH_PITCH_TOLERANCE:
+            parts.append(current)
+            current, pitch = [block], None
+            continue
+        pitch = step if pitch is None else pitch
+        current.append(block)
+    parts.append(current)
+    return parts
+
+
 def continues(previous, block):
     """Is `block` the next line of the paragraph `previous` starts?"""
     line_height = previous.bbox[3]
@@ -813,7 +960,7 @@ def continues(previous, block):
     gap = block.bbox[1] - (previous.bbox[1] + previous.bbox[3])
     if not -line_height * 0.25 <= gap <= line_height * 1.5:
         return False
-    if abs(block.bbox[0] - previous.bbox[0]) > max(0.006, previous.bbox[2] * 0.15):
+    if not (left_aligned(previous, block) or centred(previous, block)):
         return False
 
     return (
@@ -856,7 +1003,7 @@ def merge_lines(blocks):
             successor[i] = best
             claimed.add(best)
 
-    merged = []
+    chains = []
     for i, head in enumerate(ordered):
         if i in claimed:
             continue
@@ -866,7 +1013,11 @@ def merge_lines(blocks):
         while cursor in successor:
             cursor = successor[cursor]
             chain.append(ordered[cursor])
+        chains.extend(even_pitch(chain))
 
+    merged = []
+    for chain in chains:
+        head = chain[0]
         if len(chain) == 1:
             merged.append(head)
             continue
@@ -897,7 +1048,7 @@ def merge_lines(blocks):
                 bold=head.bold,
                 italic=head.italic,
                 script=head.script,
-                align=head.align,
+                align=head.align if all(left_aligned(a, b) for a, b in zip(chain, chain[1:])) else "center",
                 bullet=head.bullet,
                 mark_x=min(b.mark_x for b in chain),
                 line_pitch=float(np.median(pitches)),
@@ -940,7 +1091,11 @@ def text_frame(block, slide_width_pt, slide_height_pt):
     height = h + lift + extra_h
     if block.font_matches or block.runs:
         height = max(height, block.font_size_pt * 1.3 / slide_height_pt)
-    return clamp_bbox(x, top, w * TEXT_WIDTH_SLACK + extra_w, height)
+    width = w * TEXT_WIDTH_SLACK + extra_w
+    if block.align == "center":
+        # Slack on both sides keeps centred lines over the source ink.
+        x = max(0.0, x - (width - w) / 2)
+    return clamp_bbox(x, top, width, height)
 
 
 def slide_number(path, index):
@@ -1042,6 +1197,60 @@ def harmonise_font_matches(blocks):
             block.font_matches[0]["selection"] = "shared_style"
 
 
+def run_script(run):
+    return "cjk" if is_cjk(run["text"]) else "latin"
+
+
+def harmonise_runs(blocks, pt_per_px):
+    """Give text measured as one style one face, weight and size.
+
+    Each line is matched on its own, and near-equal candidates swap places from
+    line to line. Left alone, three cards of one design come out in three
+    fonts, and a paragraph cannot merge because its lines disagree.
+    """
+    from rich_text import share_face
+
+    units = []
+    for block in blocks:
+        visible = [run for run in block.runs if run["text"].strip()]
+        if len(visible) != len(block.font_matches):
+            continue
+        units.extend((block, run, report) for run, report in zip(visible, block.font_matches)
+                     if report.get("candidates") and "color" in run)
+
+    def alike(left, right):
+        return (siblings(left[0], right[0]) and run_script(left[1]) == run_script(right[1])
+                and colour_distance(left[1]["color"], right[1]["color"]) <= SIBLING_COLOUR_TOLERANCE)
+
+    groups = []
+    for unit in units:
+        group = next((g for g in groups if all(alike(unit, member) for member in g)), None)
+        if group is None:
+            groups.append([unit])
+        else:
+            group.append(unit)
+
+    for group in groups:
+        if len(group) < 2:
+            continue
+        share_face([(run, report) for _, run, report in group], pt_per_px, "shared_style")
+        # One face at near-equal sizes is one size.
+        faces = {}
+        for _, run, _ in group:
+            faces.setdefault((run["font_face"], run["bold"], run["italic"]), []).append(run)
+        for runs in faces.values():
+            size = float(np.median([run["font_size_pt"] for run in runs]))
+            for run in runs:
+                if abs(run["font_size_pt"] - size) <= size * 0.08:
+                    run["font_size_pt"] = round(size, 2)
+    for block in blocks:
+        styled = [run for run in block.runs if run.get("font_size_pt")]
+        if styled:
+            block.font_family = styled[0].get("font_family", block.font_family)
+            block.font_face = styled[0].get("font_face", block.font_face)
+            block.font_size_pt = max(run["font_size_pt"] for run in styled)
+
+
 def progress(path, position, total, block):
     """One line per text line, so a long matching run is visibly alive."""
     text = block.text.replace("\n", " ")
@@ -1049,7 +1258,8 @@ def progress(path, position, total, block):
 
 
 def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
-                 slide_width_in=DEFAULT_SLIDE_WIDTH_IN, font_matcher=None, rich_text=False):
+                 slide_width_in=DEFAULT_SLIDE_WIDTH_IN, font_matcher=None, rich_text=False,
+                 photo_regions=None):
     slide_width_pt = slide_width_in * 72
     slides = []
     ref_w = ref_h = None
@@ -1068,7 +1278,8 @@ def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
                 "name the pages slide_001.png, slide_002.png, ..."
             )
         seen[number] = path
-        blocks = extract_text(path, f"s{number}", bold_mode, expected, slide_width_pt)
+        blocks = extract_text(path, f"s{number}", bold_mode, expected, slide_width_pt,
+                              (photo_regions or {}).get(number, ()))
         pages.append((path, number, page_w, page_h, blocks))
 
     # Weight is decided across the deck, before lines merge, since merging
@@ -1087,6 +1298,8 @@ def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
             for position, block in enumerate(blocks, 1):
                 progress(path, position, line_count, block)
                 analyse_line(image, block, slide_width_pt / page_w, font_matcher)
+            if font_matcher is not None:
+                harmonise_runs(blocks, slide_width_pt / page_w)
         elif font_matcher is not None:
             from match_fonts import crop_mask
 
@@ -1147,6 +1360,8 @@ def main():
                                        "(e.g. text from PPTX XML) to correct near-miss OCR")
     ap.add_argument("--slide-width-in", type=float, default=DEFAULT_SLIDE_WIDTH_IN,
                     help="Composed slide width; must match slide_width_in in the compose spec")
+    ap.add_argument("--element-analysis",
+                    help="element_analysis.json; text inside its photo_source_crop boxes is left in the photograph")
     ap.add_argument("--font-index", help="Local font index from match_fonts.py index")
     ap.add_argument("--font-model", help="Trained ONNX font encoder from train_font_matcher.py")
     ap.add_argument("--rich-text", action=argparse.BooleanOptionalAction, default=True,
@@ -1194,6 +1409,7 @@ def main():
         slide_width_in=args.slide_width_in,
         font_matcher=font_matcher,
         rich_text=args.rich_text,
+        photo_regions=photo_regions(args.element_analysis) if args.element_analysis else None,
     )
     layout["font_matching_required"] = not args.ocr_only
     if not args.ocr_only:
