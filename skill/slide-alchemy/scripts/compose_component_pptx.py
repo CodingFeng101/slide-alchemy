@@ -181,7 +181,9 @@ def add_text(slide, item, ref_w, ref_h, slide_w, slide_h):
     box = slide.shapes.add_textbox(*bbox(item, ref_w, ref_h, slide_w, slide_h))
     tf = box.text_frame
     tf.clear()
-    tf.word_wrap = True
+    # Line breaks are measured and written out. Wrapping would add more of them
+    # wherever the matched font runs wider than the source lettering.
+    tf.word_wrap = False
     tf.margin_left = 0
     tf.margin_right = 0
     tf.margin_top = 0

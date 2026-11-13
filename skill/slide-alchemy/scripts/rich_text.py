@@ -4,7 +4,7 @@ import re
 import cv2
 import numpy as np
 
-from text_effects import fit_effects, gradient_field, hex_colour, infer_gradient
+from text_effects import REVIEW_RMSE, fit_effects, gradient_field, hex_colour, infer_gradient
 
 
 def foreground(crop, background):
@@ -22,6 +22,64 @@ def fill_alpha(rgb, background, fill):
     core = (coverage > 0.8) & on_colour
     support = cv2.dilate(core.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0
     return (coverage * support * on_colour).astype(np.float32)
+
+
+# --- lettering drawn as an outline only ---------------------------------------
+
+# Below this height an outline and a light stroke cannot be told apart.
+HOLLOW_MIN_HEIGHT_PX = 36
+# The enclosed fill of outlined lettering is about as large as the outline or larger.
+HOLLOW_BODY_OVER_INK = 0.9
+# Nearly all of the ink has to form closed loops; ordinary strokes are open.
+HOLLOW_LOOP_SHARE = 0.85
+
+
+def hollow_body(ink):
+    """The fill area of lettering whose fill matches the background.
+
+    White letters with a blue outline on a white page leave only the outline
+    as ink. Read as ordinary text they become thin blue letters in a hollow
+    font. The outline's loops enclose the real letter shapes: loops nest as
+    outline, fill, counter outline, counter.
+
+    Returns (fill mask, outline width in pixels), or None for ordinary text.
+    """
+    rows = np.where(ink.any(axis=1))[0]
+    if rows.size == 0 or rows[-1] - rows[0] + 1 < HOLLOW_MIN_HEIGHT_PX:
+        return None
+    contours, hierarchy = cv2.findContours(ink, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    if hierarchy is None:
+        return None
+    parents = hierarchy[0][:, 3]
+    depths = []
+    for index in range(len(contours)):
+        depth, parent = 0, parents[index]
+        while parent >= 0:
+            depth, parent = depth + 1, parents[parent]
+        depths.append(depth)
+    shape = np.zeros_like(ink)
+    for index in sorted(range(len(contours)), key=depths.__getitem__):
+        if depths[index] % 4 == 0:
+            cv2.drawContours(shape, contours, index, 1, cv2.FILLED)
+        elif depths[index] % 4 == 3:
+            cv2.drawContours(shape, contours, index, 0, cv2.FILLED)
+    body = shape & (1 - ink)
+    ink_area = float(ink.sum())
+    if body.sum() < HOLLOW_BODY_OVER_INK * ink_area:
+        return None
+    _, labels, stats, _ = cv2.connectedComponentsWithStats(ink, connectivity=8)
+    looped = 0.0
+    for index, contour in enumerate(contours):
+        if depths[index] % 2:
+            continue
+        x, y = contour[0][0]
+        own = float(stats[labels[y, x], cv2.CC_STAT_AREA])
+        if cv2.contourArea(contour) >= 2 * own:
+            looped += own
+    if looped < HOLLOW_LOOP_SHARE * ink_area:
+        return None
+    length = sum(cv2.arcLength(contour, True) for contour in contours)
+    return body, max(1.0, 2 * ink_area / max(length, 1))
 
 
 def character_samples(image, box, text, background):
@@ -140,6 +198,33 @@ def adopt(run, report, candidate, pt_per_px, selection):
         run["font_size_pt"] = round(candidate["size_px"] * pt_per_px, 2)
 
 
+def share_effects(runs):
+    """Give neighbouring runs of one face and colour one set of effects.
+
+    Bevelled or textured lettering fits an outline on one word and none on the
+    next; side by side that reads as two styles. The longer run decides, and
+    on a tie the plainer one.
+    """
+    def rgb(run):
+        return np.array([int(run["color"][i:i + 2], 16) for i in (1, 3, 5)], float)
+
+    styled = [run for run in runs if "effects" in run and "color" in run]
+    groups = []
+    for run in styled:
+        last = groups[-1][-1] if groups else None
+        if (last is not None and last.get("font_face") == run.get("font_face")
+                and np.linalg.norm(rgb(last) - rgb(run)) <= 55):
+            groups[-1].append(run)
+        else:
+            groups.append([run])
+    for group in groups:
+        donor = max(group, key=lambda run: (len(run["text"].strip()), -len(run["effects"])))
+        for run in group:
+            if run is not donor and run["effects"] != donor["effects"]:
+                run["effects"] = {name: dict(value) for name, value in donor["effects"].items()}
+                run["effects_from"] = "line"
+
+
 def lettered(cuts, text):
     """Drop cuts that leave a stretch of punctuation alone.
 
@@ -224,6 +309,17 @@ def analyse_line(image, block, pt_per_px, matcher=None):
         x0 = group[0]["x0"] if group else box.x
         x1 = group[-1]["x1"] if group else box.x + box.w
         y0, y1 = box.y, min(image.shape[0], box.y + box.h)
+        # Effects reach past the letters, further on large lettering.
+        pad = max(12, round(box.h * 0.15))
+        hollow = None
+        if not line_gradient:
+            # Character columns end at the letter and cut through its outline,
+            # so outlined lettering is looked for on the padded crop.
+            wide = (max(0, x0 - pad), max(0, y0 - pad),
+                    min(image.shape[1], x1 + pad), min(image.shape[0], y1 + pad))
+            hollow = hollow_body(foreground(image[wide[1]:wide[3], wide[0]:wide[2]], background_bgr))
+            if hollow:
+                x0, y0, x1, y1 = wide
         crop = image[y0:y1, x0:x1]
         ink = foreground(crop, background_bgr)
         rgb = crop[..., ::-1].astype(float)
@@ -245,6 +341,11 @@ def analyse_line(image, block, pt_per_px, matcher=None):
             fill = fill_colour
         observed_alpha = fill_alpha(rgb, background_bgr[::-1], fill)
         fill_mask = (observed_alpha >= 0.4).astype(np.uint8)
+        if hollow:
+            # The ink is the outline; the letters are what it encloses.
+            body, outline_px = hollow
+            outline_colour, fill_colour = fill_colour, np.median(rgb[body > 0], axis=0)
+            fill_mask, observed_alpha = body, body.astype(np.float32)
         if not fill_mask.any():
             fill_mask = ink
             observed_alpha = ink.astype(np.float32)
@@ -257,13 +358,20 @@ def analyse_line(image, block, pt_per_px, matcher=None):
                "italic": block.italic, "font_family": block.font_family,
                "font_face": block.font_face, "font_size_pt": block.font_size_pt}
         # Pad the observed fill mask so outlines and shifted shadows are visible.
-        pad = 12
         px0, py0 = max(0, x0 - pad), max(0, y0 - pad)
         px1, py1 = min(image.shape[1], x1 + pad), min(image.shape[0], y1 + pad)
         effect_crop = image[py0:py1, px0:px1, ::-1]
         alpha = np.zeros(effect_crop.shape[:2], np.float32)
         alpha[y0 - py0:y1 - py0, x0 - px0:x1 - px0] = observed_alpha
-        fitted = fit_effects(effect_crop, alpha, background_bgr[::-1], fill_colour, pt_per_px)
+        if hollow:
+            painted = np.where(ink[..., None] > 0, outline_colour, background_bgr[::-1].astype(float))
+            error = float(np.sqrt(np.mean((rgb - painted) ** 2)))
+            fitted = {"effects": {"outline": {"color": hex_colour(outline_colour),
+                                              "width_pt": round(outline_px * pt_per_px, 3)}},
+                      "pixel_rmse": round(error, 3), "baseline_rmse": round(error, 3),
+                      "needs_review": error > REVIEW_RMSE, "hollow": True}
+        else:
+            fitted = fit_effects(effect_crop, alpha, background_bgr[::-1], fill_colour, pt_per_px)
         run["effects"] = fitted["effects"]
         piece = {"run": run}
         if matcher is not None:
@@ -303,6 +411,8 @@ def analyse_line(image, block, pt_per_px, matcher=None):
         pieces.extend(parts)
 
     runs = [piece["run"] for piece in pieces]
+    if not line_gradient:
+        share_effects(runs)
     reports = [piece["report"] for piece in pieces if "report" in piece]
     ink_boxes = [run["ink_bbox_px"] for run in runs if "ink_bbox_px" in run]
     if line_gradient and len(pieces) == 1 and "effects" in runs[0]:

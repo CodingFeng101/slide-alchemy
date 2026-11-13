@@ -22,6 +22,16 @@ This file records the notable changes in each Slide Alchemy release.
 - Give runs of the same size, colour and script on a page one face and size, so that the cards of one design and the lines of one paragraph no longer come out in different fonts.
 - Keep punctuation in the run beside it; an interpunct no longer gets a symbol font of its own.
 
+### Text effects
+
+- Read lettering drawn as an outline around a fill of the background colour as filled text with an outline, instead of thin letters in a hollow font. Light bevelled lettering with a dark rim is read the same way.
+- Scale the outline widths and shadow offsets that are tried with the height of the lettering; headlines were limited to the 4px range of body text.
+- Drop shadows fitted in the fill's own colour, and require a larger gain before a shadow is kept. A decorative stroke under a title was read as a red shadow.
+- Add a middle gradient stop when the blend bends.
+- Give neighbouring runs of one face and colour one set of effects.
+- Set `needs_review` only when the fit leaves a pixel RMSE above 45. It was true for nearly every run.
+- Stop wrapping text boxes in the composed deck. Line breaks are measured; wrapping added more wherever the matched font ran wider than the source.
+
 ### Photographs
 
 - Add the `photo_source_crop` category and `scripts/crop_source_photos.py`. Real photographs are cropped from the source page instead of being regenerated, which redrew faces and erased banner text.

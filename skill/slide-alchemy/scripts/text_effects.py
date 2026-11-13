@@ -9,6 +9,18 @@ from pptx.oxml.ns import qn
 from pptx.util import Pt
 
 
+# A fit worse than this leaves visible differences: bevels, extrusion, texture.
+# Plain text lands near 20-30 from antialiasing alone.
+REVIEW_RMSE = 45
+# An effect is kept when it lowers the squared pixel error to this share.
+OUTLINE_GAIN = 0.85
+SHADOW_GAIN = 0.78
+# A gradient gets a middle stop when its midpoint is this far off a straight blend.
+MIDDLE_STOP_DISTANCE = 40
+# A shadow this close to the fill colour is part of the lettering.
+SHADOW_FILL_DISTANCE = 100
+
+
 def colour(value):
     value = str(value).lstrip("#")
     if len(value) == 3:
@@ -145,8 +157,19 @@ def infer_gradient(rgb, mask):
     end = np.array([1, *last]) @ coefficients
     if np.linalg.norm(end - start) < 45:
         return None
-    return {"angle": round(angle, 2), "stops": [{"position": 0, "color": hex_colour(start)},
-                                               {"position": 1, "color": hex_colour(end)}]}
+    stops = [{"position": 0, "color": hex_colour(start)}, {"position": 1, "color": hex_colour(end)}]
+    along = np.column_stack([xs, ys]) @ direction
+    position = (along - projection.min()) / max(float(np.ptp(projection)), 1)
+    bands = [position < 0.1, (position > 0.45) & (position < 0.55), position > 0.9]
+    if all(band.sum() >= 20 for band in bands):
+        # A straight fit hides a blend that bends, so compare what is there.
+        first, middle, last = (np.median(values[band], axis=0) for band in bands)
+        # Ends far from the fit are a shadow or highlight at the edge, not the blend.
+        trusted = max(np.linalg.norm(first - start), np.linalg.norm(last - end)) <= 60
+        if trusted and np.linalg.norm(middle - (first + last) / 2) > MIDDLE_STOP_DISTANCE:
+            stops = [{"position": 0, "color": hex_colour(first)}, {"position": 0.5, "color": hex_colour(middle)},
+                     {"position": 1, "color": hex_colour(last)}]
+    return {"angle": round(angle, 2), "stops": stops}
 
 
 def shadow_direction(alpha, possible, residual):
@@ -180,6 +203,11 @@ def fit_effects(rgb, alpha, background, fill_colour, pt_per_px):
     bounds = (cols.min(), rows.min(), cols.max(), rows.max()) if len(rows) else None
     fill = gradient_field(alpha.shape, gradient, bounds) if gradient else fill_colour
     effects = {"gradient": gradient} if gradient else {}
+    # Effects grow with the lettering: a 110px headline carries an 8px outline
+    # and a shadow 10px away, far outside what fits 14pt body text.
+    height = int(rows.max() - rows.min() + 1) if len(rows) else 0
+    step = max(1, round(height / 50))
+    widest = max(4, round(height * 0.08))
     base = background * (1 - alpha[..., None]) + fill * alpha[..., None]
     before = float(np.mean((rgb - base) ** 2))
     best_error = before
@@ -197,7 +225,7 @@ def fit_effects(rgb, alpha, background, fill_colour, pt_per_px):
         strong = coloured & (off_line >= np.percentile(off_line[coloured], 70))
         outline_colour = np.median(rgb[strong], axis=0)
         outline_fit = None
-        for radius in range(1, 5):
+        for radius in range(1, widest + 1):
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (radius * 2 + 1, radius * 2 + 1))
             expanded = cv2.dilate(alpha, kernel)
             outlined = background * (1 - expanded[..., None]) + outline_colour * expanded[..., None]
@@ -205,7 +233,7 @@ def fit_effects(rgb, alpha, background, fill_colour, pt_per_px):
             error = float(np.mean((rgb - predicted) ** 2))
             if outline_fit is None or error < outline_fit[0]:
                 outline_fit = (error, predicted, expanded, radius)
-        if outline_fit[0] < best_error * 0.85:
+        if outline_fit[0] < best_error * OUTLINE_GAIN:
             best_error, base, outer_alpha, radius = outline_fit
             effects["outline"] = {"color": hex_colour(outline_colour), "width_pt": round(radius * pt_per_px, 3)}
     # Fit black/coloured shadows behind the glyphs. Opacity is solved linearly.
@@ -216,12 +244,17 @@ def fit_effects(rgb, alpha, background, fill_colour, pt_per_px):
     if possible.sum() >= 20 and shadow_direction(outer_alpha, possible, residual) > 0.2:
         sampled = np.median(rgb[possible], axis=0)
         shadow_colour = sampled if np.ptp(sampled) > 40 else np.zeros(3)
+        # A rim in nearly the fill's own colour is a soft edge or a bevel.
+        # Fitted as a shadow it comes out opaque and misplaced.
+        if shadow_colour.any() and np.linalg.norm(shadow_colour - fill_colour) < SHADOW_FILL_DISTANCE:
+            possible[:] = False
         best_shadow = None
         shadow_error = best_error
-        for sigma in (0, 1, 2):
+        offsets = [k * step for k in range(-4, 5)]
+        for sigma in (0, step, 2 * step, 3 * step):
             blurred = cv2.GaussianBlur(outer_alpha, (0, 0), sigma) if sigma else outer_alpha
-            for dx in range(-4, 5, 2):
-                for dy in range(-4, 5, 2):
+            for dx in offsets:
+                for dy in offsets:
                     if dx == 0 and dy == 0:
                         continue
                     shifted = cv2.warpAffine(blurred, np.float32([[1, 0, dx], [0, 1, dy]]), (alpha.shape[1], alpha.shape[0]))
@@ -234,8 +267,8 @@ def fit_effects(rgb, alpha, background, fill_colour, pt_per_px):
                         best_shadow = {"color": hex_colour(shadow_colour), "opacity": round(float(opacity), 3),
                                        "offset_x_pt": round(dx * pt_per_px, 3), "offset_y_pt": round(dy * pt_per_px, 3),
                                        "blur_pt": round(sigma * pt_per_px, 3)}
-        if best_shadow and shadow_error < best_error * 0.85:
+        if best_shadow and possible.any() and shadow_error < best_error * SHADOW_GAIN:
             best_error = shadow_error
             effects["shadow"] = best_shadow
     return {"effects": effects, "pixel_rmse": round(math.sqrt(best_error), 3),
-            "needs_review": best_error > 400, "baseline_rmse": round(math.sqrt(before), 3)}
+            "needs_review": math.sqrt(best_error) > REVIEW_RMSE, "baseline_rmse": round(math.sqrt(before), 3)}

@@ -1208,7 +1208,7 @@ def harmonise_runs(blocks, pt_per_px):
     line to line. Left alone, three cards of one design come out in three
     fonts, and a paragraph cannot merge because its lines disagree.
     """
-    from rich_text import share_face
+    from rich_text import share_effects, share_face
 
     units = []
     for block in blocks:
@@ -1244,6 +1244,9 @@ def harmonise_runs(blocks, pt_per_px):
                 if abs(run["font_size_pt"] - size) <= size * 0.08:
                     run["font_size_pt"] = round(size, 2)
     for block in blocks:
+        # Words that only now share a face may still disagree on effects.
+        if not any("gradient" in run.get("effects", {}) for run in block.runs):
+            share_effects(block.runs)
         styled = [run for run in block.runs if run.get("font_size_pt")]
         if styled:
             block.font_family = styled[0].get("font_family", block.font_family)
