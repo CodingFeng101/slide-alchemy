@@ -29,9 +29,17 @@ Options:
 - `--rich-text` / `--no-rich-text`: enable or disable inline style/effect extraction. The default is enabled. Disabling rich text keeps per-line font matching active.
 - `--font-server <release-url>`: select the release the core pack is downloaded from. Defaults to `http://182.254.211.241/fonts/v1`. Use `--font-cache <directory>` to select the download cache. See `font-distribution.md` for file verification and review limits.
 - `--remote-match`: also send poorly matched lines to the font server's larger library. Off by default, because it uploads the line's ink mask and text and waits on the network.
+- `--jobs <n>`: pages matched side by side. Default: half the processors, at most 4. Remote matching always runs one page at a time.
+- `--no-cache`: redo every page. By default finished pages are kept in `.text_cache/` beside the output and reused when the page image, the options, the fonts and the scripts are all unchanged.
 - `--ocr-only`: explicit legacy OCR measurement analysis with the Microsoft YaHei estimation path. Font matching and rich text are disabled in this mode. Reconstructed slides require matching records before composition.
 
 Slide numbers come from the trailing digits of each file name (`slide_003.png` -> 3).
+
+## Reruns and Failures
+
+Run the same command again after any interruption or failure. Pages that finished are reused and only the rest are redone. When a page fails, the others still finish, the command exits with an error that names the failed page, and no layout is written until every page succeeds. Replacing one page image redoes that page only. Adding or removing pages can move the deck's bold threshold, which redoes font matching on every page but not OCR.
+
+The font index is reused between runs as well: a font file with the size and modification time it was indexed at is not read again.
 
 ## Local Font Matching
 

@@ -53,8 +53,25 @@ def font_directories():
             Path("/System/Library/Fonts"), Path.home() / "Library/Fonts"]
 
 
-def index_fonts(directories):
+def file_stamp(path):
+    stat = Path(path).stat()
+    return [stat.st_size, stat.st_mtime_ns]
+
+
+def index_fonts(directories, previous=None):
+    """Index font files, reusing `previous` for files that have not changed.
+
+    Reading every character map and hashing every file takes over a minute on
+    a machine with a few hundred fonts, and almost none of them change between
+    runs.
+    """
     from fontTools.ttLib import TTCollection, TTFont, TTLibError
+
+    known = (previous or {}).get("scanned", {})
+    earlier = {}
+    for font in (previous or {}).get("fonts", []):
+        earlier.setdefault(font["path"], []).append(font)
+    scanned = {}
 
     paths = set()
     for directory in directories:
@@ -65,6 +82,14 @@ def index_fonts(directories):
     fonts, errors, seen = [], [], set()
     for path in sorted(paths):
         try:
+            stamp = file_stamp(path)
+            if known.get(str(path)) == stamp:
+                for font in earlier.get(str(path), []):
+                    if (font["family"], font["style"]) not in seen:
+                        seen.add((font["family"], font["style"]))
+                        fonts.append(font)
+                scanned[str(path)] = stamp
+                continue
             digest = hashlib.sha256(path.read_bytes()).hexdigest()
             count = 1
             if path.suffix.lower() in (".ttc", ".otc"):
@@ -98,9 +123,10 @@ def index_fonts(directories):
                                   "characters": "".join(chr(c) for c in sorted(cmap)
                                                         if c <= 0x10ffff)})
                     seen.add((family, style))
+            scanned[str(path)] = stamp
         except (OSError, TTLibError) as error:
             errors.append({"path": str(path), "error": str(error)})
-    return {"version": 1, "fonts": fonts, "errors": errors}
+    return {"version": 1, "fonts": fonts, "errors": errors, "scanned": scanned}
 
 
 def load_index(path):
@@ -108,11 +134,18 @@ def load_index(path):
     if data.get("version") != 1 or not data.get("fonts"):
         raise ValueError("font index must contain version 1 and at least one font")
     base = Path(path).resolve().parent
+    scanned = data.get("scanned", {})
     hashes = {}
     for font in data["fonts"]:
+        recorded = scanned.get(font["path"])
         font["path"] = str((base / font["path"]).resolve())
         if font["path"] not in hashes:
-            hashes[font["path"]] = hashlib.sha256(Path(font["path"]).read_bytes()).hexdigest()
+            # A file with the size and modification time it was indexed at is
+            # the same file; hashing all of them again costs most of a minute.
+            if recorded is not None and recorded == file_stamp(font["path"]):
+                hashes[font["path"]] = font["sha256"]
+            else:
+                hashes[font["path"]] = hashlib.sha256(Path(font["path"]).read_bytes()).hexdigest()
         if hashes[font["path"]] != font["sha256"]:
             raise ValueError(f'font file changed; rebuild the index: {font["path"]}')
         if "face_name" not in font or "bold" not in font:
@@ -172,8 +205,19 @@ def region_allows(font, text):
     return bool(codepages & SIMPLIFIED_CHINESE)
 
 
+_CHARSETS = {}
+
+
+def charset(font):
+    """A font's characters as a set, built once: it holds tens of thousands."""
+    key = font["characters"]
+    if key not in _CHARSETS:
+        _CHARSETS[key] = frozenset(font["characters"])
+    return _CHARSETS[key]
+
+
 def supports(font, text):
-    return set(text) - set(" \t\r\n") <= set(font["characters"]) and region_allows(font, text)
+    return set(text) - set(" \t\r\n") <= charset(font) and region_allows(font, text)
 
 
 @lru_cache(maxsize=256)
@@ -257,13 +301,19 @@ def shape_error(source, candidate):
     b[4:4 + candidate.shape[0], 4:4 + candidate.shape[1]] = candidate
     distance_a = cv2.distanceTransform(1 - a, cv2.DIST_L2, 3)
     distance_b = cv2.distanceTransform(1 - b, cv2.DIST_L2, 3)
+    # A one-pixel shift is a window one pixel over; the margin of 4 keeps all
+    # ink inside it. Windows give the same values as shifting copies of the
+    # whole arrays nine times, without the copies.
+    inner_a = a[1:-1, 1:-1] > 0
+    inner_distance_a = distance_a[1:-1, 1:-1]
+    total = float(a.sum() + b.sum())
     best = float("inf")
     for dy in (-1, 0, 1):
         for dx in (-1, 0, 1):
-            shifted = np.roll(b, (dy, dx), axis=(0, 1))
-            distance = (distance_a[shifted > 0].mean()
-                        + np.roll(distance_b, (dy, dx), axis=(0, 1))[a > 0].mean()) / 2
-            overlap_error = np.abs(a.astype(np.float32) - shifted).sum() / (a.sum() + b.sum())
+            window = (slice(1 - dy, h - 1 - dy), slice(1 - dx, w - 1 - dx))
+            shifted = b[window] > 0
+            distance = (inner_distance_a[shifted].mean() + distance_b[window][inner_a].mean()) / 2
+            overlap_error = (total - 2 * np.count_nonzero(inner_a & shifted)) / total
             best = min(best, float(distance) / max(1, source.shape[0]) + 0.25 * overlap_error)
     dimensions = (abs(source.shape[1] - candidate.shape[1]) / source.shape[1]
                   + abs(source.shape[0] - candidate.shape[0]) / source.shape[0])
@@ -316,6 +366,7 @@ class FontMatcher:
         if metadata.get("slide_alchemy_font_encoder") != "1":
             raise ValueError("expected a trained Slide Alchemy font encoder")
         self.trained_faces = set(json.loads(metadata["trained_faces"]))
+        self.by_face = {(font["path"], font["index"]): font for font in self.fonts}
 
     def encode(self, masks):
         batches = []
@@ -324,12 +375,18 @@ class FontMatcher:
             batches.append(self.session.run(["embedding"], {"ink": batch})[0])
         return np.concatenate(batches)
 
-    def rank_fonts(self, mask, text, top_k=10):
+    def rank_fonts(self, mask, text, top_k=10, pool=None):
+        """Shortlist fonts by encoder similarity.
+
+        `pool` limits the search to (path, index) faces already shortlisted for
+        text of the same style, instead of rendering the whole library again.
+        """
         text = text.strip()
         if not text or "\n" in text or top_k < 1:
             raise ValueError("matching needs a nonempty single line and top_k >= 1")
         mask = trim(mask)
-        eligible = [f for f in self.fonts if supports(f, text)]
+        fonts = self.fonts if pool is None else [self.by_face[key] for key in pool if key in self.by_face]
+        eligible = [f for f in fonts if supports(f, text)]
         if not eligible:
             return [], 0
         # Normalize every candidate to the source ink height using uniform scale.
@@ -355,8 +412,8 @@ class FontMatcher:
         return [(renderable[position], sizes[position], float(similarities[position]))
                 for position in shortlist], len(eligible)
 
-    def match(self, mask, text, top_k=10):
-        ranking, eligible_count = self.rank_fonts(mask, text, top_k)
+    def match(self, mask, text, top_k=10, pool=None):
+        ranking, eligible_count = self.rank_fonts(mask, text, top_k, pool)
         if not ranking:
             return {"status": "no_supported_font", "candidates": []}
         mask = trim(mask)

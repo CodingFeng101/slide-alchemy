@@ -141,8 +141,12 @@ class FontStore:
                   + ", ".join(missing), file=sys.stderr, flush=True)
         self.cache.mkdir(parents=True, exist_ok=True)
         sources = [*fonts, *font_directories()] if include_system else fonts
-        index = index_fonts(sources)
         path = self.cache / ("local-index.json" if include_system else "core-index.json")
+        try:
+            previous = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            previous = None
+        index = index_fonts(sources, previous)
         with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=self.cache, delete=False) as stream:
             temporary = Path(stream.name)
             json.dump(index, stream, ensure_ascii=False)

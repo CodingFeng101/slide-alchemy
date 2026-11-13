@@ -22,6 +22,15 @@ This file records the notable changes in each Slide Alchemy release.
 - Give runs of the same size, colour and script on a page one face and size, so that the cards of one design and the lines of one paragraph no longer come out in different fonts.
 - Keep punctuation in the run beside it; an interpunct no longer gets a symbol font of its own.
 
+### Speed and reruns
+
+- Reuse the font index between runs. Reading every character map and hashing every font file took over a minute at each start.
+- Build each font's character set once instead of on every support check, and compare glyph shapes at ink coordinates instead of shifting whole arrays; both give the same values as before.
+- Match text against the shortlist of like-styled text on the page before ranking the whole library again, when the shortlist fits as well as it fit the text it came from.
+- Match pages side by side (`--jobs`, default half the processors up to 4).
+- Keep finished pages in `.text_cache/` beside the output. A rerun reuses pages whose image, options, fonts and scripts are unchanged; `--no-cache` redoes everything.
+- Let the other pages finish when one fails, name the failed page, and redo only that page on the next run.
+
 ### Text effects
 
 - Read lettering drawn as an outline around a fill of the background colour as filled text with an outline, instead of thin letters in a hollow font. Light bevelled lettering with a dark rim is read the same way.

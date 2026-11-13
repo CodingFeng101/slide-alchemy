@@ -280,7 +280,48 @@ def share_face(units, pt_per_px, selection):
         adopt(run, report, own, pt_per_px, selection)
 
 
-def analyse_line(image, block, pt_per_px, matcher=None):
+# A shortlist is passed on to like-styled text only when it matched this well,
+# and kept for that text only when it matches this well again.
+REUSE_MATCH = 0.08
+REUSE_SLACK = 0.015
+
+
+def style_key(chunk, colour, mask):
+    """Text of one script, colour, size and weight on a page is nearly always one font."""
+    from extract_text import stroke_metrics
+
+    script = "cjk" if re.search(r"[\u3400-\u9fff]", chunk) else "latin"
+    height = max(mask.shape[0], 2)
+    # Weight keeps a bold label from lending its shortlist to regular text.
+    weight = max(stroke_metrics(mask)[0], 0.5) / height
+    step = lambda value, ratio: int(round(np.log(value) / np.log(ratio)))
+    return script, tuple(int(c) // 24 for c in colour), step(height, 1.12), step(weight, 1.15)
+
+
+def match_remembering(matcher, memory, key, glyph, text):
+    """Match against the shortlist of like-styled text before the whole library.
+
+    Ranking renders every font in the library for every word. Body text
+    repeats one style dozens of times a page, and its shortlist does not change.
+    """
+    if memory is None or not hasattr(matcher, "by_face"):
+        return matcher.match(glyph, text)
+    pool, fitted = memory.get(key, (None, None))
+    if pool:
+        result = matcher.match(glyph, text, pool=pool)
+        # The shortlist has to fit this text as well as it fit the text it
+        # came from; a looser fit means another font, found only by a full search.
+        if result["candidates"] and result["candidates"][0]["shape_error"] <= min(REUSE_MATCH, fitted + REUSE_SLACK):
+            result["shortlist"] = "style"
+            return result
+    result = matcher.match(glyph, text)
+    if result["candidates"] and result["candidates"][0]["shape_error"] <= REUSE_MATCH:
+        memory.setdefault(key, ([(c["path"], c["index"]) for c in result["candidates"]],
+                                result["candidates"][0]["shape_error"]))
+    return result
+
+
+def analyse_line(image, block, pt_per_px, matcher=None, memory=None):
     from extract_text import font_height_px, ring_background
 
     box = block.source_box
@@ -379,7 +420,8 @@ def analyse_line(image, block, pt_per_px, matcher=None):
                 radius = max(1, round(fitted["effects"]["outline"]["width_pt"] / pt_per_px / 2))
                 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * radius + 1, 2 * radius + 1))
                 glyph = cv2.dilate(observed_alpha, kernel) * 255
-            match = matcher.match(glyph, chunk.strip())
+            match = match_remembering(matcher, memory, style_key(chunk, fill_colour, fill_mask[top:bottom, left:right]),
+                                      glyph, chunk.strip())
             piece["report"] = match
             if match["candidates"]:
                 first = match["candidates"][0]

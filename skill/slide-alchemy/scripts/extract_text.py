@@ -15,7 +15,10 @@ Two parts of the measurement chain are load-bearing and easy to get wrong:
     Coverage cannot tell a dense regular glyph from a simple bold one.
 """
 import argparse
+import hashlib
 import json
+import os
+import pickle
 import re
 import sys
 from dataclasses import dataclass, field
@@ -1260,20 +1263,129 @@ def progress(path, position, total, block):
     print(f"{Path(path).name} [{position}/{total}] {text[:24]}", file=sys.stderr, flush=True)
 
 
+# --- reuse between runs -------------------------------------------------------
+
+# A change to any of these changes what a page comes out as.
+VERSIONED_SOURCES = ("extract_text.py", "rich_text.py", "text_effects.py", "match_fonts.py")
+MAX_JOBS = 4
+
+
+def fingerprint(*parts):
+    digest = hashlib.sha256()
+    for part in parts:
+        digest.update(part if isinstance(part, bytes) else repr(part).encode("utf-8"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def code_version():
+    here = Path(__file__).resolve().parent
+    return fingerprint(*((here / name).read_bytes() for name in VERSIONED_SOURCES))
+
+
+class PageCache:
+    """Finished work per page, kept beside the output.
+
+    A page is reused only when its image, the options, the fonts and these
+    scripts are all unchanged. One file per page and stage, so nothing piles up.
+    """
+
+    def __init__(self, directory):
+        self.directory = Path(directory)
+        self.directory.mkdir(parents=True, exist_ok=True)
+
+    def file(self, stage, source):
+        return self.directory / f"{Path(source).stem}.{stage}.pkl"
+
+    def load(self, stage, source, key):
+        try:
+            with self.file(stage, source).open("rb") as stream:
+                stored = pickle.load(stream)
+            return stored["value"] if stored["key"] == key else None
+        except Exception:  # a damaged or outdated cache file is simply not used
+            return None
+
+    def save(self, stage, source, key, value):
+        target = self.file(stage, source)
+        temporary = target.with_suffix(".tmp")
+        with temporary.open("wb") as stream:
+            pickle.dump({"key": key, "value": value}, stream)
+        temporary.replace(target)
+
+
+_worker = {}
+
+
+def start_worker(matcher_factory):
+    _worker["matcher"] = matcher_factory()
+
+
+def finish_page(path, number, page_w, page_h, blocks, slide_width_pt, rich_text, merge,
+                matching, font_matcher=None):
+    """Styles, fonts and paragraphs of one page, from its measured lines."""
+    if matching and font_matcher is None:
+        font_matcher = _worker["matcher"]
+    line_count = len(blocks)
+    if rich_text:
+        from rich_text import analyse_line
+        image = read_image(path)
+        memory = {}
+        for position, block in enumerate(blocks, 1):
+            progress(path, position, line_count, block)
+            analyse_line(image, block, slide_width_pt / page_w, font_matcher, memory)
+        if font_matcher is not None:
+            harmonise_runs(blocks, slide_width_pt / page_w)
+    elif font_matcher is not None:
+        from match_fonts import crop_mask
+
+        image = read_image(path)
+        for position, block in enumerate(blocks, 1):
+            progress(path, position, line_count, block)
+            mask = crop_mask(image, to_px(block.bbox, page_w, page_h))
+            result = font_matcher.match(mask, block.text)
+            result["line_id"] = block.id
+            block.font_matches = [result]
+        harmonise_font_matches(blocks)
+        for block in blocks:
+            result = block.font_matches[0]
+            if result["candidates"]:
+                best = result.get("selected_candidate", result["candidates"][0])
+                block.font_family = best["family"]
+                block.font_face = best.get("face_name", best["family"])
+                block.bold = best["bold"]
+                block.italic = best["italic"]
+                if best.get("size_px"):
+                    block.font_size_pt = round(best["size_px"] * slide_width_pt / page_w, 2)
+    if merge:
+        blocks = merge_lines(blocks)
+    print(f"{Path(path).name}: {line_count} lines -> {len(blocks)} text boxes", flush=True)
+    return {
+        "slide": number,
+        "source": Path(path).name,
+        "width": page_w,
+        "height": page_h,
+        "texts": [block_record(b, page_w, page_h, slide_width_pt) for b in blocks],
+    }
+
+
 def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
                  slide_width_in=DEFAULT_SLIDE_WIDTH_IN, font_matcher=None, rich_text=False,
-                 photo_regions=None):
+                 photo_regions=None, matcher_factory=None, matcher_id="", cache=None, jobs=1):
+    """Read every page into a text layout.
+
+    `matcher_factory` builds the font matcher on demand: not at all when every
+    page is reused from `cache`, and once per worker when `jobs` pages run side
+    by side. With a cache, a page that fails does not stop the others, and the
+    next run redoes only that page.
+    """
     slide_width_pt = slide_width_in * 72
-    slides = []
-    ref_w = ref_h = None
+    matching = font_matcher is not None or matcher_factory is not None
+    ref_w = ref_h = engine = None
+    version = code_version() if cache else ""
 
     seen = {}
     pages = []
     for index, path in enumerate(image_paths):
-        page_h, page_w = read_image(path).shape[:2]
-        if ref_w is None:
-            ref_w, ref_h = page_w, page_h
-
         number = slide_number(path, index)
         if number in seen:
             raise SystemExit(
@@ -1281,71 +1393,103 @@ def build_layout(image_paths, bold_mode="auto", merge=True, expected=None,
                 "name the pages slide_001.png, slide_002.png, ..."
             )
         seen[number] = path
-        blocks = extract_text(path, f"s{number}", bold_mode, expected, slide_width_pt,
-                              (photo_regions or {}).get(number, ()))
-        pages.append((path, number, page_w, page_h, blocks))
+        regions = tuple((photo_regions or {}).get(number, ()))
+        read_key = stored = None
+        if cache:
+            read_key = fingerprint(version, Path(path).read_bytes(), number, bold_mode, expected,
+                                   slide_width_pt, regions)
+            stored = cache.load("lines", path, read_key)
+        if stored:
+            page_w, page_h, blocks, engine = stored
+        else:
+            page_h, page_w = read_image(path).shape[:2]
+            blocks = extract_text(path, f"s{number}", bold_mode, expected, slide_width_pt, regions)
+            if cache:
+                cache.save("lines", path, read_key, (page_w, page_h, blocks, _engine_name))
+        if ref_w is None:
+            ref_w, ref_h = page_w, page_h
+        pages.append((path, number, page_w, page_h, blocks, read_key))
 
     # Weight is decided across the deck, before lines merge, since merging
     # keeps bold and regular lines apart.
     offset = 0.0
     if (bold_mode or "auto").strip().lower() == "auto":
-        offset = deck_weight_offset([block for *_, blocks in pages for block in blocks])
-        for *_, blocks in pages:
-            resolve_bold(blocks, "auto", offset)
+        offset = deck_weight_offset([block for page in pages for block in page[4]])
+        for page in pages:
+            resolve_bold(page[4], "auto", offset)
 
-    for path, number, page_w, page_h, blocks in pages:
-        line_count = len(blocks)
-        if rich_text:
-            from rich_text import analyse_line
-            image = read_image(path)
-            for position, block in enumerate(blocks, 1):
-                progress(path, position, line_count, block)
-                analyse_line(image, block, slide_width_pt / page_w, font_matcher)
-            if font_matcher is not None:
-                harmonise_runs(blocks, slide_width_pt / page_w)
-        elif font_matcher is not None:
-            from match_fonts import crop_mask
+    records, waiting = {}, []
+    for path, number, page_w, page_h, blocks, read_key in pages:
+        arguments = (path, number, page_w, page_h, blocks, slide_width_pt, rich_text, merge, matching)
+        page_key = None
+        if cache:
+            # The deck's weight threshold moves when pages are added or removed.
+            page_key = fingerprint(read_key, round(offset, 4), rich_text, merge, matching, matcher_id)
+            stored = cache.load("page", path, page_key)
+            if stored:
+                records[number] = stored
+                print(f"{Path(path).name}: reused from the last run", flush=True)
+                continue
+        waiting.append((arguments, page_key))
 
-            image = read_image(path)
-            for position, block in enumerate(blocks, 1):
-                progress(path, position, line_count, block)
-                mask = crop_mask(image, to_px(block.bbox, page_w, page_h))
-                result = font_matcher.match(mask, block.text)
-                result["line_id"] = block.id
-                block.font_matches = [result]
-            harmonise_font_matches(blocks)
-            for block in blocks:
-                result = block.font_matches[0]
-                if result["candidates"]:
-                    best = result.get("selected_candidate", result["candidates"][0])
-                    block.font_family = best["family"]
-                    block.font_face = best.get("face_name", best["family"])
-                    block.bold = best["bold"]
-                    block.italic = best["italic"]
-                    if best.get("size_px"):
-                        block.font_size_pt = round(best["size_px"] * slide_width_pt / page_w, 2)
-        if merge:
-            blocks = merge_lines(blocks)
-        print(f"{Path(path).name}: {line_count} lines -> {len(blocks)} text boxes")
+    failures = []
 
-        slides.append({
-            "slide": number,
-            "source": Path(path).name,
-            "width": page_w,
-            "height": page_h,
-            "texts": [block_record(b, page_w, page_h, slide_width_pt) for b in blocks],
-        })
+    def keep(arguments, page_key, result):
+        records[arguments[1]] = result
+        if cache:
+            cache.save("page", arguments[0], page_key, result)
+
+    def failed(arguments, error):
+        if not cache:
+            raise error
+        failures.append(f"{Path(arguments[0]).name}: {type(error).__name__}: {error}")
+
+    jobs = max(1, min(jobs, MAX_JOBS, len(waiting)))
+    if jobs > 1 and matcher_factory is not None and font_matcher is None:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+
+        with ProcessPoolExecutor(jobs, initializer=start_worker, initargs=(matcher_factory,)) as pool:
+            futures = {pool.submit(finish_page, *arguments): (arguments, page_key)
+                       for arguments, page_key in waiting}
+            for future in as_completed(futures):
+                arguments, page_key = futures[future]
+                try:
+                    keep(arguments, page_key, future.result())
+                except Exception as error:  # one page must not cost the others
+                    failed(arguments, error)
+    elif waiting:
+        if matching and font_matcher is None:
+            font_matcher = matcher_factory()
+        for arguments, page_key in waiting:
+            try:
+                keep(arguments, page_key, finish_page(*arguments, font_matcher))
+            except Exception as error:
+                failed(arguments, error)
+    if failures:
+        raise SystemExit("Text extraction failed on:\n  " + "\n  ".join(failures)
+                         + "\nRun the same command again; the finished pages are reused.")
 
     return {
         "method": "ocr",
-        "ocr_engine": _engine_name,
+        "ocr_engine": _engine_name or engine,
         "bold_mode": bold_mode,
         "bold_offset": round(offset, 4),
         "slide_width_in": slide_width_in,
         "ref_width": ref_w,
         "ref_height": ref_h,
-        "slides": slides,
+        "slides": [records[page[1]] for page in pages],
     }
+
+
+def make_matcher(index_path, model_path, remote_store=None):
+    """Build the font matcher; a module-level function so workers can call it."""
+    from match_fonts import FontMatcher
+
+    matcher = FontMatcher(index_path, model_path)
+    if remote_store is not None:
+        from font_store import RemoteFontMatcher
+        matcher = RemoteFontMatcher(matcher, remote_store)
+    return matcher
 
 
 def main():
@@ -1375,45 +1519,62 @@ def main():
     ap.add_argument("--remote-match", action="store_true",
                     help="Also send poor local matches to the font server (off by default)")
     ap.add_argument("--font-cache", type=Path, help="Downloaded font cache directory")
+    ap.add_argument("--jobs", type=int, default=0,
+                    help=f"Pages matched side by side; default is half the processors, at most {MAX_JOBS}")
+    ap.add_argument("--no-cache", action="store_true",
+                    help="Redo every page instead of reusing unchanged pages from the last run")
     args = ap.parse_args()
 
     if args.slide_width_in <= 0:
         raise SystemExit("--slide-width-in must be positive")
     if bool(args.font_index) != bool(args.font_model):
         ap.error("--font-index and --font-model must be supplied together")
-    font_matcher = None
+    matcher_factory, matcher_id = None, ""
     if args.ocr_only:
         if args.font_index or args.font_model or args.font_server or args.font_cache or args.remote_match:
             ap.error("--ocr-only conflicts with font matching options")
         args.rich_text = False
     else:
-        from font_store import FontStore, RemoteFontMatcher
-        from match_fonts import DEFAULT_FONT_SERVER, FontMatcher
+        import functools
+
+        from font_store import FontStore
+        from match_fonts import DEFAULT_FONT_SERVER
         try:
             store = FontStore(args.font_server or DEFAULT_FONT_SERVER, args.font_cache)
             if not args.font_index:
                 args.font_index, args.font_model = store.install_core(include_system=True)
-            font_matcher = FontMatcher(args.font_index, args.font_model)
             # Local fonts decide by default. The server is opt-in because a slow
             # response stalls every poorly matched line.
-            if args.remote_match:
-                font_matcher = RemoteFontMatcher(font_matcher, store)
+            matcher_factory = functools.partial(make_matcher, str(args.font_index), str(args.font_model),
+                                                store if args.remote_match else None)
+            matcher_id = fingerprint(Path(args.font_index).read_bytes(), Path(args.font_model).read_bytes(),
+                                     args.remote_match)
         except (OSError, ValueError) as error:
             ap.exit(2, f"Font matching setup failed. Check the font server or cache. {error}\n")
     expected = None
     if args.expected:
         expected = Path(args.expected).read_text(encoding="utf-8-sig").splitlines()
 
-    layout = build_layout(
-        args.images,
-        bold_mode=args.bold_mode,
-        merge=not args.no_merge_lines,
-        expected=expected,
-        slide_width_in=args.slide_width_in,
-        font_matcher=font_matcher,
-        rich_text=args.rich_text,
-        photo_regions=photo_regions(args.element_analysis) if args.element_analysis else None,
-    )
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    # Remote matching waits on one server; side-by-side pages would only queue.
+    jobs = 1 if args.remote_match else args.jobs or max(1, (os.cpu_count() or 2) // 2)
+    try:
+        layout = build_layout(
+            args.images,
+            bold_mode=args.bold_mode,
+            merge=not args.no_merge_lines,
+            expected=expected,
+            slide_width_in=args.slide_width_in,
+            rich_text=args.rich_text,
+            photo_regions=photo_regions(args.element_analysis) if args.element_analysis else None,
+            matcher_factory=matcher_factory,
+            matcher_id=matcher_id,
+            cache=None if args.no_cache else PageCache(out.parent / ".text_cache"),
+            jobs=jobs,
+        )
+    except (OSError, ValueError) as error:
+        ap.exit(2, f"Font matching setup failed. Check the font server or cache. {error}\n")
     layout["font_matching_required"] = not args.ocr_only
     if not args.ocr_only:
         from match_fonts import validate_font_matches
@@ -1423,8 +1584,6 @@ def main():
                     validate_font_matches(item)
         except ValueError as error:
             ap.exit(2, f"Font matching incomplete. {error}\n")
-    out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(layout, ensure_ascii=False, indent=2), encoding="utf-8")
     print(out)
 

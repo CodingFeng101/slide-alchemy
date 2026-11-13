@@ -22,34 +22,52 @@ class FontDefaultTests(unittest.TestCase):
                 "bbox_frac": [0.1, 0.1, 0.7, 0.2], "ink_bbox_px": [10, 10, 100, 30],
                 "font_matches": [{"candidates": [candidate]}]}
 
+    def font_files(self, directory):
+        index, model = Path(directory) / "index.json", Path(directory) / "model.onnx"
+        index.write_text("{}", encoding="utf-8")
+        model.write_bytes(b"model")
+        return str(index), str(model)
+
     def test_plain_command_matches_locally_without_the_font_server(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "layout.json"
             layout = {"slides": [{"texts": [self.item()]}]}
+            files = self.font_files(directory)
             with patch.object(sys, "argv", ["extract_text.py", "slide.png", "--out", str(output)]), \
                     patch("font_store.FontStore") as store, patch("match_fonts.FontMatcher") as matcher, \
                     patch("font_store.RemoteFontMatcher") as remote, patch.object(extract_text, "build_layout", return_value=layout) as build:
-                store.return_value.install_core.return_value = ("index.json", "model.onnx")
+                store.return_value.install_core.return_value = files
                 extract_text.main()
+                # The matcher is built on demand: not at all when every page is reused.
+                matcher.assert_not_called()
+                self.assertIs(matcher.return_value, build.call_args.kwargs["matcher_factory"]())
+                matcher.assert_called_once_with(*files)
                 remote.assert_not_called()
-                self.assertIs(matcher.return_value, build.call_args.kwargs["font_matcher"])
                 self.assertTrue(build.call_args.kwargs["rich_text"])
+                self.assertGreaterEqual(build.call_args.kwargs["jobs"], 1)
+                self.assertEqual(output.parent / ".text_cache", build.call_args.kwargs["cache"].directory)
             self.assertTrue(json.loads(output.read_text(encoding="utf-8"))["font_matching_required"])
 
     def test_remote_match_flag_enables_server_expansion(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "layout.json"
             layout = {"slides": [{"texts": [self.item()]}]}
-            with patch.object(sys, "argv", ["extract_text.py", "slide.png", "--out", str(output), "--remote-match"]), \
+            files = self.font_files(directory)
+            with patch.object(sys, "argv", ["extract_text.py", "slide.png", "--out", str(output), "--remote-match",
+                                            "--no-cache"]), \
                     patch("font_store.FontStore") as store, patch("match_fonts.FontMatcher") as matcher, \
                     patch("font_store.RemoteFontMatcher") as remote, patch.object(extract_text, "build_layout", return_value=layout) as build:
-                store.return_value.install_core.return_value = ("index.json", "model.onnx")
+                store.return_value.install_core.return_value = files
                 extract_text.main()
                 store.assert_called_once_with(DEFAULT_FONT_SERVER, None)
                 store.return_value.install_core.assert_called_once_with(include_system=True)
-                matcher.assert_called_once_with("index.json", "model.onnx")
-                self.assertIs(remote.return_value, build.call_args.kwargs["font_matcher"])
+                self.assertIs(remote.return_value, build.call_args.kwargs["matcher_factory"]())
+                matcher.assert_called_once_with(*files)
+                remote.assert_called_once_with(matcher.return_value, store.return_value)
                 self.assertTrue(build.call_args.kwargs["rich_text"])
+                # One server answers remote matches; pages do not run side by side.
+                self.assertEqual(1, build.call_args.kwargs["jobs"])
+                self.assertIsNone(build.call_args.kwargs["cache"])
             self.assertTrue(json.loads(output.read_text(encoding="utf-8"))["font_matching_required"])
 
     def test_explicit_ocr_only_preserves_legacy_measurement_mode(self):
@@ -59,7 +77,7 @@ class FontDefaultTests(unittest.TestCase):
                     patch("font_store.FontStore") as store, patch.object(extract_text, "build_layout", return_value={"slides": []}) as build:
                 extract_text.main()
                 store.assert_not_called()
-                self.assertIsNone(build.call_args.kwargs["font_matcher"])
+                self.assertIsNone(build.call_args.kwargs["matcher_factory"])
                 self.assertFalse(build.call_args.kwargs["rich_text"])
 
     def test_setup_failure_stops_before_ocr(self):
@@ -80,7 +98,7 @@ class FontDefaultTests(unittest.TestCase):
             with patch.object(sys, "argv", ["extract_text.py", "slide.png", "--out", str(output)]), \
                     patch("font_store.FontStore") as store, patch("match_fonts.FontMatcher"), \
                     patch.object(extract_text, "build_layout", return_value={"slides": [{"texts": [item]}]}), patch("sys.stderr"):
-                store.return_value.install_core.return_value = ("index.json", "model.onnx")
+                store.return_value.install_core.return_value = self.font_files(directory)
                 with self.assertRaises(SystemExit):
                     extract_text.main()
             self.assertEqual("previous", output.read_text(encoding="utf-8"))
