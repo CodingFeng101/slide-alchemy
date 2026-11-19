@@ -46,21 +46,55 @@ https://github.com/user-attachments/assets/da4675ac-5296-4938-b162-6c674a16d19f
 
 ## 🖥️ 示例
 
-### 1. 智慧校园核心模块
+### 门店经营分析
 
-| 图片 PPT 截图 | 可编辑 PPT 截图（所有文本框已选中） |
+| 图片版 PPT | 可编辑 PPTX（已选中对象） |
 | --- | --- |
-| ![智慧校园图片 PPT](examples/01-smart-campus/image-ppt-screenshot.png) | ![智慧校园可编辑 PPT](examples/01-smart-campus/editable-selected-textboxes.png) |
+| ![门店经营分析 · 图片版 PPT](examples/03-complex-chinese/source-01.jpg) | ![门店经营分析 · 可编辑 PPTX（已选中对象）](examples/03-complex-chinese/selected-01.jpg) |
 
-📎 文件：[`image-ppt.pptx`](examples/01-smart-campus/image-ppt.pptx) / [`editable.pptx`](examples/01-smart-campus/editable.pptx)
+### 跨区发布架构
 
-### 2. 项目内容概览
-
-| 图片 PPT 截图 | 可编辑 PPT 截图（所有文本框已选中） |
+| 图片版 PPT | 可编辑 PPTX（已选中对象） |
 | --- | --- |
-| ![项目内容概览图片 PPT](examples/02-project-overview/image-ppt-screenshot.png) | ![项目内容概览可编辑 PPT](examples/02-project-overview/editable-selected-textboxes.png) |
+| ![跨区发布架构 · 图片版 PPT](examples/03-complex-chinese/source-02.jpg) | ![跨区发布架构 · 可编辑 PPTX（已选中对象）](examples/03-complex-chinese/selected-02.jpg) |
 
-📎 文件：[`image-ppt.pptx`](examples/02-project-overview/image-ppt.pptx) / [`editable.pptx`](examples/02-project-overview/editable.pptx)
+### 仓配网络重构
+
+| 图片版 PPT | 可编辑 PPTX（已选中对象） |
+| --- | --- |
+| ![仓配网络重构 · 图片版 PPT](examples/03-complex-chinese/source-03.jpg) | ![仓配网络重构 · 可编辑 PPTX（已选中对象）](examples/03-complex-chinese/selected-03.jpg) |
+
+### 单摆实验
+
+| 图片版 PPT | 可编辑 PPTX（已选中对象） |
+| --- | --- |
+| ![单摆实验 · 图片版 PPT](examples/03-complex-chinese/source-04.jpg) | ![单摆实验 · 可编辑 PPTX（已选中对象）](examples/03-complex-chinese/selected-04.jpg) |
+
+### 办公空间改造
+
+| 图片版 PPT | 可编辑 PPTX（已选中对象） |
+| --- | --- |
+| ![办公空间改造 · 图片版 PPT](examples/03-complex-chinese/source-05.jpg) | ![办公空间改造 · 可编辑 PPTX（已选中对象）](examples/03-complex-chinese/selected-05.jpg) |
+
+### 自助服务试点
+
+| 图片版 PPT | 可编辑 PPTX（已选中对象） |
+| --- | --- |
+| ![自助服务试点 · 图片版 PPT](examples/03-complex-chinese/source-06.jpg) | ![自助服务试点 · 可编辑 PPTX（已选中对象）](examples/03-complex-chinese/selected-06.jpg) |
+
+### 产线停机改善
+
+| 图片版 PPT | 可编辑 PPTX（已选中对象） |
+| --- | --- |
+| ![产线停机改善 · 图片版 PPT](examples/03-complex-chinese/source-07.jpg) | ![产线停机改善 · 可编辑 PPTX（已选中对象）](examples/03-complex-chinese/selected-07.jpg) |
+
+### 城市档案展陈
+
+| 图片版 PPT | 可编辑 PPTX（已选中对象） |
+| --- | --- |
+| ![城市档案展陈 · 图片版 PPT](examples/03-complex-chinese/source-08.jpg) | ![城市档案展陈 · 可编辑 PPTX（已选中对象）](examples/03-complex-chinese/selected-08.jpg) |
+
+[图片版 PPTX](examples/03-complex-chinese/image-ppt.pptx) · [可编辑 PPTX](examples/03-complex-chinese/editable.pptx) · [8 页逐页对比](examples/README.md#complex-chinese-slides) · [无选框总览](examples/03-complex-chinese/overview.jpg) · [原有基础案例](examples/README.md#basic-examples)
 
 ## 🎯 为什么需要它
 

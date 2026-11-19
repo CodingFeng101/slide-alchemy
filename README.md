@@ -46,21 +46,55 @@ Token and timing benchmarks will be added after measurement.
 
 ## 🖥️ Examples
 
-### 1. Smart Campus Core Modules
+### Retail performance
 
-| Image PPT screenshot | Editable PPTX screenshot, all text boxes selected |
+| Image-based slide | Editable PPTX (objects selected) |
 | --- | --- |
-| ![Smart campus image PPT](examples/01-smart-campus/image-ppt-screenshot.png) | ![Smart campus editable PPTX](examples/01-smart-campus/editable-selected-textboxes.png) |
+| ![Retail performance · Image-based slide](examples/03-complex-chinese/source-01.jpg) | ![Retail performance · Editable PPTX (objects selected)](examples/03-complex-chinese/selected-01.jpg) |
 
-📎 Files: [`image-ppt.pptx`](examples/01-smart-campus/image-ppt.pptx) / [`editable.pptx`](examples/01-smart-campus/editable.pptx)
+### Cross-region release architecture
 
-### 2. Project Content Overview
-
-| Image PPT screenshot | Editable PPTX screenshot, all text boxes selected |
+| Image-based slide | Editable PPTX (objects selected) |
 | --- | --- |
-| ![Project overview image PPT](examples/02-project-overview/image-ppt-screenshot.png) | ![Project overview editable PPTX](examples/02-project-overview/editable-selected-textboxes.png) |
+| ![Cross-region release architecture · Image-based slide](examples/03-complex-chinese/source-02.jpg) | ![Cross-region release architecture · Editable PPTX (objects selected)](examples/03-complex-chinese/selected-02.jpg) |
 
-📎 Files: [`image-ppt.pptx`](examples/02-project-overview/image-ppt.pptx) / [`editable.pptx`](examples/02-project-overview/editable.pptx)
+### Warehouse redesign
+
+| Image-based slide | Editable PPTX (objects selected) |
+| --- | --- |
+| ![Warehouse redesign · Image-based slide](examples/03-complex-chinese/source-03.jpg) | ![Warehouse redesign · Editable PPTX (objects selected)](examples/03-complex-chinese/selected-03.jpg) |
+
+### Pendulum experiment
+
+| Image-based slide | Editable PPTX (objects selected) |
+| --- | --- |
+| ![Pendulum experiment · Image-based slide](examples/03-complex-chinese/source-04.jpg) | ![Pendulum experiment · Editable PPTX (objects selected)](examples/03-complex-chinese/selected-04.jpg) |
+
+### Office space planning
+
+| Image-based slide | Editable PPTX (objects selected) |
+| --- | --- |
+| ![Office space planning · Image-based slide](examples/03-complex-chinese/source-05.jpg) | ![Office space planning · Editable PPTX (objects selected)](examples/03-complex-chinese/selected-05.jpg) |
+
+### Self-service pilot
+
+| Image-based slide | Editable PPTX (objects selected) |
+| --- | --- |
+| ![Self-service pilot · Image-based slide](examples/03-complex-chinese/source-06.jpg) | ![Self-service pilot · Editable PPTX (objects selected)](examples/03-complex-chinese/selected-06.jpg) |
+
+### Assembly downtime improvement
+
+| Image-based slide | Editable PPTX (objects selected) |
+| --- | --- |
+| ![Assembly downtime improvement · Image-based slide](examples/03-complex-chinese/source-07.jpg) | ![Assembly downtime improvement · Editable PPTX (objects selected)](examples/03-complex-chinese/selected-07.jpg) |
+
+### City archive exhibition
+
+| Image-based slide | Editable PPTX (objects selected) |
+| --- | --- |
+| ![City archive exhibition · Image-based slide](examples/03-complex-chinese/source-08.jpg) | ![City archive exhibition · Editable PPTX (objects selected)](examples/03-complex-chinese/selected-08.jpg) |
+
+[Image-based PPTX](examples/03-complex-chinese/image-ppt.pptx) · [Editable PPTX](examples/03-complex-chinese/editable.pptx) · [All eight comparisons](examples/README.md#complex-chinese-slides) · [Clean overview](examples/03-complex-chinese/overview.jpg) · [Original basic examples](examples/README.md#basic-examples)
 
 ## 🎯 Why It Exists
 
