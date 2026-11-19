@@ -1,48 +1,53 @@
 <h1 align="center">Slide Alchemy</h1>
 
 <p align="center">
-  <b>English</b> | <a href="README.zh-CN.md">简体中文</a>
-</p>
-
-<p align="center">
-  <strong>🧪 Reforge image-based slides into TRULY EDITABLE, component-based PowerPoint decks.</strong>
-</p>
-
-> Turn a slide screenshot, scanned deck, or image-based PPTX into a PowerPoint you can actually edit: real text boxes, native geometry, and stable visual assets.
-
-[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
+  <b>English</b[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
 [![License](https://img.shields.io/github/license/CodingFeng101/slide-alchemy?style=flat-square)](LICENSE)
 
-If this saves you from rebuilding a deck by hand, please **star the repo** so more people working with AI-generated slides can find it.
+Slide Alchemy is a skill for Codex and Claude Code that rebuilds image-based decks, slide screenshots, and scanned slides as editable PowerPoint files.
 
-Slide Alchemy is a skill for Codex and Claude Code that rebuilds picture-style PPT/PPTX files, slide screenshots, and scanned visual decks into editable `.pptx` files. It does not place a full-slide screenshot back into PowerPoint and call it editable. It separates each page into a clean base background, editable geometry, generated PNG assets, and real text boxes.
+## What gets rebuilt
+
+| Source element | PowerPoint output |
+| --- | --- |
+| Body text, headings, and decorative lettering | Native text boxes. Gradients, outlines, and shadows use native text effects. More complex effects are approximated while keeping the text editable. |
+| Lines, borders, cards, and other simple geometry | Individually editable PowerPoint shapes. |
+| Icons and complex illustrations | Regenerated PNGs that can be moved, resized, and replaced independently. |
+| Real photographs, such as group and event photos | Cropped directly from the source slide and inserted as separate pictures. |
+| Slide backgrounds | Clean backgrounds created with an image editing model that removes foreground content. |
+
+## Quick start
+
+After [installation and configuration](#installation-and-configuration), attach the image-based PPTX or slide screenshots. Use `$slide-alchemy` in Codex or `/slide-alchemy` in Claude Code.
+
+**Default mode**
 
 ```text
-source slide image
--> clean base background
--> component classification
--> editable geometry + generated PNG assets + real text
--> editable PPTX
+Use slide-alchemy to convert this image-based deck into an editable PPTX.
 ```
+
+Review the proposed background groups, then review the clean background previews.
+
+**Unattended mode**
+
+```text
+Use slide-alchemy to convert this image-based deck into an editable PPTX. Run unattended without intermediate confirmation.
+```
+
+Both modes deliver an editable PPTX and comparison previews.
+
+## Workflow
+
+1. **Render the source slides and clean the backgrounds.** Group pages by background and remove foreground content with an image editing model.
+2. **Classify and rebuild components.** Convert simple geometry to PowerPoint shapes, slice icons and illustrations from generated asset sheets, and crop real photographs from their source pages. Reuse components that repeat across pages.
+3. **Extract text, measure layout, and match fonts.** OCR reads the text, and pixel measurements recover position, size, color, and line spacing. A small local model shortlists up to 10 fonts, then OpenCV compares their glyph shapes. Reruns reuse completed text extraction results when the inputs and settings match.
+4. **Compose and compare each slide.** Combine the backgrounds, shapes, pictures, and text, then export previews and record visible differences against the source.
+
+[Full workflow](skill/slide-alchemy/references/workflow.md) · [Text extraction and font matching](skill/slide-alchemy/references/text-extraction.md)
 
 ## 🎬 Demo Video
 
 https://github.com/user-attachments/assets/da4675ac-5296-4938-b162-6c674a16d19f
-
-## ✨ Core Strengths
-
-| Strength | What It Means |
-| --- | --- |
-| 🪙 **Lower token use** | Pages are analyzed into reusable components, so repeated slide objects do not need to be described and rebuilt from scratch. |
-| ⚡ **Faster reconstruction** | Repeated cards, stars, lines, title bars, and icon assets are generated once, then reused across slides. |
-| ✍️ **Editable text** | Normal slide text becomes real PowerPoint text boxes, not rasterized text. |
-| 📏 **Measured text layout** | OCR reads the characters; position, font size, colour, weight, bullets, and line spacing are measured from the pixels instead of estimated by a vision model. |
-| 📐 **Editable geometry** | Lines, stars, cards, title bars, circles, borders, and other simple shapes become editable PPT objects when practical. |
-| 🧩 **Stable complex icons** | Badges, illustrations, glow effects, and detailed icons stay as transparent PNG assets instead of brittle over-splitting. |
-| 🖼️ **AI-cleaned bases** | Backgrounds are regenerated with an image editing model, not covered with white masks or rough local inpainting. |
-| ✨ **Generated icon assets** | PNG icons and complex PNG components are generated with an image generation/editing model, then sliced from the generated asset sheet. They are never cropped directly from the original slide screenshot. |
-
-Token and timing benchmarks will be added after measurement.
 
 ## 🖥️ Examples
 
@@ -96,95 +101,42 @@ Token and timing benchmarks will be added after measurement.
 
 [Image-based PPTX](examples/03-complex-chinese/image-ppt.pptx) · [Editable PPTX](examples/03-complex-chinese/editable.pptx) · [All eight comparisons](examples/README.md#complex-chinese-slides) · [Clean overview](examples/03-complex-chinese/overview.jpg) · [Original basic examples](examples/README.md#basic-examples)
 
-## 🎯 Why It Exists
-
-Most image-to-PPT workflows fail in one of two ways:
-
-1. ❌ They put the original slide screenshot into PPT and call it "editable".
-2. ❌ They slice every visual element into PNGs, making simple shapes hard to edit and icons easy to crop badly.
-
-Slide Alchemy uses a component-based reconstruction strategy:
-
-- ✅ **Bases are image-edited, not masked.**
-- ✅ **Simple geometry stays editable.**
-- ✅ **Complex icons stay visually stable.**
-- ✅ **Repeated pieces are reused.**
-
-## 📦 Installation
+## Installation and configuration
 
 ### Codex
 
-Ask Codex to install this skill from the repository, then restart Codex:
+Ask Codex to install the skill from the repository, then restart Codex.
 
 ```text
-Install the Codex skill from https://github.com/CodingFeng101/slide-alchemy.git
+Install the Codex skill from https://github.com/CodingFeng101/slide-alchemy.git using the skill/slide-alchemy directory.
 ```
 
 ### Claude Code
 
-Ask Claude Code to install it:
-
-```text
-Install the skill from https://github.com/CodingFeng101/slide-alchemy.git: copy its skill/slide-alchemy folder into ~/.claude/skills/
-```
-
-Or copy it yourself:
+Clone the repository, copy the skill into the Claude Code skills directory, and restart Claude Code.
 
 ```bash
 git clone https://github.com/CodingFeng101/slide-alchemy.git
 cp -r slide-alchemy/skill/slide-alchemy ~/.claude/skills/
 ```
 
-Restart Claude Code so it picks up the skill.
+### Python, image models, and fonts
 
-Claude Code has no image tool of its own, so the skill calls `scripts/generate_image.py`, which uses an OpenAI-compatible Images API. Set these before starting Claude Code:
-
-```bash
-export SLIDE_ALCHEMY_IMAGE_API_KEY=sk-...
-export SLIDE_ALCHEMY_IMAGE_BASE_URL=https://api.openai.com/v1   # or your compatible gateway
-export SLIDE_ALCHEMY_IMAGE_MODEL=gpt-image-2                     # optional, this is the default
-```
-
-On Windows PowerShell, use `$env:SLIDE_ALCHEMY_IMAGE_API_KEY = "sk-..."`, or `setx` to keep the values across sessions.
-
-### Python dependencies
-
-The bundled scripts need their Python dependencies, including the OCR engine used for text extraction. The OCR models ship inside the package, so nothing is downloaded at run time:
+Install the script dependencies from the repository root.
 
 ```bash
-pip install -r skill/slide-alchemy/requirements.txt
+python -m pip install -r skill/slide-alchemy/requirements.txt
 ```
 
-## 🚀 Usage
+The skill uses the host's image tool when available. For hosts without an image tool, `scripts/generate_image.py` uses an OpenAI-compatible image API. Set `SLIDE_ALCHEMY_IMAGE_API_KEY` before starting the host. Set `SLIDE_ALCHEMY_IMAGE_BASE_URL` and `SLIDE_ALCHEMY_IMAGE_MODEL` for a custom gateway or model.
 
-In Codex:
+The OCR model ships with the dependencies, and font matching runs locally by default. If the rebuild needs a missing font, install the cached fonts using the command below, then restart PowerPoint.
 
-```text
-Use $slide-alchemy to convert these image-style PPT slides into an editable PPTX.
+```bash
+python skill/slide-alchemy/scripts/font_store.py --install-fonts
 ```
 
-In Claude Code:
-
-```text
-/slide-alchemy convert deck.pptx into an editable PPTX
-```
-
-## 🧱 Element Strategy
-
-| Category | Use For | Output |
-| --- | --- | --- |
-| 📐 `simple_geometry_svg_ooxml` | lines, stars, circles, rings, cards, title bars, borders, simple circuit lines | editable PPT geometry |
-| 🖼️ `icon_png` | trophy, flowers, book, hands/heart, computer, chain link, badges | transparent PNG |
-| 🧩 `complex_png_whole` | swirls, glow-heavy decorations, multi-layer badges, complex illustrations | one whole transparent PNG |
-| 📷 `photo_source_crop` | real photographs of people, events, places, documents | cropped from the source page, never regenerated |
-
-Core rule:
-
-> If the element can be described by geometry, fill, and stroke, make it editable. If it depends on texture, glow, shadow, or dense detail, keep it as PNG.
-
-PNG icons and complex PNG components must be generated with an image generation/editing model and then sliced from the generated asset sheet. They must not be cropped directly from the original slide image.
-
-Semantic icons stay PNG by default, even when they are flat or line-art icons. SVG/OOXML is for simple layout geometry, not for rebuilding recognizable icons out of native PPT shapes.
+[Font setup and optional remote matching](skill/slide-alchemy/references/font-distribution.md) · [Troubleshooting](skill/slide-alchemy/references/failure-decision-tree.md)
 
 ## 📄 License
 

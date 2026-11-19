@@ -1,48 +1,53 @@
 <h1 align="center">Slide Alchemy</h1>
 
 <p align="center">
-  <a href="README.md">English</a> | <b>简体中文</b>
-</p>
-
-<p align="center">
-  <strong>🧪 把图片式幻灯片重新炼成真正可编辑、组件化的 PowerPoint。</strong>
-</p>
-
-> 把幻灯片截图、扫描版 PPT 或图片型 PPTX 变成真正能修改的 PowerPoint：文字是文本框，几何元素是原生对象，复杂视觉素材保持稳定。
-
-[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
+  <a href="README.md">English</a[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
 [![License](https://img.shields.io/github/license/CodingFeng101/slide-alchemy?style=flat-square)](LICENSE)
 
-如果它帮你省下了手工重做幻灯片的时间，欢迎给仓库点个 **Star**，让更多需要处理 AI 幻灯片的人找到它。
+Slide Alchemy 是一个可用于 Codex 和 Claude Code 的 Skill，把图片型 PPT、幻灯片截图和扫描页还原成可编辑的 PowerPoint。
 
-Slide Alchemy 是一个可用于 Codex 和 Claude Code 的 Skill，用来把图片型 PPT/PPTX、幻灯片截图、扫描版视觉页面还原成可编辑的 `.pptx`。它不是把整页截图塞回 PowerPoint 后称为“可编辑”，而是把页面拆成干净底图、可编辑几何形状、生成式 PNG 素材和真实文本框。
+## 能还原什么
+
+| 源页元素 | PowerPoint 中的结果 |
+| --- | --- |
+| 正文、标题和艺术字 | 原生文本框。渐变、描边和阴影用原生文字效果还原，复杂效果保留可编辑文字并做视觉近似。 |
+| 线条、边框、卡片等简单几何 | 可独立编辑的 PowerPoint 形状。 |
+| 图标和复杂插画 | 重新生成的独立 PNG，可移动、缩放和替换。 |
+| 合影、现场照等真实照片 | 直接从源页裁取，作为独立图片放回。 |
+| 页面底图 | 图像编辑模型清理前景内容后生成的净底。 |
+
+## 快速开始
+
+[安装与配置](#安装与配置)后，上传图片型 PPTX 或幻灯片截图。在 Codex 可以用 `$slide-alchemy`，在 Claude Code 可以用 `/slide-alchemy` 调用。
+
+**默认模式**
 
 ```text
-原始幻灯片图片
--> 干净底图
--> 组件分类
--> 可编辑几何元素 + 生成式 PNG 素材 + 真实文本
--> 可编辑 PPTX
+使用 slide-alchemy，把这份图片型 PPT 转成可编辑的 PPTX。
 ```
+
+先确认底图分组，再确认净底预览。
+
+**全自动模式**
+
+```text
+使用 slide-alchemy，把这份图片型 PPT 转成可编辑的 PPTX。全自动处理，中途不用确认。
+```
+
+两种模式都会交付可编辑 PPTX 和对比预览。
+
+## 工作流程
+
+1. **渲染源页并生成净底。** 按页面背景分组，使用图像编辑模型清理底图。
+2. **分类并重建组件。** 简单图形转为 PowerPoint 形状，图标和插画从生成的素材图中切出，真实照片从源页裁取。跨页重复的组件可复用。
+3. **识字、测量并匹配字体。** OCR 识别文字，从像素测量位置、字号、颜色与行距。小模型在本地筛出最多 10 个候选字体，再用 OpenCV 比较字形。输入和配置相同时，重跑可复用已完成页的文字提取结果。
+4. **合成并逐页对比。** 合成底图、图形、图片和文字，导出预览并对照源页检查，记录可见差异。
+
+[完整工作流程](skill/slide-alchemy/references/workflow.md) · [文字提取与字体匹配](skill/slide-alchemy/references/text-extraction.md)
 
 ## 🎬 演示视频
 
 https://github.com/user-attachments/assets/da4675ac-5296-4938-b162-6c674a16d19f
-
-## ✨ 核心优势
-
-| 优势 | 说明 |
-| --- | --- |
-| 🪙 **更省 token** | 先把页面分析成可复用组件，避免每一页都从零描述和重建。 |
-| ⚡ **还原更快** | 重复的卡片、星星、线条、标题条和图标素材只生成一次，再跨页面复用。 |
-| ✍️ **文字可编辑** | 普通文字会还原为 PowerPoint 文本框，而不是截图文字。 |
-| 📏 **文字位置实测** | OCR 只负责认字，位置、字号、颜色、粗细、项目符号和行距都从像素量出来，不靠视觉模型估算。 |
-| 📐 **几何元素可编辑** | 线条、星星、卡片、标题条、圆形、边框等会尽量还原为 PPT 可编辑对象。 |
-| 🧩 **复杂图标更稳定** | 奖杯、徽章、插画、光效等复杂图标保留为透明 PNG，避免硬拆后变丑。 |
-| 🖼️ **底图由 AI 清理** | 底图由图像编辑模型补全，不用白块遮罩或本地粗糙 inpaint。 |
-| ✨ **图标素材更干净** | PNG 图标和复杂 PNG 组件必须用图像生成/编辑模型生成素材图，再从素材图里裁剪，不能直接从原始截图上裁剪。 |
-
-具体 token 消耗和耗时数据会在实测后补充。
 
 ## 🖥️ 示例
 
@@ -96,95 +101,42 @@ https://github.com/user-attachments/assets/da4675ac-5296-4938-b162-6c674a16d19f
 
 [图片版 PPTX](examples/03-complex-chinese/image-ppt.pptx) · [可编辑 PPTX](examples/03-complex-chinese/editable.pptx) · [8 页逐页对比](examples/README.md#complex-chinese-slides) · [无选框总览](examples/03-complex-chinese/overview.jpg) · [原有基础案例](examples/README.md#basic-examples)
 
-## 🎯 为什么需要它
-
-常见图片转 PPT 流程容易有两个问题：
-
-1. ❌ 把整页截图放进 PPT，然后说“可编辑”。
-2. ❌ 把所有元素都切成 PNG，导致线条、星星、卡片、边框这些简单元素无法编辑，而且图标容易被切残。
-
-Slide Alchemy 使用组件化还原策略：
-
-- ✅ **底图是图像编辑生成的，不是遮罩糊出来的。**
-- ✅ **简单几何保持可编辑。**
-- ✅ **复杂图标保持视觉稳定。**
-- ✅ **重复组件直接复用。**
-
-## 📦 安装
+## 安装与配置
 
 ### Codex
 
-让 Codex 从这个仓库安装 skill，装好后重启 Codex：
+让 Codex 安装仓库中的 Skill，再重启 Codex。
 
 ```text
-Install the Codex skill from https://github.com/CodingFeng101/slide-alchemy.git
+Install the Codex skill from https://github.com/CodingFeng101/slide-alchemy.git using the skill/slide-alchemy directory.
 ```
 
 ### Claude Code
 
-让 Claude Code 帮你安装：
-
-```text
-从 https://github.com/CodingFeng101/slide-alchemy.git 安装 skill：把其中的 skill/slide-alchemy 文件夹复制到 ~/.claude/skills/
-```
-
-也可以手动复制：
+克隆仓库，把 Skill 复制到 Claude Code 的技能目录，然后重启 Claude Code。
 
 ```bash
 git clone https://github.com/CodingFeng101/slide-alchemy.git
 cp -r slide-alchemy/skill/slide-alchemy ~/.claude/skills/
 ```
 
-装好后重启 Claude Code，让它加载这个 skill。
+### Python、图像模型和字体
 
-Claude Code 没有自带的生图工具，skill 会改用 `scripts/generate_image.py` 调用兼容 OpenAI 的 Images API。启动 Claude Code 前先设置：
-
-```bash
-export SLIDE_ALCHEMY_IMAGE_API_KEY=sk-...
-export SLIDE_ALCHEMY_IMAGE_BASE_URL=https://api.openai.com/v1   # 也可以换成兼容的中转地址
-export SLIDE_ALCHEMY_IMAGE_MODEL=gpt-image-2                     # 可选，默认就是这个
-```
-
-Windows PowerShell 用 `$env:SLIDE_ALCHEMY_IMAGE_API_KEY = "sk-..."`；想长期生效可以用 `setx`。
-
-### Python 依赖
-
-Skill 自带的脚本需要安装 Python 依赖，其中包括文字提取用的 OCR 引擎。OCR 模型随包附带，运行时不需要联网下载：
+在仓库根目录安装脚本依赖。
 
 ```bash
-pip install -r skill/slide-alchemy/requirements.txt
+python -m pip install -r skill/slide-alchemy/requirements.txt
 ```
 
-## 🚀 使用
+Skill 优先使用宿主的图像工具。宿主没有图像工具时，`scripts/generate_image.py` 使用兼容 OpenAI 的图像接口。启动宿主前设置 `SLIDE_ALCHEMY_IMAGE_API_KEY`，自定义网关或模型时再设置 `SLIDE_ALCHEMY_IMAGE_BASE_URL` 和 `SLIDE_ALCHEMY_IMAGE_MODEL`。
 
-在 Codex 中调用：
+OCR 模型随依赖提供，字体默认在本地匹配。如果缺少重建使用的字体，可运行下列命令安装已缓存的字体，再重启 PowerPoint。
 
-```text
-Use $slide-alchemy to convert these image-style PPT slides into an editable PPTX.
+```bash
+python skill/slide-alchemy/scripts/font_store.py --install-fonts
 ```
 
-在 Claude Code 中调用：
-
-```text
-/slide-alchemy 把 deck.pptx 转成可编辑的 PPTX
-```
-
-## 🧱 元素分类策略
-
-| 分类 | 适合元素 | 输出 |
-| --- | --- | --- |
-| 📐 `simple_geometry_svg_ooxml` | 线条、星星、圆形、圆环、卡片、标题条、边框、简单电路线 | PPT 可编辑几何元素 |
-| 🖼️ `icon_png` | 奖杯、花、书本、爱心托举、电脑、链条、徽章 | 透明 PNG |
-| 🧩 `complex_png_whole` | 漩涡、复杂光效、多层徽章、复杂插画 | 整体透明 PNG |
-| 📷 `photo_source_crop` | 真实照片：合影、活动现场、场地、证书文件 | 直接从原图裁切，不重新生成 |
-
-核心判断：
-
-> 如果一个元素能用几何轮廓、填充色、描边描述，就做成可编辑对象；如果它依赖纹理、光影、渐变、细节堆叠，就保留为 PNG。
-
-PNG 图标和复杂 PNG 组件必须用图像生成/编辑模型生成素材图，再从生成的素材图里裁剪。绝对不能直接从原始幻灯片截图上裁剪。
-
-语义图标默认保留为 PNG，即使它是扁平图标或线稿图标。SVG/OOXML 只用于简单版式几何，不用于把可识别图标强行拼成 PPT 原生形状。
+[字体配置与可选远程匹配](skill/slide-alchemy/references/font-distribution.md) · [故障排查](skill/slide-alchemy/references/failure-decision-tree.md)
 
 ## 📄 许可证
 
