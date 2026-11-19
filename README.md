@@ -1,7 +1,10 @@
 <h1 align="center">Slide Alchemy</h1>
 
 <p align="center">
-  <b>English</b[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
+  <b>English</b> | <a href="README.zh-CN.md">简体中文</a>
+</p>
+
+[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
 [![License](https://img.shields.io/github/license/CodingFeng101/slide-alchemy?style=flat-square)](LICENSE)
 
 Slide Alchemy is a skill for Codex and Claude Code that rebuilds image-based decks, slide screenshots, and scanned slides as editable PowerPoint files.

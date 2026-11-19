@@ -1,7 +1,10 @@
 <h1 align="center">Slide Alchemy</h1>
 
 <p align="center">
-  <a href="README.md">English</a[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
+  <a href="README.md">English</a> | <b>简体中文</b>
+</p>
+
+[![GitHub stars](https://img.shields.io/github/stars/CodingFeng101/slide-alchemy?style=flat-square)](https://github.com/CodingFeng101/slide-alchemy/stargazers)
 [![License](https://img.shields.io/github/license/CodingFeng101/slide-alchemy?style=flat-square)](LICENSE)
 
 Slide Alchemy 是一个可用于 Codex 和 Claude Code 的 Skill，把图片型 PPT、幻灯片截图和扫描页还原成可编辑的 PowerPoint。
