@@ -141,6 +141,17 @@ python skill/slide-alchemy/scripts/font_store.py --install-fonts
 
 [Font setup and optional remote matching](skill/slide-alchemy/references/font-distribution.md) · [Troubleshooting](skill/slide-alchemy/references/failure-decision-tree.md)
 
+## 🗺️ Roadmap
+
+| # | Area | Goal |
+|---|---|---|
+| 1 | Automatic scoring | Render the rebuilt deck, compare it with the source region by region, score every slide and element, and flag anything that was missed. Every later improvement is checked against this score. |
+| 2 | Crop first, generate second | Cut icons and illustrations from the source as transparent images so they match exactly. Send them to the image model only when the background is busy, the element contains text, overlaps another element, has soft edges, or can't be cut cleanly. |
+| 3 | Native tables | Rebuild tables as PowerPoint tables with editable text, rows, columns, and borders. |
+| 4 | Shape effects | Measure and rebuild gradients, shadows, transparency, and glow accurately. |
+| 5 | More shapes | Cover every PowerPoint preset shape: recognize each one in the slide image and rebuild it as an editable native shape. |
+| 6 | Animation | Group the rebuilt elements and add entrance animations, so the result looks like a hand-made deck. |
+
 ## 📄 License
 
 MIT
